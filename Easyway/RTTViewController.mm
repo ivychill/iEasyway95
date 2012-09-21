@@ -372,7 +372,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     mActivityTimer = nil;
     
     mSpeedIndex = 0;
-    mSpeedSedList = [[NSMutableArray alloc] initWithCapacity:10000];
+    mSpeedSedList = [[NSMutableArray alloc] initWithCapacity:1000];
 }
 
 - (void) initCommUnit
@@ -1532,8 +1532,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //avgSegSpeed = avgSegSpeed/4000.0*80.0;
     if (avgSegSpeed <= 80.0)
     {
-        [self DrawSpeedPolyline:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
-        [self saveSpeed:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
+//        [self DrawSpeedPolyline:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
+//        [self saveSpeed:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
     }
     
     //更新上一次获得的当前坐标
