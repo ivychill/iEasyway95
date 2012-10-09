@@ -14,6 +14,7 @@
 #import "Tss.pb.h"
 #import "RttGHistoryPathInfo.h"
 #import "Tss.pb.h"
+#import "RTTTrafficTTSPlayRecord.h"
 
 enum RTTEN_ROUTECODE {
     ROUTEUNKNOW = 0,
@@ -41,7 +42,7 @@ enum RTTEN_MANUALSETTING {
 @property NSMutableArray *planedRoadNames;
 @property int currentRoadStep;    //当前在Step中的哪一步（数组位置）
 @property int nextRoadPointIndex; //下一个路径的Point点位置
-@property TSSCityTraffic *cityTraffic4Me;
+//@property LYCityTraffic *cityTraffic4Me;
 @property RttGRouteInfo *formatedRouteInfo;
 @property BOOL isPlaned;
 @property BOOL isPlaningFailed;
@@ -63,9 +64,13 @@ enum RTTEN_MANUALSETTING {
 @property RttGRouteInfo *formatedH2ORouteInfo;
 @property RttGRouteInfo *formatedO2HRouteInfo;
 
+@property NSString *userToken;
+
+@property RTTTrafficTTSPlayRecord *trffTTSPlayRec; //用于保存每隔500M播放一次拥堵的记录，避免重复播放
 
 
-@property NSMutableArray *trafficInfoList; //RttGTrafficInfo
+@property NSMutableArray *filteredRouteTrafficList; //RttGTrafficInfo
 
+@property NSMutableArray *allRouteTrafficFromTSS ;//RTTFormatedTrafficFromTSS;
 
 @end

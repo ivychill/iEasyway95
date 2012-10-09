@@ -18,6 +18,7 @@
 
 @synthesize roadName;
 @synthesize trafficDetail;
+@synthesize timestamp;
 
 @end
 
@@ -84,7 +85,7 @@
     int iTrfSegCnt = 0;
     if (!mIsShowAllTraffic)
     {
-        iTrfSegCnt = runtimeDataset.trafficInfoList.count;
+        iTrfSegCnt = runtimeDataset.filteredRouteTrafficList.count;
     }
     else 
     {
@@ -113,18 +114,20 @@
     [[cell detailTextLabel] setNumberOfLines:2];
     [[cell detailTextLabel] setLineBreakMode:UILineBreakModeWordWrap];
     
-    int iSegCnt = 0;//runtimeDataset.trafficInfoList.count;
+    int iSegCnt = 0;//runtimeDataset.filteredRouteTrafficList.count;
     
     if (!mIsShowAllTraffic)
     {
-        iSegCnt = runtimeDataset.trafficInfoList.count;
+        iSegCnt = runtimeDataset.filteredRouteTrafficList.count;
         if (indexPath.row < iSegCnt)
         {
             
-            RttGTrafficInfo *ptrfInfo = [runtimeDataset.trafficInfoList objectAtIndex:indexPath.row];
+            RttGTrafficInfo *ptrfInfo = [runtimeDataset.filteredRouteTrafficList objectAtIndex:indexPath.row];
             if (ptrfInfo)
             {
-                NSString *cellString = ptrfInfo.roadname;
+                //NSString *cellString = ptrfInfo.roadname;
+                NSString *cellString = [[NSString alloc] initWithFormat:@"%@ (%@)", ptrfInfo.roadname, [self getTimeInterner:ptrfInfo.timeStamp]];
+
                 [[cell textLabel] setText:cellString];
                 [[cell detailTextLabel] setText:ptrfInfo.detail];
                 //[[cell detailTextLabel] sizeToFit];
@@ -133,7 +136,14 @@
     }
     else 
     {
-        NSString *mainTitle = [[trafficArray objectAtIndex:indexPath.row] roadName];
+//        NSString *mainTitle = [[NSString alloc] initWithFormat:@"%@——%@", [[trafficArray objectAtIndex:indexPath.row] roadName], [self getTimeInterner:[[trafficArray objectAtIndex:indexPath.row] timeStamp]]];
+
+        NSString *roadName = [[trafficArray objectAtIndex:indexPath.row] roadName];
+        NSString *timeInter = [self getTimeInterner:([(RoadTrafficInfo*)[trafficArray objectAtIndex:indexPath.row] timestamp])];
+
+        NSString *mainTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", roadName, timeInter];
+
+        //NSString *mainTitle = [[trafficArray objectAtIndex:indexPath.row] roadName];
         NSString *detailTxt = [[trafficArray objectAtIndex:indexPath.row] trafficDetail];
 
         [[cell textLabel] setText:mainTitle];
@@ -232,45 +242,90 @@
 {
     trafficArray = [[NSMutableArray alloc] initWithCapacity:10];
     
-    TSSCityTraffic *pTrafficInfo = self.runtimeDataset.cityTraffic4Me;
-    TSSRoadTraffic *pRdTrc;
-    int roaddCnt = pTrafficInfo.roadTrafficsList.count;
+//    LYCityTraffic *pTrafficInfo = self.runtimeDataset.cityTraffic4Me;
+//    
+//    LYRoadTraffic *pRdTrc;
+//    int roaddCnt = pTrafficInfo.roadTrafficsList.count;
+//    
+//    
+//    for (int i = 0; i < roaddCnt; i++)
+//    {
+//        pRdTrc = [pTrafficInfo.roadTrafficsList objectAtIndex:i];
+//        int segCnt= pRdTrc.segmentTrafficsList.count;
+//        
+//        if (segCnt > 0)
+//        {
+//            for (int j = 0; j < segCnt; j++)
+//            {
+//                LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
+//
+//                RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
+//                trafficInfoItem.roadName = pRdTrc.road;
+//                trafficInfoItem.trafficDetail = pSegTrf.details;
+//                
+//                [trafficArray addObject:trafficInfoItem];
+//            }
+//        }
+//        else 
+//        {
+//            RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
+//            trafficInfoItem.roadName = pRdTrc.road;
+//            if ((pRdTrc.desc == nil) || (pRdTrc.desc == @""))
+//            {
+//                trafficInfoItem.trafficDetail = @"目前无拥堵信息";
+//            }
+//            else {
+//                trafficInfoItem.trafficDetail = pRdTrc.desc;
+//            }
+//            
+//            [trafficArray addObject:trafficInfoItem];
+//        }
+//    }
+
+//    RTTFormatedTrafficFromTSS *trafficList = self.runtimeDataset.allRouteTrafficFromTSS;
+//    LYRoadTraffic *pRdTrc;
+//    int roaddCnt = pTrafficInfo.roadTrafficsList.count;
     
     
-    for (int i = 0; i < roaddCnt; i++)
+    for (RTTFormatedTrafficFromTSS *trafficList in self.runtimeDataset.allRouteTrafficFromTSS)
     {
-        pRdTrc = [pTrafficInfo.roadTrafficsList objectAtIndex:i];
-        int segCnt= pRdTrc.segmentTrafficsList.count;
         
-        if (segCnt > 0)
-        {
-            for (int j = 0; j < segCnt; j++)
-            {
-                TSSSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
-
-                RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
-                trafficInfoItem.roadName = pRdTrc.road;
-                trafficInfoItem.trafficDetail = pSegTrf.details;
-                
-                [trafficArray addObject:trafficInfoItem];
-            }
-        }
-        else 
-        {
-            RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
-            trafficInfoItem.roadName = pRdTrc.road;
-            if ((pRdTrc.desc == nil) || (pRdTrc.desc == @""))
-            {
-                trafficInfoItem.trafficDetail = @"目前无拥堵信息";
-            }
-            else {
-                trafficInfoItem.trafficDetail = pRdTrc.desc;
-            }
-            
-            [trafficArray addObject:trafficInfoItem];
-        }
+        //LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
+        
+        RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
+        trafficInfoItem.roadName = trafficList.roadName;
+        trafficInfoItem.trafficDetail = trafficList.details;
+        trafficInfoItem.timestamp = trafficList.timestamp;
+        
+        [trafficArray addObject:trafficInfoItem];
     }
+    
+//    if (trafficArray.count <= 0)
+//    {
+//        RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
+//        trafficInfoItem.roadName = @"目前无拥堵信息";
+//        
+//        [trafficArray addObject:trafficInfoItem];
+//    }
 
+
+}
+
+- (NSString*) getTimeInterner:(TimeValue64) timestamp
+{
+    NSDate *segDate = [NSDate dateWithTimeIntervalSince1970:timestamp];
+    NSTimeInterval secondsBetweenNow =  [segDate timeIntervalSinceNow];
+    __autoreleasing NSString *strTimeInterner;
+    if (secondsBetweenNow <= -3600.0) //超过一个小时
+    {
+        strTimeInterner = [[NSString alloc] initWithFormat:@"%.1f小时前", fabs((double)secondsBetweenNow/3600.0)];
+    }
+    else if (secondsBetweenNow <= 0.0)
+    {
+        strTimeInterner = [[NSString alloc] initWithFormat:@"%d分钟前", abs((int)(secondsBetweenNow/60))];
+    }
+    
+    return strTimeInterner;
 }
 
 

@@ -41,6 +41,7 @@
 @synthesize stepIndex;
 @synthesize nextPointIndex;
 @synthesize detail;
+@synthesize timeStamp;
 
 - (id) init
 {
@@ -59,6 +60,18 @@
 @implementation  RttGMapPoint
 
 @synthesize mappoint;
+
+@end
+
+
+@implementation RTTFormatedTrafficFromTSS
+
+@synthesize startCoord;
+@synthesize endCoord;
+@synthesize timestamp;
+@synthesize speedKMPH;
+@synthesize roadName;
+@synthesize details;
 
 @end
 

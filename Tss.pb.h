@@ -2,86 +2,103 @@
 
 #import "ProtocolBuffers.h"
 
-@class TSSCityTraffic;
-@class TSSCityTraffic_Builder;
-@class TSSCoordinate;
-@class TSSCoordinate_Builder;
-@class TSSDeviceReport;
-@class TSSDeviceReport_Builder;
-@class TSSLocation;
-@class TSSLocation_Builder;
-@class TSSPackage;
-@class TSSPackage_Builder;
-@class TSSRoadTraffic;
-@class TSSRoadTraffic_Builder;
-@class TSSRoute;
-@class TSSRoute_Builder;
-@class TSSSegment;
-@class TSSSegmentTraffic;
-@class TSSSegmentTraffic_Builder;
-@class TSSSegment_Builder;
-@class TSSTrafficProbe;
-@class TSSTrafficProbe_Builder;
-@class TSSTrafficSub;
-@class TSSTrafficSub_Builder;
+@class LYCityTraffic;
+@class LYCityTraffic_Builder;
+@class LYCoordinate;
+@class LYCoordinate_Builder;
+@class LYCrontab;
+@class LYCrontab_Builder;
+@class LYDeviceReport;
+@class LYDeviceReport_Builder;
+@class LYLocation;
+@class LYLocation_Builder;
+@class LYMsgOnAir;
+@class LYMsgOnAir_Builder;
+@class LYRoadTraffic;
+@class LYRoadTraffic_Builder;
+@class LYRoute;
+@class LYRoute_Builder;
+@class LYSamplePoint;
+@class LYSamplePoint_Builder;
+@class LYSegment;
+@class LYSegmentTraffic;
+@class LYSegmentTraffic_Builder;
+@class LYSegment_Builder;
+@class LYTrafficPub;
+@class LYTrafficPub_Builder;
+@class LYTrafficReport;
+@class LYTrafficReport_Builder;
+@class LYTrafficSub;
+@class LYTrafficSub_Builder;
 typedef enum {
-  TSSDirectionUnknown = 0,
-  TSSDirectionEast = 1,
-  TSSDirectionNortheast = 2,
-  TSSDirectionNorth = 3,
-  TSSDirectionNorthwest = 4,
-  TSSDirectionWest = 5,
-  TSSDirectionSouthwest = 6,
-  TSSDirectionSouth = 7,
-  TSSDirectionSoutheast = 8,
-} TSSDirection;
+  LYDirectionLyUnknown = 0,
+  LYDirectionLyEast = 1,
+  LYDirectionLyNortheast = 2,
+  LYDirectionLyNorth = 3,
+  LYDirectionLyNorthwest = 4,
+  LYDirectionLyWest = 5,
+  LYDirectionLySouthwest = 6,
+  LYDirectionLySouth = 7,
+  LYDirectionLySoutheast = 8,
+} LYDirection;
 
-BOOL TSSDirectionIsValidValue(TSSDirection value);
-
-typedef enum {
-  TSSOprTypeSubCreate = 1,
-  TSSOprTypeSubDelete = 2,
-  TSSOprTypeSubUpdate = 3,
-} TSSOprType;
-
-BOOL TSSOprTypeIsValidValue(TSSOprType value);
+BOOL LYDirectionIsValidValue(LYDirection value);
 
 typedef enum {
-  TSSPubTypePubOnce = 1,
-  TSSPubTypePubEvent = 2,
-  TSSPubTypePubTimer = 3,
-} TSSPubType;
+  LYRetCodeLySuccess = 0,
+  LYRetCodeLyVersionImcompatible = 273,
+  LYRetCodeLyVersionLow = 291,
+  LYRetCodeLyPartyError = 553,
+  LYRetCodeLyMsgTypeError = 914,
+  LYRetCodeLyTimeout = 1171,
+  LYRetCodeLyOtherError = 2457,
+} LYRetCode;
 
-BOOL TSSPubTypeIsValidValue(TSSPubType value);
-
-typedef enum {
-  TSSErrCodeVersionImcompatible = 273,
-  TSSErrCodeVersionLow = 785,
-  TSSErrCodeMsgDirError = 544,
-  TSSErrCodeMsgTypeError = 560,
-  TSSErrCodeTimeout = 848,
-  TSSErrCodeOthers = 2304,
-} TSSErrCode;
-
-BOOL TSSErrCodeIsValidValue(TSSErrCode value);
+BOOL LYRetCodeIsValidValue(LYRetCode value);
 
 typedef enum {
-  TSSMsgDirClient2Tss = 1,
-  TSSMsgDirTss2Client = 2,
-} TSSMsgDir;
+  LYPartyLyClient = 1,
+  LYPartyLyTss = 2,
+} LYParty;
 
-BOOL TSSMsgDirIsValidValue(TSSMsgDir value);
+BOOL LYPartyIsValidValue(LYParty value);
 
 typedef enum {
-  TSSMsgTypeVoid = 1,
-  TSSMsgTypeErrCode = 2,
-  TSSMsgTypeTrafficSub = 4,
-  TSSMsgTypeTrafficReport = 5,
-  TSSMsgTypeDeviceReport = 6,
-  TSSMsgTypeCityTrafficPub = 19,
-} TSSMsgType;
+  LYMsgTypeLyVoid = 1,
+  LYMsgTypeLyRetCode = 2,
+  LYMsgTypeLyTrafficSub = 4,
+  LYMsgTypeLyTrafficReport = 5,
+  LYMsgTypeLyDeviceReport = 6,
+  LYMsgTypeLyTrafficPub = 19,
+} LYMsgType;
 
-BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
+BOOL LYMsgTypeIsValidValue(LYMsgType value);
+
+typedef enum {
+  LYCrontab_LYCronTypeLyRepMinute = 1,
+  LYCrontab_LYCronTypeLyRepHour = 2,
+  LYCrontab_LYCronTypeLyRepDom = 4,
+  LYCrontab_LYCronTypeLyRepMonth = 8,
+  LYCrontab_LYCronTypeLyRepDow = 16,
+} LYCrontab_LYCronType;
+
+BOOL LYCrontab_LYCronTypeIsValidValue(LYCrontab_LYCronType value);
+
+typedef enum {
+  LYTrafficSub_LYOprTypeLySubCreate = 1,
+  LYTrafficSub_LYOprTypeLySubDelete = 2,
+  LYTrafficSub_LYOprTypeLySubUpdate = 3,
+} LYTrafficSub_LYOprType;
+
+BOOL LYTrafficSub_LYOprTypeIsValidValue(LYTrafficSub_LYOprType value);
+
+typedef enum {
+  LYTrafficSub_LYPubTypeLyPubAdhoc = 1,
+  LYTrafficSub_LYPubTypeLyPubEvent = 2,
+  LYTrafficSub_LYPubTypeLyPubCron = 3,
+} LYTrafficSub_LYPubType;
+
+BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 
 
 @interface TssRoot : NSObject {
@@ -90,7 +107,7 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 + (void) registerAllExtensions:(PBMutableExtensionRegistry*) registry;
 @end
 
-@interface TSSCoordinate : PBGeneratedMessage {
+@interface LYCoordinate : PBGeneratedMessage {
 @private
   BOOL hasLng_:1;
   BOOL hasLat_:1;
@@ -102,52 +119,52 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 @property (readonly) Float64 lng;
 @property (readonly) Float64 lat;
 
-+ (TSSCoordinate*) defaultInstance;
-- (TSSCoordinate*) defaultInstance;
++ (LYCoordinate*) defaultInstance;
+- (LYCoordinate*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSCoordinate_Builder*) builder;
-+ (TSSCoordinate_Builder*) builder;
-+ (TSSCoordinate_Builder*) builderWithPrototype:(TSSCoordinate*) prototype;
+- (LYCoordinate_Builder*) builder;
++ (LYCoordinate_Builder*) builder;
++ (LYCoordinate_Builder*) builderWithPrototype:(LYCoordinate*) prototype;
 
-+ (TSSCoordinate*) parseFromData:(NSData*) data;
-+ (TSSCoordinate*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSCoordinate*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSCoordinate*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCoordinate*) parseFromData:(NSData*) data;
++ (LYCoordinate*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCoordinate*) parseFromInputStream:(NSInputStream*) input;
++ (LYCoordinate*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSCoordinate_Builder : PBGeneratedMessage_Builder {
+@interface LYCoordinate_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSCoordinate* result;
+  LYCoordinate* result;
 }
 
-- (TSSCoordinate*) defaultInstance;
+- (LYCoordinate*) defaultInstance;
 
-- (TSSCoordinate_Builder*) clear;
-- (TSSCoordinate_Builder*) clone;
+- (LYCoordinate_Builder*) clear;
+- (LYCoordinate_Builder*) clone;
 
-- (TSSCoordinate*) build;
-- (TSSCoordinate*) buildPartial;
+- (LYCoordinate*) build;
+- (LYCoordinate*) buildPartial;
 
-- (TSSCoordinate_Builder*) mergeFrom:(TSSCoordinate*) other;
-- (TSSCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYCoordinate_Builder*) mergeFrom:(LYCoordinate*) other;
+- (LYCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasLng;
 - (Float64) lng;
-- (TSSCoordinate_Builder*) setLng:(Float64) value;
-- (TSSCoordinate_Builder*) clearLng;
+- (LYCoordinate_Builder*) setLng:(Float64) value;
+- (LYCoordinate_Builder*) clearLng;
 
 - (BOOL) hasLat;
 - (Float64) lat;
-- (TSSCoordinate_Builder*) setLat:(Float64) value;
-- (TSSCoordinate_Builder*) clearLat;
+- (LYCoordinate_Builder*) setLat:(Float64) value;
+- (LYCoordinate_Builder*) clearLat;
 @end
 
-@interface TSSLocation : PBGeneratedMessage {
+@interface LYLocation : PBGeneratedMessage {
 @private
   BOOL hasLng_:1;
   BOOL hasLat_:1;
@@ -167,287 +184,190 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 @property (readonly, retain) NSString* name;
 @property (readonly, retain) NSString* adt;
 
-+ (TSSLocation*) defaultInstance;
-- (TSSLocation*) defaultInstance;
++ (LYLocation*) defaultInstance;
+- (LYLocation*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSLocation_Builder*) builder;
-+ (TSSLocation_Builder*) builder;
-+ (TSSLocation_Builder*) builderWithPrototype:(TSSLocation*) prototype;
+- (LYLocation_Builder*) builder;
++ (LYLocation_Builder*) builder;
++ (LYLocation_Builder*) builderWithPrototype:(LYLocation*) prototype;
 
-+ (TSSLocation*) parseFromData:(NSData*) data;
-+ (TSSLocation*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSLocation*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSLocation*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYLocation*) parseFromData:(NSData*) data;
++ (LYLocation*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYLocation*) parseFromInputStream:(NSInputStream*) input;
++ (LYLocation*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSLocation_Builder : PBGeneratedMessage_Builder {
+@interface LYLocation_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSLocation* result;
+  LYLocation* result;
 }
 
-- (TSSLocation*) defaultInstance;
+- (LYLocation*) defaultInstance;
 
-- (TSSLocation_Builder*) clear;
-- (TSSLocation_Builder*) clone;
+- (LYLocation_Builder*) clear;
+- (LYLocation_Builder*) clone;
 
-- (TSSLocation*) build;
-- (TSSLocation*) buildPartial;
+- (LYLocation*) build;
+- (LYLocation*) buildPartial;
 
-- (TSSLocation_Builder*) mergeFrom:(TSSLocation*) other;
-- (TSSLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYLocation_Builder*) mergeFrom:(LYLocation*) other;
+- (LYLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasLng;
 - (Float64) lng;
-- (TSSLocation_Builder*) setLng:(Float64) value;
-- (TSSLocation_Builder*) clearLng;
+- (LYLocation_Builder*) setLng:(Float64) value;
+- (LYLocation_Builder*) clearLng;
 
 - (BOOL) hasLat;
 - (Float64) lat;
-- (TSSLocation_Builder*) setLat:(Float64) value;
-- (TSSLocation_Builder*) clearLat;
+- (LYLocation_Builder*) setLat:(Float64) value;
+- (LYLocation_Builder*) clearLat;
 
 - (BOOL) hasName;
 - (NSString*) name;
-- (TSSLocation_Builder*) setName:(NSString*) value;
-- (TSSLocation_Builder*) clearName;
+- (LYLocation_Builder*) setName:(NSString*) value;
+- (LYLocation_Builder*) clearName;
 
 - (BOOL) hasAdt;
 - (NSString*) adt;
-- (TSSLocation_Builder*) setAdt:(NSString*) value;
-- (TSSLocation_Builder*) clearAdt;
+- (LYLocation_Builder*) setAdt:(NSString*) value;
+- (LYLocation_Builder*) clearAdt;
 @end
 
-@interface TSSSegment : PBGeneratedMessage {
+@interface LYSegment : PBGeneratedMessage {
 @private
   BOOL hasRoad_:1;
   BOOL hasStart_:1;
   BOOL hasEnd_:1;
   NSString* road;
-  TSSCoordinate* start;
-  TSSCoordinate* end;
+  LYCoordinate* start;
+  LYCoordinate* end;
 }
 - (BOOL) hasStart;
 - (BOOL) hasEnd;
 - (BOOL) hasRoad;
-@property (readonly, retain) TSSCoordinate* start;
-@property (readonly, retain) TSSCoordinate* end;
+@property (readonly, retain) LYCoordinate* start;
+@property (readonly, retain) LYCoordinate* end;
 @property (readonly, retain) NSString* road;
 
-+ (TSSSegment*) defaultInstance;
-- (TSSSegment*) defaultInstance;
++ (LYSegment*) defaultInstance;
+- (LYSegment*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSSegment_Builder*) builder;
-+ (TSSSegment_Builder*) builder;
-+ (TSSSegment_Builder*) builderWithPrototype:(TSSSegment*) prototype;
+- (LYSegment_Builder*) builder;
++ (LYSegment_Builder*) builder;
++ (LYSegment_Builder*) builderWithPrototype:(LYSegment*) prototype;
 
-+ (TSSSegment*) parseFromData:(NSData*) data;
-+ (TSSSegment*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSSegment*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSSegment*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegment*) parseFromData:(NSData*) data;
++ (LYSegment*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegment*) parseFromInputStream:(NSInputStream*) input;
++ (LYSegment*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSSegment_Builder : PBGeneratedMessage_Builder {
+@interface LYSegment_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSSegment* result;
+  LYSegment* result;
 }
 
-- (TSSSegment*) defaultInstance;
+- (LYSegment*) defaultInstance;
 
-- (TSSSegment_Builder*) clear;
-- (TSSSegment_Builder*) clone;
+- (LYSegment_Builder*) clear;
+- (LYSegment_Builder*) clone;
 
-- (TSSSegment*) build;
-- (TSSSegment*) buildPartial;
+- (LYSegment*) build;
+- (LYSegment*) buildPartial;
 
-- (TSSSegment_Builder*) mergeFrom:(TSSSegment*) other;
-- (TSSSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYSegment_Builder*) mergeFrom:(LYSegment*) other;
+- (LYSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasStart;
-- (TSSCoordinate*) start;
-- (TSSSegment_Builder*) setStart:(TSSCoordinate*) value;
-- (TSSSegment_Builder*) setStartBuilder:(TSSCoordinate_Builder*) builderForValue;
-- (TSSSegment_Builder*) mergeStart:(TSSCoordinate*) value;
-- (TSSSegment_Builder*) clearStart;
+- (LYCoordinate*) start;
+- (LYSegment_Builder*) setStart:(LYCoordinate*) value;
+- (LYSegment_Builder*) setStartBuilder:(LYCoordinate_Builder*) builderForValue;
+- (LYSegment_Builder*) mergeStart:(LYCoordinate*) value;
+- (LYSegment_Builder*) clearStart;
 
 - (BOOL) hasEnd;
-- (TSSCoordinate*) end;
-- (TSSSegment_Builder*) setEnd:(TSSCoordinate*) value;
-- (TSSSegment_Builder*) setEndBuilder:(TSSCoordinate_Builder*) builderForValue;
-- (TSSSegment_Builder*) mergeEnd:(TSSCoordinate*) value;
-- (TSSSegment_Builder*) clearEnd;
+- (LYCoordinate*) end;
+- (LYSegment_Builder*) setEnd:(LYCoordinate*) value;
+- (LYSegment_Builder*) setEndBuilder:(LYCoordinate_Builder*) builderForValue;
+- (LYSegment_Builder*) mergeEnd:(LYCoordinate*) value;
+- (LYSegment_Builder*) clearEnd;
 
 - (BOOL) hasRoad;
 - (NSString*) road;
-- (TSSSegment_Builder*) setRoad:(NSString*) value;
-- (TSSSegment_Builder*) clearRoad;
+- (LYSegment_Builder*) setRoad:(NSString*) value;
+- (LYSegment_Builder*) clearRoad;
 @end
 
-@interface TSSRoute : PBGeneratedMessage {
+@interface LYRoute : PBGeneratedMessage {
 @private
   BOOL hasIdentity_:1;
-  int64_t identity;
+  int32_t identity;
   NSMutableArray* mutableSegmentsList;
 }
 - (BOOL) hasIdentity;
-@property (readonly) int64_t identity;
+@property (readonly) int32_t identity;
 - (NSArray*) segmentsList;
-- (TSSSegment*) segmentsAtIndex:(int32_t) index;
+- (LYSegment*) segmentsAtIndex:(int32_t) index;
 
-+ (TSSRoute*) defaultInstance;
-- (TSSRoute*) defaultInstance;
++ (LYRoute*) defaultInstance;
+- (LYRoute*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSRoute_Builder*) builder;
-+ (TSSRoute_Builder*) builder;
-+ (TSSRoute_Builder*) builderWithPrototype:(TSSRoute*) prototype;
+- (LYRoute_Builder*) builder;
++ (LYRoute_Builder*) builder;
++ (LYRoute_Builder*) builderWithPrototype:(LYRoute*) prototype;
 
-+ (TSSRoute*) parseFromData:(NSData*) data;
-+ (TSSRoute*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSRoute*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSRoute*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoute*) parseFromData:(NSData*) data;
++ (LYRoute*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoute*) parseFromInputStream:(NSInputStream*) input;
++ (LYRoute*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSRoute_Builder : PBGeneratedMessage_Builder {
+@interface LYRoute_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSRoute* result;
+  LYRoute* result;
 }
 
-- (TSSRoute*) defaultInstance;
+- (LYRoute*) defaultInstance;
 
-- (TSSRoute_Builder*) clear;
-- (TSSRoute_Builder*) clone;
+- (LYRoute_Builder*) clear;
+- (LYRoute_Builder*) clone;
 
-- (TSSRoute*) build;
-- (TSSRoute*) buildPartial;
+- (LYRoute*) build;
+- (LYRoute*) buildPartial;
 
-- (TSSRoute_Builder*) mergeFrom:(TSSRoute*) other;
-- (TSSRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYRoute_Builder*) mergeFrom:(LYRoute*) other;
+- (LYRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasIdentity;
-- (int64_t) identity;
-- (TSSRoute_Builder*) setIdentity:(int64_t) value;
-- (TSSRoute_Builder*) clearIdentity;
+- (int32_t) identity;
+- (LYRoute_Builder*) setIdentity:(int32_t) value;
+- (LYRoute_Builder*) clearIdentity;
 
 - (NSArray*) segmentsList;
-- (TSSSegment*) segmentsAtIndex:(int32_t) index;
-- (TSSRoute_Builder*) replaceSegmentsAtIndex:(int32_t) index with:(TSSSegment*) value;
-- (TSSRoute_Builder*) addSegments:(TSSSegment*) value;
-- (TSSRoute_Builder*) addAllSegments:(NSArray*) values;
-- (TSSRoute_Builder*) clearSegmentsList;
+- (LYSegment*) segmentsAtIndex:(int32_t) index;
+- (LYRoute_Builder*) replaceSegmentsAtIndex:(int32_t) index with:(LYSegment*) value;
+- (LYRoute_Builder*) addSegments:(LYSegment*) value;
+- (LYRoute_Builder*) addAllSegments:(NSArray*) values;
+- (LYRoute_Builder*) clearSegmentsList;
 @end
 
-@interface TSSTrafficProbe : PBGeneratedMessage {
-@private
-  BOOL hasTimestamp_:1;
-  BOOL hasSpeed_:1;
-  BOOL hasAcceleration_:1;
-  BOOL hasSegment_:1;
-  BOOL hasLocation_:1;
-  BOOL hasDirection_:1;
-  int64_t timestamp;
-  int32_t speed;
-  int32_t acceleration;
-  TSSSegment* segment;
-  TSSCoordinate* location;
-  TSSDirection direction;
-}
-- (BOOL) hasSegment;
-- (BOOL) hasLocation;
-- (BOOL) hasTimestamp;
-- (BOOL) hasDirection;
-- (BOOL) hasSpeed;
-- (BOOL) hasAcceleration;
-@property (readonly, retain) TSSSegment* segment;
-@property (readonly, retain) TSSCoordinate* location;
-@property (readonly) int64_t timestamp;
-@property (readonly) TSSDirection direction;
-@property (readonly) int32_t speed;
-@property (readonly) int32_t acceleration;
-
-+ (TSSTrafficProbe*) defaultInstance;
-- (TSSTrafficProbe*) defaultInstance;
-
-- (BOOL) isInitialized;
-- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSTrafficProbe_Builder*) builder;
-+ (TSSTrafficProbe_Builder*) builder;
-+ (TSSTrafficProbe_Builder*) builderWithPrototype:(TSSTrafficProbe*) prototype;
-
-+ (TSSTrafficProbe*) parseFromData:(NSData*) data;
-+ (TSSTrafficProbe*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSTrafficProbe*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSTrafficProbe*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSTrafficProbe*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSTrafficProbe*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-@end
-
-@interface TSSTrafficProbe_Builder : PBGeneratedMessage_Builder {
-@private
-  TSSTrafficProbe* result;
-}
-
-- (TSSTrafficProbe*) defaultInstance;
-
-- (TSSTrafficProbe_Builder*) clear;
-- (TSSTrafficProbe_Builder*) clone;
-
-- (TSSTrafficProbe*) build;
-- (TSSTrafficProbe*) buildPartial;
-
-- (TSSTrafficProbe_Builder*) mergeFrom:(TSSTrafficProbe*) other;
-- (TSSTrafficProbe_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSTrafficProbe_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-
-- (BOOL) hasSegment;
-- (TSSSegment*) segment;
-- (TSSTrafficProbe_Builder*) setSegment:(TSSSegment*) value;
-- (TSSTrafficProbe_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue;
-- (TSSTrafficProbe_Builder*) mergeSegment:(TSSSegment*) value;
-- (TSSTrafficProbe_Builder*) clearSegment;
-
-- (BOOL) hasLocation;
-- (TSSCoordinate*) location;
-- (TSSTrafficProbe_Builder*) setLocation:(TSSCoordinate*) value;
-- (TSSTrafficProbe_Builder*) setLocationBuilder:(TSSCoordinate_Builder*) builderForValue;
-- (TSSTrafficProbe_Builder*) mergeLocation:(TSSCoordinate*) value;
-- (TSSTrafficProbe_Builder*) clearLocation;
-
-- (BOOL) hasTimestamp;
-- (int64_t) timestamp;
-- (TSSTrafficProbe_Builder*) setTimestamp:(int64_t) value;
-- (TSSTrafficProbe_Builder*) clearTimestamp;
-
-- (BOOL) hasDirection;
-- (TSSDirection) direction;
-- (TSSTrafficProbe_Builder*) setDirection:(TSSDirection) value;
-- (TSSTrafficProbe_Builder*) clearDirection;
-
-- (BOOL) hasSpeed;
-- (int32_t) speed;
-- (TSSTrafficProbe_Builder*) setSpeed:(int32_t) value;
-- (TSSTrafficProbe_Builder*) clearSpeed;
-
-- (BOOL) hasAcceleration;
-- (int32_t) acceleration;
-- (TSSTrafficProbe_Builder*) setAcceleration:(int32_t) value;
-- (TSSTrafficProbe_Builder*) clearAcceleration;
-@end
-
-@interface TSSSegmentTraffic : PBGeneratedMessage {
+@interface LYSegmentTraffic : PBGeneratedMessage {
 @private
   BOOL hasTimestamp_:1;
   BOOL hasSpeed_:1;
@@ -457,83 +377,83 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
   int64_t timestamp;
   int32_t speed;
   NSString* details;
-  TSSSegment* segment;
-  TSSDirection direction;
+  LYSegment* segment;
+  LYDirection direction;
 }
 - (BOOL) hasSegment;
 - (BOOL) hasTimestamp;
 - (BOOL) hasDirection;
 - (BOOL) hasSpeed;
 - (BOOL) hasDetails;
-@property (readonly, retain) TSSSegment* segment;
+@property (readonly, retain) LYSegment* segment;
 @property (readonly) int64_t timestamp;
-@property (readonly) TSSDirection direction;
+@property (readonly) LYDirection direction;
 @property (readonly) int32_t speed;
 @property (readonly, retain) NSString* details;
 
-+ (TSSSegmentTraffic*) defaultInstance;
-- (TSSSegmentTraffic*) defaultInstance;
++ (LYSegmentTraffic*) defaultInstance;
+- (LYSegmentTraffic*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSSegmentTraffic_Builder*) builder;
-+ (TSSSegmentTraffic_Builder*) builder;
-+ (TSSSegmentTraffic_Builder*) builderWithPrototype:(TSSSegmentTraffic*) prototype;
+- (LYSegmentTraffic_Builder*) builder;
++ (LYSegmentTraffic_Builder*) builder;
++ (LYSegmentTraffic_Builder*) builderWithPrototype:(LYSegmentTraffic*) prototype;
 
-+ (TSSSegmentTraffic*) parseFromData:(NSData*) data;
-+ (TSSSegmentTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSSegmentTraffic*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSSegmentTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegmentTraffic*) parseFromData:(NSData*) data;
++ (LYSegmentTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegmentTraffic*) parseFromInputStream:(NSInputStream*) input;
++ (LYSegmentTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSSegmentTraffic_Builder : PBGeneratedMessage_Builder {
+@interface LYSegmentTraffic_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSSegmentTraffic* result;
+  LYSegmentTraffic* result;
 }
 
-- (TSSSegmentTraffic*) defaultInstance;
+- (LYSegmentTraffic*) defaultInstance;
 
-- (TSSSegmentTraffic_Builder*) clear;
-- (TSSSegmentTraffic_Builder*) clone;
+- (LYSegmentTraffic_Builder*) clear;
+- (LYSegmentTraffic_Builder*) clone;
 
-- (TSSSegmentTraffic*) build;
-- (TSSSegmentTraffic*) buildPartial;
+- (LYSegmentTraffic*) build;
+- (LYSegmentTraffic*) buildPartial;
 
-- (TSSSegmentTraffic_Builder*) mergeFrom:(TSSSegmentTraffic*) other;
-- (TSSSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYSegmentTraffic_Builder*) mergeFrom:(LYSegmentTraffic*) other;
+- (LYSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasSegment;
-- (TSSSegment*) segment;
-- (TSSSegmentTraffic_Builder*) setSegment:(TSSSegment*) value;
-- (TSSSegmentTraffic_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue;
-- (TSSSegmentTraffic_Builder*) mergeSegment:(TSSSegment*) value;
-- (TSSSegmentTraffic_Builder*) clearSegment;
+- (LYSegment*) segment;
+- (LYSegmentTraffic_Builder*) setSegment:(LYSegment*) value;
+- (LYSegmentTraffic_Builder*) setSegmentBuilder:(LYSegment_Builder*) builderForValue;
+- (LYSegmentTraffic_Builder*) mergeSegment:(LYSegment*) value;
+- (LYSegmentTraffic_Builder*) clearSegment;
 
 - (BOOL) hasTimestamp;
 - (int64_t) timestamp;
-- (TSSSegmentTraffic_Builder*) setTimestamp:(int64_t) value;
-- (TSSSegmentTraffic_Builder*) clearTimestamp;
+- (LYSegmentTraffic_Builder*) setTimestamp:(int64_t) value;
+- (LYSegmentTraffic_Builder*) clearTimestamp;
 
 - (BOOL) hasDirection;
-- (TSSDirection) direction;
-- (TSSSegmentTraffic_Builder*) setDirection:(TSSDirection) value;
-- (TSSSegmentTraffic_Builder*) clearDirection;
+- (LYDirection) direction;
+- (LYSegmentTraffic_Builder*) setDirection:(LYDirection) value;
+- (LYSegmentTraffic_Builder*) clearDirection;
 
 - (BOOL) hasSpeed;
 - (int32_t) speed;
-- (TSSSegmentTraffic_Builder*) setSpeed:(int32_t) value;
-- (TSSSegmentTraffic_Builder*) clearSpeed;
+- (LYSegmentTraffic_Builder*) setSpeed:(int32_t) value;
+- (LYSegmentTraffic_Builder*) clearSpeed;
 
 - (BOOL) hasDetails;
 - (NSString*) details;
-- (TSSSegmentTraffic_Builder*) setDetails:(NSString*) value;
-- (TSSSegmentTraffic_Builder*) clearDetails;
+- (LYSegmentTraffic_Builder*) setDetails:(NSString*) value;
+- (LYSegmentTraffic_Builder*) clearDetails;
 @end
 
-@interface TSSRoadTraffic : PBGeneratedMessage {
+@interface LYRoadTraffic : PBGeneratedMessage {
 @private
   BOOL hasTimestamp_:1;
   BOOL hasRoad_:1;
@@ -554,71 +474,71 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 @property (readonly, retain) NSString* href;
 @property (readonly, retain) NSString* desc;
 - (NSArray*) segmentTrafficsList;
-- (TSSSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index;
+- (LYSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index;
 
-+ (TSSRoadTraffic*) defaultInstance;
-- (TSSRoadTraffic*) defaultInstance;
++ (LYRoadTraffic*) defaultInstance;
+- (LYRoadTraffic*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSRoadTraffic_Builder*) builder;
-+ (TSSRoadTraffic_Builder*) builder;
-+ (TSSRoadTraffic_Builder*) builderWithPrototype:(TSSRoadTraffic*) prototype;
+- (LYRoadTraffic_Builder*) builder;
++ (LYRoadTraffic_Builder*) builder;
++ (LYRoadTraffic_Builder*) builderWithPrototype:(LYRoadTraffic*) prototype;
 
-+ (TSSRoadTraffic*) parseFromData:(NSData*) data;
-+ (TSSRoadTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSRoadTraffic*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSRoadTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoadTraffic*) parseFromData:(NSData*) data;
++ (LYRoadTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoadTraffic*) parseFromInputStream:(NSInputStream*) input;
++ (LYRoadTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSRoadTraffic_Builder : PBGeneratedMessage_Builder {
+@interface LYRoadTraffic_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSRoadTraffic* result;
+  LYRoadTraffic* result;
 }
 
-- (TSSRoadTraffic*) defaultInstance;
+- (LYRoadTraffic*) defaultInstance;
 
-- (TSSRoadTraffic_Builder*) clear;
-- (TSSRoadTraffic_Builder*) clone;
+- (LYRoadTraffic_Builder*) clear;
+- (LYRoadTraffic_Builder*) clone;
 
-- (TSSRoadTraffic*) build;
-- (TSSRoadTraffic*) buildPartial;
+- (LYRoadTraffic*) build;
+- (LYRoadTraffic*) buildPartial;
 
-- (TSSRoadTraffic_Builder*) mergeFrom:(TSSRoadTraffic*) other;
-- (TSSRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYRoadTraffic_Builder*) mergeFrom:(LYRoadTraffic*) other;
+- (LYRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasRoad;
 - (NSString*) road;
-- (TSSRoadTraffic_Builder*) setRoad:(NSString*) value;
-- (TSSRoadTraffic_Builder*) clearRoad;
+- (LYRoadTraffic_Builder*) setRoad:(NSString*) value;
+- (LYRoadTraffic_Builder*) clearRoad;
 
 - (BOOL) hasTimestamp;
 - (int64_t) timestamp;
-- (TSSRoadTraffic_Builder*) setTimestamp:(int64_t) value;
-- (TSSRoadTraffic_Builder*) clearTimestamp;
+- (LYRoadTraffic_Builder*) setTimestamp:(int64_t) value;
+- (LYRoadTraffic_Builder*) clearTimestamp;
 
 - (NSArray*) segmentTrafficsList;
-- (TSSSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index;
-- (TSSRoadTraffic_Builder*) replaceSegmentTrafficsAtIndex:(int32_t) index with:(TSSSegmentTraffic*) value;
-- (TSSRoadTraffic_Builder*) addSegmentTraffics:(TSSSegmentTraffic*) value;
-- (TSSRoadTraffic_Builder*) addAllSegmentTraffics:(NSArray*) values;
-- (TSSRoadTraffic_Builder*) clearSegmentTrafficsList;
+- (LYSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index;
+- (LYRoadTraffic_Builder*) replaceSegmentTrafficsAtIndex:(int32_t) index with:(LYSegmentTraffic*) value;
+- (LYRoadTraffic_Builder*) addSegmentTraffics:(LYSegmentTraffic*) value;
+- (LYRoadTraffic_Builder*) addAllSegmentTraffics:(NSArray*) values;
+- (LYRoadTraffic_Builder*) clearSegmentTrafficsList;
 
 - (BOOL) hasHref;
 - (NSString*) href;
-- (TSSRoadTraffic_Builder*) setHref:(NSString*) value;
-- (TSSRoadTraffic_Builder*) clearHref;
+- (LYRoadTraffic_Builder*) setHref:(NSString*) value;
+- (LYRoadTraffic_Builder*) clearHref;
 
 - (BOOL) hasDesc;
 - (NSString*) desc;
-- (TSSRoadTraffic_Builder*) setDesc:(NSString*) value;
-- (TSSRoadTraffic_Builder*) clearDesc;
+- (LYRoadTraffic_Builder*) setDesc:(NSString*) value;
+- (LYRoadTraffic_Builder*) clearDesc;
 @end
 
-@interface TSSCityTraffic : PBGeneratedMessage {
+@interface LYCityTraffic : PBGeneratedMessage {
 @private
   BOOL hasTimestamp_:1;
   BOOL hasCity_:1;
@@ -631,147 +551,310 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 @property (readonly, retain) NSString* city;
 @property (readonly) int64_t timestamp;
 - (NSArray*) roadTrafficsList;
-- (TSSRoadTraffic*) roadTrafficsAtIndex:(int32_t) index;
+- (LYRoadTraffic*) roadTrafficsAtIndex:(int32_t) index;
 
-+ (TSSCityTraffic*) defaultInstance;
-- (TSSCityTraffic*) defaultInstance;
++ (LYCityTraffic*) defaultInstance;
+- (LYCityTraffic*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSCityTraffic_Builder*) builder;
-+ (TSSCityTraffic_Builder*) builder;
-+ (TSSCityTraffic_Builder*) builderWithPrototype:(TSSCityTraffic*) prototype;
+- (LYCityTraffic_Builder*) builder;
++ (LYCityTraffic_Builder*) builder;
++ (LYCityTraffic_Builder*) builderWithPrototype:(LYCityTraffic*) prototype;
 
-+ (TSSCityTraffic*) parseFromData:(NSData*) data;
-+ (TSSCityTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSCityTraffic*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSCityTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCityTraffic*) parseFromData:(NSData*) data;
++ (LYCityTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCityTraffic*) parseFromInputStream:(NSInputStream*) input;
++ (LYCityTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSCityTraffic_Builder : PBGeneratedMessage_Builder {
+@interface LYCityTraffic_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSCityTraffic* result;
+  LYCityTraffic* result;
 }
 
-- (TSSCityTraffic*) defaultInstance;
+- (LYCityTraffic*) defaultInstance;
 
-- (TSSCityTraffic_Builder*) clear;
-- (TSSCityTraffic_Builder*) clone;
+- (LYCityTraffic_Builder*) clear;
+- (LYCityTraffic_Builder*) clone;
 
-- (TSSCityTraffic*) build;
-- (TSSCityTraffic*) buildPartial;
+- (LYCityTraffic*) build;
+- (LYCityTraffic*) buildPartial;
 
-- (TSSCityTraffic_Builder*) mergeFrom:(TSSCityTraffic*) other;
-- (TSSCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYCityTraffic_Builder*) mergeFrom:(LYCityTraffic*) other;
+- (LYCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasCity;
 - (NSString*) city;
-- (TSSCityTraffic_Builder*) setCity:(NSString*) value;
-- (TSSCityTraffic_Builder*) clearCity;
+- (LYCityTraffic_Builder*) setCity:(NSString*) value;
+- (LYCityTraffic_Builder*) clearCity;
 
 - (BOOL) hasTimestamp;
 - (int64_t) timestamp;
-- (TSSCityTraffic_Builder*) setTimestamp:(int64_t) value;
-- (TSSCityTraffic_Builder*) clearTimestamp;
+- (LYCityTraffic_Builder*) setTimestamp:(int64_t) value;
+- (LYCityTraffic_Builder*) clearTimestamp;
 
 - (NSArray*) roadTrafficsList;
-- (TSSRoadTraffic*) roadTrafficsAtIndex:(int32_t) index;
-- (TSSCityTraffic_Builder*) replaceRoadTrafficsAtIndex:(int32_t) index with:(TSSRoadTraffic*) value;
-- (TSSCityTraffic_Builder*) addRoadTraffics:(TSSRoadTraffic*) value;
-- (TSSCityTraffic_Builder*) addAllRoadTraffics:(NSArray*) values;
-- (TSSCityTraffic_Builder*) clearRoadTrafficsList;
+- (LYRoadTraffic*) roadTrafficsAtIndex:(int32_t) index;
+- (LYCityTraffic_Builder*) replaceRoadTrafficsAtIndex:(int32_t) index with:(LYRoadTraffic*) value;
+- (LYCityTraffic_Builder*) addRoadTraffics:(LYRoadTraffic*) value;
+- (LYCityTraffic_Builder*) addAllRoadTraffics:(NSArray*) values;
+- (LYCityTraffic_Builder*) clearRoadTrafficsList;
 @end
 
-@interface TSSTrafficSub : PBGeneratedMessage {
+@interface LYCrontab : PBGeneratedMessage {
+@private
+  BOOL hasMinute_:1;
+  BOOL hasHour_:1;
+  BOOL hasDom_:1;
+  BOOL hasMonth_:1;
+  BOOL hasDow_:1;
+  BOOL hasCronType_:1;
+  int64_t minute;
+  int64_t hour;
+  int32_t dom;
+  int32_t month;
+  int32_t dow;
+  LYCrontab_LYCronType cronType;
+}
+- (BOOL) hasCronType;
+- (BOOL) hasMinute;
+- (BOOL) hasHour;
+- (BOOL) hasDom;
+- (BOOL) hasMonth;
+- (BOOL) hasDow;
+@property (readonly) LYCrontab_LYCronType cronType;
+@property (readonly) int64_t minute;
+@property (readonly) int64_t hour;
+@property (readonly) int32_t dom;
+@property (readonly) int32_t month;
+@property (readonly) int32_t dow;
+
++ (LYCrontab*) defaultInstance;
+- (LYCrontab*) defaultInstance;
+
+- (BOOL) isInitialized;
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
+- (LYCrontab_Builder*) builder;
++ (LYCrontab_Builder*) builder;
++ (LYCrontab_Builder*) builderWithPrototype:(LYCrontab*) prototype;
+
++ (LYCrontab*) parseFromData:(NSData*) data;
++ (LYCrontab*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCrontab*) parseFromInputStream:(NSInputStream*) input;
++ (LYCrontab*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCrontab*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYCrontab*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+@end
+
+@interface LYCrontab_Builder : PBGeneratedMessage_Builder {
+@private
+  LYCrontab* result;
+}
+
+- (LYCrontab*) defaultInstance;
+
+- (LYCrontab_Builder*) clear;
+- (LYCrontab_Builder*) clone;
+
+- (LYCrontab*) build;
+- (LYCrontab*) buildPartial;
+
+- (LYCrontab_Builder*) mergeFrom:(LYCrontab*) other;
+- (LYCrontab_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYCrontab_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+
+- (BOOL) hasCronType;
+- (LYCrontab_LYCronType) cronType;
+- (LYCrontab_Builder*) setCronType:(LYCrontab_LYCronType) value;
+- (LYCrontab_Builder*) clearCronType;
+
+- (BOOL) hasMinute;
+- (int64_t) minute;
+- (LYCrontab_Builder*) setMinute:(int64_t) value;
+- (LYCrontab_Builder*) clearMinute;
+
+- (BOOL) hasHour;
+- (int64_t) hour;
+- (LYCrontab_Builder*) setHour:(int64_t) value;
+- (LYCrontab_Builder*) clearHour;
+
+- (BOOL) hasDom;
+- (int32_t) dom;
+- (LYCrontab_Builder*) setDom:(int32_t) value;
+- (LYCrontab_Builder*) clearDom;
+
+- (BOOL) hasMonth;
+- (int32_t) month;
+- (LYCrontab_Builder*) setMonth:(int32_t) value;
+- (LYCrontab_Builder*) clearMonth;
+
+- (BOOL) hasDow;
+- (int32_t) dow;
+- (LYCrontab_Builder*) setDow:(int32_t) value;
+- (LYCrontab_Builder*) clearDow;
+@end
+
+@interface LYTrafficSub : PBGeneratedMessage {
 @private
   BOOL hasExpires_:1;
   BOOL hasCity_:1;
   BOOL hasRoute_:1;
+  BOOL hasCronTab_:1;
   BOOL hasOprType_:1;
   BOOL hasPubType_:1;
   int32_t expires;
   NSString* city;
-  TSSRoute* route;
-  TSSOprType oprType;
-  TSSPubType pubType;
+  LYRoute* route;
+  LYCrontab* cronTab;
+  LYTrafficSub_LYOprType oprType;
+  LYTrafficSub_LYPubType pubType;
 }
 - (BOOL) hasCity;
 - (BOOL) hasRoute;
 - (BOOL) hasOprType;
 - (BOOL) hasPubType;
 - (BOOL) hasExpires;
+- (BOOL) hasCronTab;
 @property (readonly, retain) NSString* city;
-@property (readonly, retain) TSSRoute* route;
-@property (readonly) TSSOprType oprType;
-@property (readonly) TSSPubType pubType;
+@property (readonly, retain) LYRoute* route;
+@property (readonly) LYTrafficSub_LYOprType oprType;
+@property (readonly) LYTrafficSub_LYPubType pubType;
 @property (readonly) int32_t expires;
+@property (readonly, retain) LYCrontab* cronTab;
 
-+ (TSSTrafficSub*) defaultInstance;
-- (TSSTrafficSub*) defaultInstance;
++ (LYTrafficSub*) defaultInstance;
+- (LYTrafficSub*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSTrafficSub_Builder*) builder;
-+ (TSSTrafficSub_Builder*) builder;
-+ (TSSTrafficSub_Builder*) builderWithPrototype:(TSSTrafficSub*) prototype;
+- (LYTrafficSub_Builder*) builder;
++ (LYTrafficSub_Builder*) builder;
++ (LYTrafficSub_Builder*) builderWithPrototype:(LYTrafficSub*) prototype;
 
-+ (TSSTrafficSub*) parseFromData:(NSData*) data;
-+ (TSSTrafficSub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSTrafficSub*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSTrafficSub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficSub*) parseFromData:(NSData*) data;
++ (LYTrafficSub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficSub*) parseFromInputStream:(NSInputStream*) input;
++ (LYTrafficSub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSTrafficSub_Builder : PBGeneratedMessage_Builder {
+@interface LYTrafficSub_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSTrafficSub* result;
+  LYTrafficSub* result;
 }
 
-- (TSSTrafficSub*) defaultInstance;
+- (LYTrafficSub*) defaultInstance;
 
-- (TSSTrafficSub_Builder*) clear;
-- (TSSTrafficSub_Builder*) clone;
+- (LYTrafficSub_Builder*) clear;
+- (LYTrafficSub_Builder*) clone;
 
-- (TSSTrafficSub*) build;
-- (TSSTrafficSub*) buildPartial;
+- (LYTrafficSub*) build;
+- (LYTrafficSub*) buildPartial;
 
-- (TSSTrafficSub_Builder*) mergeFrom:(TSSTrafficSub*) other;
-- (TSSTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYTrafficSub_Builder*) mergeFrom:(LYTrafficSub*) other;
+- (LYTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasCity;
 - (NSString*) city;
-- (TSSTrafficSub_Builder*) setCity:(NSString*) value;
-- (TSSTrafficSub_Builder*) clearCity;
+- (LYTrafficSub_Builder*) setCity:(NSString*) value;
+- (LYTrafficSub_Builder*) clearCity;
 
 - (BOOL) hasRoute;
-- (TSSRoute*) route;
-- (TSSTrafficSub_Builder*) setRoute:(TSSRoute*) value;
-- (TSSTrafficSub_Builder*) setRouteBuilder:(TSSRoute_Builder*) builderForValue;
-- (TSSTrafficSub_Builder*) mergeRoute:(TSSRoute*) value;
-- (TSSTrafficSub_Builder*) clearRoute;
+- (LYRoute*) route;
+- (LYTrafficSub_Builder*) setRoute:(LYRoute*) value;
+- (LYTrafficSub_Builder*) setRouteBuilder:(LYRoute_Builder*) builderForValue;
+- (LYTrafficSub_Builder*) mergeRoute:(LYRoute*) value;
+- (LYTrafficSub_Builder*) clearRoute;
 
 - (BOOL) hasOprType;
-- (TSSOprType) oprType;
-- (TSSTrafficSub_Builder*) setOprType:(TSSOprType) value;
-- (TSSTrafficSub_Builder*) clearOprType;
+- (LYTrafficSub_LYOprType) oprType;
+- (LYTrafficSub_Builder*) setOprType:(LYTrafficSub_LYOprType) value;
+- (LYTrafficSub_Builder*) clearOprType;
 
 - (BOOL) hasPubType;
-- (TSSPubType) pubType;
-- (TSSTrafficSub_Builder*) setPubType:(TSSPubType) value;
-- (TSSTrafficSub_Builder*) clearPubType;
+- (LYTrafficSub_LYPubType) pubType;
+- (LYTrafficSub_Builder*) setPubType:(LYTrafficSub_LYPubType) value;
+- (LYTrafficSub_Builder*) clearPubType;
 
 - (BOOL) hasExpires;
 - (int32_t) expires;
-- (TSSTrafficSub_Builder*) setExpires:(int32_t) value;
-- (TSSTrafficSub_Builder*) clearExpires;
+- (LYTrafficSub_Builder*) setExpires:(int32_t) value;
+- (LYTrafficSub_Builder*) clearExpires;
+
+- (BOOL) hasCronTab;
+- (LYCrontab*) cronTab;
+- (LYTrafficSub_Builder*) setCronTab:(LYCrontab*) value;
+- (LYTrafficSub_Builder*) setCronTabBuilder:(LYCrontab_Builder*) builderForValue;
+- (LYTrafficSub_Builder*) mergeCronTab:(LYCrontab*) value;
+- (LYTrafficSub_Builder*) clearCronTab;
 @end
 
-@interface TSSDeviceReport : PBGeneratedMessage {
+@interface LYTrafficPub : PBGeneratedMessage {
+@private
+  BOOL hasRouteId_:1;
+  BOOL hasCityTraffic_:1;
+  int32_t routeId;
+  LYCityTraffic* cityTraffic;
+}
+- (BOOL) hasRouteId;
+- (BOOL) hasCityTraffic;
+@property (readonly) int32_t routeId;
+@property (readonly, retain) LYCityTraffic* cityTraffic;
+
++ (LYTrafficPub*) defaultInstance;
+- (LYTrafficPub*) defaultInstance;
+
+- (BOOL) isInitialized;
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
+- (LYTrafficPub_Builder*) builder;
++ (LYTrafficPub_Builder*) builder;
++ (LYTrafficPub_Builder*) builderWithPrototype:(LYTrafficPub*) prototype;
+
++ (LYTrafficPub*) parseFromData:(NSData*) data;
++ (LYTrafficPub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficPub*) parseFromInputStream:(NSInputStream*) input;
++ (LYTrafficPub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficPub*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYTrafficPub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+@end
+
+@interface LYTrafficPub_Builder : PBGeneratedMessage_Builder {
+@private
+  LYTrafficPub* result;
+}
+
+- (LYTrafficPub*) defaultInstance;
+
+- (LYTrafficPub_Builder*) clear;
+- (LYTrafficPub_Builder*) clone;
+
+- (LYTrafficPub*) build;
+- (LYTrafficPub*) buildPartial;
+
+- (LYTrafficPub_Builder*) mergeFrom:(LYTrafficPub*) other;
+- (LYTrafficPub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYTrafficPub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+
+- (BOOL) hasRouteId;
+- (int32_t) routeId;
+- (LYTrafficPub_Builder*) setRouteId:(int32_t) value;
+- (LYTrafficPub_Builder*) clearRouteId;
+
+- (BOOL) hasCityTraffic;
+- (LYCityTraffic*) cityTraffic;
+- (LYTrafficPub_Builder*) setCityTraffic:(LYCityTraffic*) value;
+- (LYTrafficPub_Builder*) setCityTrafficBuilder:(LYCityTraffic_Builder*) builderForValue;
+- (LYTrafficPub_Builder*) mergeCityTraffic:(LYCityTraffic*) value;
+- (LYTrafficPub_Builder*) clearCityTraffic;
+@end
+
+@interface LYDeviceReport : PBGeneratedMessage {
 @private
   BOOL hasDeviceId_:1;
   BOOL hasDeviceName_:1;
@@ -795,273 +878,335 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value);
 @property (readonly, retain) NSString* deviceModel;
 @property (readonly, retain) NSString* deviceOsVersion;
 
-+ (TSSDeviceReport*) defaultInstance;
-- (TSSDeviceReport*) defaultInstance;
++ (LYDeviceReport*) defaultInstance;
+- (LYDeviceReport*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSDeviceReport_Builder*) builder;
-+ (TSSDeviceReport_Builder*) builder;
-+ (TSSDeviceReport_Builder*) builderWithPrototype:(TSSDeviceReport*) prototype;
+- (LYDeviceReport_Builder*) builder;
++ (LYDeviceReport_Builder*) builder;
++ (LYDeviceReport_Builder*) builderWithPrototype:(LYDeviceReport*) prototype;
 
-+ (TSSDeviceReport*) parseFromData:(NSData*) data;
-+ (TSSDeviceReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSDeviceReport*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSDeviceReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYDeviceReport*) parseFromData:(NSData*) data;
++ (LYDeviceReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYDeviceReport*) parseFromInputStream:(NSInputStream*) input;
++ (LYDeviceReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSDeviceReport_Builder : PBGeneratedMessage_Builder {
+@interface LYDeviceReport_Builder : PBGeneratedMessage_Builder {
 @private
-  TSSDeviceReport* result;
+  LYDeviceReport* result;
 }
 
-- (TSSDeviceReport*) defaultInstance;
+- (LYDeviceReport*) defaultInstance;
 
-- (TSSDeviceReport_Builder*) clear;
-- (TSSDeviceReport_Builder*) clone;
+- (LYDeviceReport_Builder*) clear;
+- (LYDeviceReport_Builder*) clone;
 
-- (TSSDeviceReport*) build;
-- (TSSDeviceReport*) buildPartial;
+- (LYDeviceReport*) build;
+- (LYDeviceReport*) buildPartial;
 
-- (TSSDeviceReport_Builder*) mergeFrom:(TSSDeviceReport*) other;
-- (TSSDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYDeviceReport_Builder*) mergeFrom:(LYDeviceReport*) other;
+- (LYDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasDeviceId;
 - (NSString*) deviceId;
-- (TSSDeviceReport_Builder*) setDeviceId:(NSString*) value;
-- (TSSDeviceReport_Builder*) clearDeviceId;
+- (LYDeviceReport_Builder*) setDeviceId:(NSString*) value;
+- (LYDeviceReport_Builder*) clearDeviceId;
 
 - (BOOL) hasDeviceToken;
 - (NSData*) deviceToken;
-- (TSSDeviceReport_Builder*) setDeviceToken:(NSData*) value;
-- (TSSDeviceReport_Builder*) clearDeviceToken;
+- (LYDeviceReport_Builder*) setDeviceToken:(NSData*) value;
+- (LYDeviceReport_Builder*) clearDeviceToken;
 
 - (BOOL) hasDeviceName;
 - (NSString*) deviceName;
-- (TSSDeviceReport_Builder*) setDeviceName:(NSString*) value;
-- (TSSDeviceReport_Builder*) clearDeviceName;
+- (LYDeviceReport_Builder*) setDeviceName:(NSString*) value;
+- (LYDeviceReport_Builder*) clearDeviceName;
 
 - (BOOL) hasDeviceModel;
 - (NSString*) deviceModel;
-- (TSSDeviceReport_Builder*) setDeviceModel:(NSString*) value;
-- (TSSDeviceReport_Builder*) clearDeviceModel;
+- (LYDeviceReport_Builder*) setDeviceModel:(NSString*) value;
+- (LYDeviceReport_Builder*) clearDeviceModel;
 
 - (BOOL) hasDeviceOsVersion;
 - (NSString*) deviceOsVersion;
-- (TSSDeviceReport_Builder*) setDeviceOsVersion:(NSString*) value;
-- (TSSDeviceReport_Builder*) clearDeviceOsVersion;
+- (LYDeviceReport_Builder*) setDeviceOsVersion:(NSString*) value;
+- (LYDeviceReport_Builder*) clearDeviceOsVersion;
 @end
 
-@interface TSSPackage : PBExtendableMessage {
+@interface LYSamplePoint : PBGeneratedMessage {
+@private
+  BOOL hasAltitude_:1;
+  BOOL hasTimestamp_:1;
+  BOOL hasCourse_:1;
+  BOOL hasSpCoordinate_:1;
+  Float64 altitude;
+  int64_t timestamp;
+  int32_t course;
+  LYCoordinate* spCoordinate;
+}
+- (BOOL) hasSpCoordinate;
+- (BOOL) hasTimestamp;
+- (BOOL) hasAltitude;
+- (BOOL) hasCourse;
+@property (readonly, retain) LYCoordinate* spCoordinate;
+@property (readonly) int64_t timestamp;
+@property (readonly) Float64 altitude;
+@property (readonly) int32_t course;
+
++ (LYSamplePoint*) defaultInstance;
+- (LYSamplePoint*) defaultInstance;
+
+- (BOOL) isInitialized;
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
+- (LYSamplePoint_Builder*) builder;
++ (LYSamplePoint_Builder*) builder;
++ (LYSamplePoint_Builder*) builderWithPrototype:(LYSamplePoint*) prototype;
+
++ (LYSamplePoint*) parseFromData:(NSData*) data;
++ (LYSamplePoint*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSamplePoint*) parseFromInputStream:(NSInputStream*) input;
++ (LYSamplePoint*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYSamplePoint*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYSamplePoint*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+@end
+
+@interface LYSamplePoint_Builder : PBGeneratedMessage_Builder {
+@private
+  LYSamplePoint* result;
+}
+
+- (LYSamplePoint*) defaultInstance;
+
+- (LYSamplePoint_Builder*) clear;
+- (LYSamplePoint_Builder*) clone;
+
+- (LYSamplePoint*) build;
+- (LYSamplePoint*) buildPartial;
+
+- (LYSamplePoint_Builder*) mergeFrom:(LYSamplePoint*) other;
+- (LYSamplePoint_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYSamplePoint_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+
+- (BOOL) hasSpCoordinate;
+- (LYCoordinate*) spCoordinate;
+- (LYSamplePoint_Builder*) setSpCoordinate:(LYCoordinate*) value;
+- (LYSamplePoint_Builder*) setSpCoordinateBuilder:(LYCoordinate_Builder*) builderForValue;
+- (LYSamplePoint_Builder*) mergeSpCoordinate:(LYCoordinate*) value;
+- (LYSamplePoint_Builder*) clearSpCoordinate;
+
+- (BOOL) hasTimestamp;
+- (int64_t) timestamp;
+- (LYSamplePoint_Builder*) setTimestamp:(int64_t) value;
+- (LYSamplePoint_Builder*) clearTimestamp;
+
+- (BOOL) hasAltitude;
+- (Float64) altitude;
+- (LYSamplePoint_Builder*) setAltitude:(Float64) value;
+- (LYSamplePoint_Builder*) clearAltitude;
+
+- (BOOL) hasCourse;
+- (int32_t) course;
+- (LYSamplePoint_Builder*) setCourse:(int32_t) value;
+- (LYSamplePoint_Builder*) clearCourse;
+@end
+
+@interface LYTrafficReport : PBGeneratedMessage {
+@private
+  NSMutableArray* mutablePointsList;
+}
+- (NSArray*) pointsList;
+- (LYSamplePoint*) pointsAtIndex:(int32_t) index;
+
++ (LYTrafficReport*) defaultInstance;
+- (LYTrafficReport*) defaultInstance;
+
+- (BOOL) isInitialized;
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
+- (LYTrafficReport_Builder*) builder;
++ (LYTrafficReport_Builder*) builder;
++ (LYTrafficReport_Builder*) builderWithPrototype:(LYTrafficReport*) prototype;
+
++ (LYTrafficReport*) parseFromData:(NSData*) data;
++ (LYTrafficReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficReport*) parseFromInputStream:(NSInputStream*) input;
++ (LYTrafficReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYTrafficReport*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYTrafficReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+@end
+
+@interface LYTrafficReport_Builder : PBGeneratedMessage_Builder {
+@private
+  LYTrafficReport* result;
+}
+
+- (LYTrafficReport*) defaultInstance;
+
+- (LYTrafficReport_Builder*) clear;
+- (LYTrafficReport_Builder*) clone;
+
+- (LYTrafficReport*) build;
+- (LYTrafficReport*) buildPartial;
+
+- (LYTrafficReport_Builder*) mergeFrom:(LYTrafficReport*) other;
+- (LYTrafficReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYTrafficReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+
+- (NSArray*) pointsList;
+- (LYSamplePoint*) pointsAtIndex:(int32_t) index;
+- (LYTrafficReport_Builder*) replacePointsAtIndex:(int32_t) index with:(LYSamplePoint*) value;
+- (LYTrafficReport_Builder*) addPoints:(LYSamplePoint*) value;
+- (LYTrafficReport_Builder*) addAllPoints:(NSArray*) values;
+- (LYTrafficReport_Builder*) clearPointsList;
+@end
+
+@interface LYMsgOnAir : PBExtendableMessage {
 @private
   BOOL hasTimestamp_:1;
   BOOL hasVersion_:1;
   BOOL hasMsgId_:1;
-  BOOL hasExpires_:1;
-  BOOL hasTrafficProbe_:1;
-  BOOL hasCityTraffic_:1;
-  BOOL hasRoadTraffic_:1;
-  BOOL hasSegmentTraffic_:1;
-  BOOL hasTrafficSub_:1;
-  BOOL hasRoute_:1;
-  BOOL hasSegment_:1;
-  BOOL hasLocation_:1;
   BOOL hasDeviceReport_:1;
-  BOOL hasUserToken_:1;
-  BOOL hasErrCode_:1;
+  BOOL hasTrafficSub_:1;
+  BOOL hasTrafficPub_:1;
+  BOOL hasTrafficReport_:1;
+  BOOL hasFromParty_:1;
+  BOOL hasToParty_:1;
   BOOL hasMsgType_:1;
-  BOOL hasMsgDir_:1;
+  BOOL hasRetCode_:1;
   int64_t timestamp;
   int32_t version;
   int32_t msgId;
-  int32_t expires;
-  TSSTrafficProbe* trafficProbe;
-  TSSCityTraffic* cityTraffic;
-  TSSRoadTraffic* roadTraffic;
-  TSSSegmentTraffic* segmentTraffic;
-  TSSTrafficSub* trafficSub;
-  TSSRoute* route;
-  TSSSegment* segment;
-  TSSLocation* location;
-  TSSDeviceReport* deviceReport;
-  NSData* userToken;
-  TSSErrCode errCode;
-  TSSMsgType msgType;
-  TSSMsgDir msgDir;
+  LYDeviceReport* deviceReport;
+  LYTrafficSub* trafficSub;
+  LYTrafficPub* trafficPub;
+  LYTrafficReport* trafficReport;
+  LYParty fromParty;
+  LYParty toParty;
+  LYMsgType msgType;
+  LYRetCode retCode;
 }
 - (BOOL) hasVersion;
-- (BOOL) hasMsgDir;
-- (BOOL) hasMsgType;
 - (BOOL) hasMsgId;
 - (BOOL) hasTimestamp;
-- (BOOL) hasExpires;
-- (BOOL) hasUserToken;
-- (BOOL) hasErrCode;
+- (BOOL) hasFromParty;
+- (BOOL) hasToParty;
+- (BOOL) hasMsgType;
+- (BOOL) hasRetCode;
 - (BOOL) hasDeviceReport;
-- (BOOL) hasLocation;
-- (BOOL) hasSegment;
-- (BOOL) hasRoute;
 - (BOOL) hasTrafficSub;
-- (BOOL) hasSegmentTraffic;
-- (BOOL) hasRoadTraffic;
-- (BOOL) hasCityTraffic;
-- (BOOL) hasTrafficProbe;
+- (BOOL) hasTrafficPub;
+- (BOOL) hasTrafficReport;
 @property (readonly) int32_t version;
-@property (readonly) TSSMsgDir msgDir;
-@property (readonly) TSSMsgType msgType;
 @property (readonly) int32_t msgId;
 @property (readonly) int64_t timestamp;
-@property (readonly) int32_t expires;
-@property (readonly, retain) NSData* userToken;
-@property (readonly) TSSErrCode errCode;
-@property (readonly, retain) TSSDeviceReport* deviceReport;
-@property (readonly, retain) TSSLocation* location;
-@property (readonly, retain) TSSSegment* segment;
-@property (readonly, retain) TSSRoute* route;
-@property (readonly, retain) TSSTrafficSub* trafficSub;
-@property (readonly, retain) TSSSegmentTraffic* segmentTraffic;
-@property (readonly, retain) TSSRoadTraffic* roadTraffic;
-@property (readonly, retain) TSSCityTraffic* cityTraffic;
-@property (readonly, retain) TSSTrafficProbe* trafficProbe;
+@property (readonly) LYParty fromParty;
+@property (readonly) LYParty toParty;
+@property (readonly) LYMsgType msgType;
+@property (readonly) LYRetCode retCode;
+@property (readonly, retain) LYDeviceReport* deviceReport;
+@property (readonly, retain) LYTrafficSub* trafficSub;
+@property (readonly, retain) LYTrafficPub* trafficPub;
+@property (readonly, retain) LYTrafficReport* trafficReport;
 
-+ (TSSPackage*) defaultInstance;
-- (TSSPackage*) defaultInstance;
++ (LYMsgOnAir*) defaultInstance;
+- (LYMsgOnAir*) defaultInstance;
 
 - (BOOL) isInitialized;
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
-- (TSSPackage_Builder*) builder;
-+ (TSSPackage_Builder*) builder;
-+ (TSSPackage_Builder*) builderWithPrototype:(TSSPackage*) prototype;
+- (LYMsgOnAir_Builder*) builder;
++ (LYMsgOnAir_Builder*) builder;
++ (LYMsgOnAir_Builder*) builderWithPrototype:(LYMsgOnAir*) prototype;
 
-+ (TSSPackage*) parseFromData:(NSData*) data;
-+ (TSSPackage*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSPackage*) parseFromInputStream:(NSInputStream*) input;
-+ (TSSPackage*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
-+ (TSSPackage*) parseFromCodedInputStream:(PBCodedInputStream*) input;
-+ (TSSPackage*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYMsgOnAir*) parseFromData:(NSData*) data;
++ (LYMsgOnAir*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYMsgOnAir*) parseFromInputStream:(NSInputStream*) input;
++ (LYMsgOnAir*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYMsgOnAir*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYMsgOnAir*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 @end
 
-@interface TSSPackage_Builder : PBExtendableMessage_Builder {
+@interface LYMsgOnAir_Builder : PBExtendableMessage_Builder {
 @private
-  TSSPackage* result;
+  LYMsgOnAir* result;
 }
 
-- (TSSPackage*) defaultInstance;
+- (LYMsgOnAir*) defaultInstance;
 
-- (TSSPackage_Builder*) clear;
-- (TSSPackage_Builder*) clone;
+- (LYMsgOnAir_Builder*) clear;
+- (LYMsgOnAir_Builder*) clone;
 
-- (TSSPackage*) build;
-- (TSSPackage*) buildPartial;
+- (LYMsgOnAir*) build;
+- (LYMsgOnAir*) buildPartial;
 
-- (TSSPackage_Builder*) mergeFrom:(TSSPackage*) other;
-- (TSSPackage_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
-- (TSSPackage_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+- (LYMsgOnAir_Builder*) mergeFrom:(LYMsgOnAir*) other;
+- (LYMsgOnAir_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYMsgOnAir_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
 
 - (BOOL) hasVersion;
 - (int32_t) version;
-- (TSSPackage_Builder*) setVersion:(int32_t) value;
-- (TSSPackage_Builder*) clearVersion;
-
-- (BOOL) hasMsgDir;
-- (TSSMsgDir) msgDir;
-- (TSSPackage_Builder*) setMsgDir:(TSSMsgDir) value;
-- (TSSPackage_Builder*) clearMsgDir;
-
-- (BOOL) hasMsgType;
-- (TSSMsgType) msgType;
-- (TSSPackage_Builder*) setMsgType:(TSSMsgType) value;
-- (TSSPackage_Builder*) clearMsgType;
+- (LYMsgOnAir_Builder*) setVersion:(int32_t) value;
+- (LYMsgOnAir_Builder*) clearVersion;
 
 - (BOOL) hasMsgId;
 - (int32_t) msgId;
-- (TSSPackage_Builder*) setMsgId:(int32_t) value;
-- (TSSPackage_Builder*) clearMsgId;
+- (LYMsgOnAir_Builder*) setMsgId:(int32_t) value;
+- (LYMsgOnAir_Builder*) clearMsgId;
 
 - (BOOL) hasTimestamp;
 - (int64_t) timestamp;
-- (TSSPackage_Builder*) setTimestamp:(int64_t) value;
-- (TSSPackage_Builder*) clearTimestamp;
+- (LYMsgOnAir_Builder*) setTimestamp:(int64_t) value;
+- (LYMsgOnAir_Builder*) clearTimestamp;
 
-- (BOOL) hasExpires;
-- (int32_t) expires;
-- (TSSPackage_Builder*) setExpires:(int32_t) value;
-- (TSSPackage_Builder*) clearExpires;
+- (BOOL) hasFromParty;
+- (LYParty) fromParty;
+- (LYMsgOnAir_Builder*) setFromParty:(LYParty) value;
+- (LYMsgOnAir_Builder*) clearFromParty;
 
-- (BOOL) hasUserToken;
-- (NSData*) userToken;
-- (TSSPackage_Builder*) setUserToken:(NSData*) value;
-- (TSSPackage_Builder*) clearUserToken;
+- (BOOL) hasToParty;
+- (LYParty) toParty;
+- (LYMsgOnAir_Builder*) setToParty:(LYParty) value;
+- (LYMsgOnAir_Builder*) clearToParty;
 
-- (BOOL) hasErrCode;
-- (TSSErrCode) errCode;
-- (TSSPackage_Builder*) setErrCode:(TSSErrCode) value;
-- (TSSPackage_Builder*) clearErrCode;
+- (BOOL) hasMsgType;
+- (LYMsgType) msgType;
+- (LYMsgOnAir_Builder*) setMsgType:(LYMsgType) value;
+- (LYMsgOnAir_Builder*) clearMsgType;
+
+- (BOOL) hasRetCode;
+- (LYRetCode) retCode;
+- (LYMsgOnAir_Builder*) setRetCode:(LYRetCode) value;
+- (LYMsgOnAir_Builder*) clearRetCode;
 
 - (BOOL) hasDeviceReport;
-- (TSSDeviceReport*) deviceReport;
-- (TSSPackage_Builder*) setDeviceReport:(TSSDeviceReport*) value;
-- (TSSPackage_Builder*) setDeviceReportBuilder:(TSSDeviceReport_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeDeviceReport:(TSSDeviceReport*) value;
-- (TSSPackage_Builder*) clearDeviceReport;
-
-- (BOOL) hasLocation;
-- (TSSLocation*) location;
-- (TSSPackage_Builder*) setLocation:(TSSLocation*) value;
-- (TSSPackage_Builder*) setLocationBuilder:(TSSLocation_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeLocation:(TSSLocation*) value;
-- (TSSPackage_Builder*) clearLocation;
-
-- (BOOL) hasSegment;
-- (TSSSegment*) segment;
-- (TSSPackage_Builder*) setSegment:(TSSSegment*) value;
-- (TSSPackage_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeSegment:(TSSSegment*) value;
-- (TSSPackage_Builder*) clearSegment;
-
-- (BOOL) hasRoute;
-- (TSSRoute*) route;
-- (TSSPackage_Builder*) setRoute:(TSSRoute*) value;
-- (TSSPackage_Builder*) setRouteBuilder:(TSSRoute_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeRoute:(TSSRoute*) value;
-- (TSSPackage_Builder*) clearRoute;
+- (LYDeviceReport*) deviceReport;
+- (LYMsgOnAir_Builder*) setDeviceReport:(LYDeviceReport*) value;
+- (LYMsgOnAir_Builder*) setDeviceReportBuilder:(LYDeviceReport_Builder*) builderForValue;
+- (LYMsgOnAir_Builder*) mergeDeviceReport:(LYDeviceReport*) value;
+- (LYMsgOnAir_Builder*) clearDeviceReport;
 
 - (BOOL) hasTrafficSub;
-- (TSSTrafficSub*) trafficSub;
-- (TSSPackage_Builder*) setTrafficSub:(TSSTrafficSub*) value;
-- (TSSPackage_Builder*) setTrafficSubBuilder:(TSSTrafficSub_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeTrafficSub:(TSSTrafficSub*) value;
-- (TSSPackage_Builder*) clearTrafficSub;
+- (LYTrafficSub*) trafficSub;
+- (LYMsgOnAir_Builder*) setTrafficSub:(LYTrafficSub*) value;
+- (LYMsgOnAir_Builder*) setTrafficSubBuilder:(LYTrafficSub_Builder*) builderForValue;
+- (LYMsgOnAir_Builder*) mergeTrafficSub:(LYTrafficSub*) value;
+- (LYMsgOnAir_Builder*) clearTrafficSub;
 
-- (BOOL) hasSegmentTraffic;
-- (TSSSegmentTraffic*) segmentTraffic;
-- (TSSPackage_Builder*) setSegmentTraffic:(TSSSegmentTraffic*) value;
-- (TSSPackage_Builder*) setSegmentTrafficBuilder:(TSSSegmentTraffic_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeSegmentTraffic:(TSSSegmentTraffic*) value;
-- (TSSPackage_Builder*) clearSegmentTraffic;
+- (BOOL) hasTrafficPub;
+- (LYTrafficPub*) trafficPub;
+- (LYMsgOnAir_Builder*) setTrafficPub:(LYTrafficPub*) value;
+- (LYMsgOnAir_Builder*) setTrafficPubBuilder:(LYTrafficPub_Builder*) builderForValue;
+- (LYMsgOnAir_Builder*) mergeTrafficPub:(LYTrafficPub*) value;
+- (LYMsgOnAir_Builder*) clearTrafficPub;
 
-- (BOOL) hasRoadTraffic;
-- (TSSRoadTraffic*) roadTraffic;
-- (TSSPackage_Builder*) setRoadTraffic:(TSSRoadTraffic*) value;
-- (TSSPackage_Builder*) setRoadTrafficBuilder:(TSSRoadTraffic_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeRoadTraffic:(TSSRoadTraffic*) value;
-- (TSSPackage_Builder*) clearRoadTraffic;
-
-- (BOOL) hasCityTraffic;
-- (TSSCityTraffic*) cityTraffic;
-- (TSSPackage_Builder*) setCityTraffic:(TSSCityTraffic*) value;
-- (TSSPackage_Builder*) setCityTrafficBuilder:(TSSCityTraffic_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeCityTraffic:(TSSCityTraffic*) value;
-- (TSSPackage_Builder*) clearCityTraffic;
-
-- (BOOL) hasTrafficProbe;
-- (TSSTrafficProbe*) trafficProbe;
-- (TSSPackage_Builder*) setTrafficProbe:(TSSTrafficProbe*) value;
-- (TSSPackage_Builder*) setTrafficProbeBuilder:(TSSTrafficProbe_Builder*) builderForValue;
-- (TSSPackage_Builder*) mergeTrafficProbe:(TSSTrafficProbe*) value;
-- (TSSPackage_Builder*) clearTrafficProbe;
+- (BOOL) hasTrafficReport;
+- (LYTrafficReport*) trafficReport;
+- (LYMsgOnAir_Builder*) setTrafficReport:(LYTrafficReport*) value;
+- (LYMsgOnAir_Builder*) setTrafficReportBuilder:(LYTrafficReport_Builder*) builderForValue;
+- (LYMsgOnAir_Builder*) mergeTrafficReport:(LYTrafficReport*) value;
+- (LYMsgOnAir_Builder*) clearTrafficReport;
 @end
 

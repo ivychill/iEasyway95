@@ -18,6 +18,7 @@
 @class RTTTrafficBoardView;
 @class RTTModeActivityIndicatorView;
 @class RTTComm4TSS;
+@class RTTSynthesizeTTS;
 
 #import <UIKit/UIKit.h>
 #import "BMapKit.h"
@@ -27,6 +28,9 @@
 #import "RTTMapPointSettingViewController.h"
 #import "RTTToolbarView.h"
 #import "RTTVCDelegate.h"
+#import "RTTSynthesizeTTS.h"
+
+
 
 
 //为了方便异步的异常处理，下面这些百度服务动作必须同时只能进行一个，靠定时器保护
@@ -41,7 +45,7 @@ enum RTTEN_ACTIVITYTYPE {
 
 
 @interface RTTViewController : UIViewController <UITableViewDelegate, RNSwipeBarDelegate, BMKMapViewDelegate, BMKSearchDelegate, UISearchBarDelegate, RttGTSSCommunication, RttgRDVCdelegate, RTTVCDelegate>
-//<BMKMapViewDelegate, BMKSearchDelegate, RttGTSSCommunication, RttgRDVCdelegate, UISearchBarDelegate, RttGPassDataV2C, UIGestureRecognizerDelegate> 
+//<BMKMapViewDelegate, BMKSearchDelegate, RttGTSSCommunication, RttgRDVCdelegate, UISearchBarDelegate, RttGPassDataV2C, UIGestureRecognizerDelegate, IFlySynthesizerControlDelegate> 
 
 {
     //IBOutlet UIView *mMapView;
@@ -119,6 +123,14 @@ enum RTTEN_ACTIVITYTYPE {
     
     int mSpeedIndex;
     NSMutableArray *mSpeedSedList;
+    
+    RTTSynthesizeTTS *mSynTTS;
+    
+    BOOL mIsOutofRange;
+    
+    UIDevice *dev; //= [UIDevice currentDevice];
+    NSString *deviceVersion; //= dev.systemVersion;
+    NSString *deviceUuid; //= dev.uniqueIdentifier;
 }
 
 //@property (nonatomic) CLLocationCoordinate2D lastOnPlanLocation;

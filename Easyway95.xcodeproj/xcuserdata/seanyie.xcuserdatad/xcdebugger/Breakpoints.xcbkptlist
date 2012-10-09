@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371267716.888581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "866"
-         endingLineNumber = "866"
+         startingLineNumber = "917"
+         endingLineNumber = "917"
          landmarkName = "-showSettingRoutPointView:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -73,11 +73,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371267716.888581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "683"
-         endingLineNumber = "683"
+         startingLineNumber = "713"
+         endingLineNumber = "713"
          landmarkName = "-toHomeAddrReview"
          landmarkType = "5">
       </FileBreakpoint>
@@ -86,24 +86,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371374928.910705"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "4231"
-         endingLineNumber = "4231"
-         landmarkName = "-createTestPath"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "4100"
-         endingLineNumber = "4100"
+         startingLineNumber = "4606"
+         endingLineNumber = "4606"
          landmarkName = "-ConstructTSSData"
          landmarkType = "5">
       </FileBreakpoint>
@@ -112,11 +99,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371267716.888581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "701"
-         endingLineNumber = "701"
+         startingLineNumber = "731"
+         endingLineNumber = "731"
          landmarkName = "-toHomeSettingView"
          landmarkType = "5">
       </FileBreakpoint>
@@ -138,11 +125,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTAccountViewController.m"
-         timestampString = "367213452.001115"
+         timestampString = "370160645.42242"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "70"
-         endingLineNumber = "70"
+         startingLineNumber = "71"
+         endingLineNumber = "71"
          landmarkName = "-webViewDidStartLoad:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -151,11 +138,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTAccountViewController.m"
-         timestampString = "367213452.001115"
+         timestampString = "370160645.42242"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "40"
-         endingLineNumber = "40"
+         startingLineNumber = "41"
+         endingLineNumber = "41"
          landmarkName = "-viewDidLoad"
          landmarkType = "5">
       </FileBreakpoint>
@@ -164,12 +151,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371372777.314818"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "2343"
-         endingLineNumber = "2343"
-         landmarkName = "-mapView:viewForAnnotation:"
+         startingLineNumber = "2451"
+         endingLineNumber = "2451"
+         landmarkName = "-DrawTrafficPolyline:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -177,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371372777.314818"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1543"
-         endingLineNumber = "1543"
+         startingLineNumber = "1617"
+         endingLineNumber = "1617"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -190,24 +177,24 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371374928.910705"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "4298"
-         endingLineNumber = "4298"
-         landmarkName = "@implementation RTTViewController"
-         landmarkType = "3">
+         startingLineNumber = "4673"
+         endingLineNumber = "4673"
+         landmarkName = "-ConstructTSSData"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "371267716.888581"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "782"
-         endingLineNumber = "782"
+         startingLineNumber = "823"
+         endingLineNumber = "823"
          landmarkName = "-didToolbarGoHomeBTN:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -216,31 +203,44 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369888247.010874"
+         timestampString = "370248211.313488"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "2846"
-         endingLineNumber = "2846"
-         landmarkName = "-createTrafficPolylineInfo:withRttgRoadInfo:"
+         startingLineNumber = "101"
+         endingLineNumber = "101"
+         landmarkName = "GetNearLineDistance(BMKMapPoint pnt, BMKMapPoint p1, BMKMapPoint p2, BMKMapPoint *retproj)"
+         landmarkType = "7">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Easyway/RTTSynTrafficTTSOpr.m"
+         timestampString = "370258166.433913"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "74"
+         endingLineNumber = "74"
+         landmarkName = "-main"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "Easyway/RTTViewController.mm"
-         timestampString = "369499883.878269"
+         filePath = "Easyway/RTTSynTrafficTTSOpr.m"
+         timestampString = "370258166.433913"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "100"
-         endingLineNumber = "100"
-         landmarkName = "GetNearLineDistance(BMKMapPoint pnt, BMKMapPoint p1, BMKMapPoint p2, BMKMapPoint *retproj)"
-         landmarkType = "7">
+         startingLineNumber = "110"
+         endingLineNumber = "110"
+         landmarkName = "-onSynthesizerEnd:theError:"
+         landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
    <ExceptionBreakpoints>
       <ExceptionBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          scope = "0"

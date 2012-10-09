@@ -28,4 +28,6 @@
 
 - (void)didHomeAddrReset:(id)sender;
 
+- (void)gotUserLoginToken:(NSString*) token;
+
 @end

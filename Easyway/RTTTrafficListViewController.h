@@ -14,6 +14,7 @@
 
 @property (strong, nonatomic)  NSString *roadName;
 @property (strong, nonatomic) NSString *trafficDetail;
+@property TimeValue64 timestamp;
 
 @end
 

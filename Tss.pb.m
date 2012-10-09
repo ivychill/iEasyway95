@@ -19,83 +19,64 @@ static PBExtensionRegistry* extensionRegistry = nil;
 }
 @end
 
-BOOL TSSDirectionIsValidValue(TSSDirection value) {
+BOOL LYDirectionIsValidValue(LYDirection value) {
   switch (value) {
-    case TSSDirectionUnknown:
-    case TSSDirectionEast:
-    case TSSDirectionNortheast:
-    case TSSDirectionNorth:
-    case TSSDirectionNorthwest:
-    case TSSDirectionWest:
-    case TSSDirectionSouthwest:
-    case TSSDirectionSouth:
-    case TSSDirectionSoutheast:
+    case LYDirectionLyUnknown:
+    case LYDirectionLyEast:
+    case LYDirectionLyNortheast:
+    case LYDirectionLyNorth:
+    case LYDirectionLyNorthwest:
+    case LYDirectionLyWest:
+    case LYDirectionLySouthwest:
+    case LYDirectionLySouth:
+    case LYDirectionLySoutheast:
       return YES;
     default:
       return NO;
   }
 }
-BOOL TSSOprTypeIsValidValue(TSSOprType value) {
+BOOL LYRetCodeIsValidValue(LYRetCode value) {
   switch (value) {
-    case TSSOprTypeSubCreate:
-    case TSSOprTypeSubDelete:
-    case TSSOprTypeSubUpdate:
+    case LYRetCodeLySuccess:
+    case LYRetCodeLyVersionImcompatible:
+    case LYRetCodeLyVersionLow:
+    case LYRetCodeLyPartyError:
+    case LYRetCodeLyMsgTypeError:
+    case LYRetCodeLyTimeout:
+    case LYRetCodeLyOtherError:
       return YES;
     default:
       return NO;
   }
 }
-BOOL TSSPubTypeIsValidValue(TSSPubType value) {
+BOOL LYPartyIsValidValue(LYParty value) {
   switch (value) {
-    case TSSPubTypePubOnce:
-    case TSSPubTypePubEvent:
-    case TSSPubTypePubTimer:
+    case LYPartyLyClient:
+    case LYPartyLyTss:
       return YES;
     default:
       return NO;
   }
 }
-BOOL TSSErrCodeIsValidValue(TSSErrCode value) {
+BOOL LYMsgTypeIsValidValue(LYMsgType value) {
   switch (value) {
-    case TSSErrCodeVersionImcompatible:
-    case TSSErrCodeVersionLow:
-    case TSSErrCodeMsgDirError:
-    case TSSErrCodeMsgTypeError:
-    case TSSErrCodeTimeout:
-    case TSSErrCodeOthers:
+    case LYMsgTypeLyVoid:
+    case LYMsgTypeLyRetCode:
+    case LYMsgTypeLyTrafficSub:
+    case LYMsgTypeLyTrafficReport:
+    case LYMsgTypeLyDeviceReport:
+    case LYMsgTypeLyTrafficPub:
       return YES;
     default:
       return NO;
   }
 }
-BOOL TSSMsgDirIsValidValue(TSSMsgDir value) {
-  switch (value) {
-    case TSSMsgDirClient2Tss:
-    case TSSMsgDirTss2Client:
-      return YES;
-    default:
-      return NO;
-  }
-}
-BOOL TSSMsgTypeIsValidValue(TSSMsgType value) {
-  switch (value) {
-    case TSSMsgTypeVoid:
-    case TSSMsgTypeErrCode:
-    case TSSMsgTypeTrafficSub:
-    case TSSMsgTypeTrafficReport:
-    case TSSMsgTypeDeviceReport:
-    case TSSMsgTypeCityTrafficPub:
-      return YES;
-    default:
-      return NO;
-  }
-}
-@interface TSSCoordinate ()
+@interface LYCoordinate ()
 @property Float64 lng;
 @property Float64 lat;
 @end
 
-@implementation TSSCoordinate
+@implementation LYCoordinate
 
 - (BOOL) hasLng {
   return !!hasLng_;
@@ -121,17 +102,17 @@ BOOL TSSMsgTypeIsValidValue(TSSMsgType value) {
   }
   return self;
 }
-static TSSCoordinate* defaultTSSCoordinateInstance = nil;
+static LYCoordinate* defaultLYCoordinateInstance = nil;
 + (void) initialize {
-  if (self == [TSSCoordinate class]) {
-    defaultTSSCoordinateInstance = [[TSSCoordinate alloc] init];
+  if (self == [LYCoordinate class]) {
+    defaultLYCoordinateInstance = [[LYCoordinate alloc] init];
   }
 }
-+ (TSSCoordinate*) defaultInstance {
-  return defaultTSSCoordinateInstance;
++ (LYCoordinate*) defaultInstance {
+  return defaultLYCoordinateInstance;
 }
-- (TSSCoordinate*) defaultInstance {
-  return defaultTSSCoordinateInstance;
+- (LYCoordinate*) defaultInstance {
+  return defaultLYCoordinateInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasLng) {
@@ -168,40 +149,40 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSCoordinate*) parseFromData:(NSData*) data {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromData:data] build];
++ (LYCoordinate*) parseFromData:(NSData*) data {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromData:data] build];
 }
-+ (TSSCoordinate*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYCoordinate*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCoordinate*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromInputStream:input] build];
++ (LYCoordinate*) parseFromInputStream:(NSInputStream*) input {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromInputStream:input] build];
 }
-+ (TSSCoordinate*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYCoordinate*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromCodedInputStream:input] build];
++ (LYCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCoordinate*)[[[TSSCoordinate builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYCoordinate*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCoordinate*)[[[LYCoordinate builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCoordinate_Builder*) builder {
-  return [[[TSSCoordinate_Builder alloc] init] autorelease];
++ (LYCoordinate_Builder*) builder {
+  return [[[LYCoordinate_Builder alloc] init] autorelease];
 }
-+ (TSSCoordinate_Builder*) builderWithPrototype:(TSSCoordinate*) prototype {
-  return [[TSSCoordinate builder] mergeFrom:prototype];
++ (LYCoordinate_Builder*) builderWithPrototype:(LYCoordinate*) prototype {
+  return [[LYCoordinate builder] mergeFrom:prototype];
 }
-- (TSSCoordinate_Builder*) builder {
-  return [TSSCoordinate builder];
+- (LYCoordinate_Builder*) builder {
+  return [LYCoordinate builder];
 }
 @end
 
-@interface TSSCoordinate_Builder()
-@property (retain) TSSCoordinate* result;
+@interface LYCoordinate_Builder()
+@property (retain) LYCoordinate* result;
 @end
 
-@implementation TSSCoordinate_Builder
+@implementation LYCoordinate_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -209,34 +190,34 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSCoordinate alloc] init] autorelease];
+    self.result = [[[LYCoordinate alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSCoordinate_Builder*) clear {
-  self.result = [[[TSSCoordinate alloc] init] autorelease];
+- (LYCoordinate_Builder*) clear {
+  self.result = [[[LYCoordinate alloc] init] autorelease];
   return self;
 }
-- (TSSCoordinate_Builder*) clone {
-  return [TSSCoordinate builderWithPrototype:result];
+- (LYCoordinate_Builder*) clone {
+  return [LYCoordinate builderWithPrototype:result];
 }
-- (TSSCoordinate*) defaultInstance {
-  return [TSSCoordinate defaultInstance];
+- (LYCoordinate*) defaultInstance {
+  return [LYCoordinate defaultInstance];
 }
-- (TSSCoordinate*) build {
+- (LYCoordinate*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSCoordinate*) buildPartial {
-  TSSCoordinate* returnMe = [[result retain] autorelease];
+- (LYCoordinate*) buildPartial {
+  LYCoordinate* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSCoordinate_Builder*) mergeFrom:(TSSCoordinate*) other {
-  if (other == [TSSCoordinate defaultInstance]) {
+- (LYCoordinate_Builder*) mergeFrom:(LYCoordinate*) other {
+  if (other == [LYCoordinate defaultInstance]) {
     return self;
   }
   if (other.hasLng) {
@@ -248,10 +229,10 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYCoordinate_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -283,12 +264,12 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
 - (Float64) lng {
   return result.lng;
 }
-- (TSSCoordinate_Builder*) setLng:(Float64) value {
+- (LYCoordinate_Builder*) setLng:(Float64) value {
   result.hasLng = YES;
   result.lng = value;
   return self;
 }
-- (TSSCoordinate_Builder*) clearLng {
+- (LYCoordinate_Builder*) clearLng {
   result.hasLng = NO;
   result.lng = 0;
   return self;
@@ -299,26 +280,26 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
 - (Float64) lat {
   return result.lat;
 }
-- (TSSCoordinate_Builder*) setLat:(Float64) value {
+- (LYCoordinate_Builder*) setLat:(Float64) value {
   result.hasLat = YES;
   result.lat = value;
   return self;
 }
-- (TSSCoordinate_Builder*) clearLat {
+- (LYCoordinate_Builder*) clearLat {
   result.hasLat = NO;
   result.lat = 0;
   return self;
 }
 @end
 
-@interface TSSLocation ()
+@interface LYLocation ()
 @property Float64 lng;
 @property Float64 lat;
 @property (retain) NSString* name;
 @property (retain) NSString* adt;
 @end
 
-@implementation TSSLocation
+@implementation LYLocation
 
 - (BOOL) hasLng {
   return !!hasLng_;
@@ -362,17 +343,17 @@ static TSSCoordinate* defaultTSSCoordinateInstance = nil;
   }
   return self;
 }
-static TSSLocation* defaultTSSLocationInstance = nil;
+static LYLocation* defaultLYLocationInstance = nil;
 + (void) initialize {
-  if (self == [TSSLocation class]) {
-    defaultTSSLocationInstance = [[TSSLocation alloc] init];
+  if (self == [LYLocation class]) {
+    defaultLYLocationInstance = [[LYLocation alloc] init];
   }
 }
-+ (TSSLocation*) defaultInstance {
-  return defaultTSSLocationInstance;
++ (LYLocation*) defaultInstance {
+  return defaultLYLocationInstance;
 }
-- (TSSLocation*) defaultInstance {
-  return defaultTSSLocationInstance;
+- (LYLocation*) defaultInstance {
+  return defaultLYLocationInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasLng) {
@@ -421,40 +402,40 @@ static TSSLocation* defaultTSSLocationInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSLocation*) parseFromData:(NSData*) data {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromData:data] build];
++ (LYLocation*) parseFromData:(NSData*) data {
+  return (LYLocation*)[[[LYLocation builder] mergeFromData:data] build];
 }
-+ (TSSLocation*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYLocation*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYLocation*)[[[LYLocation builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSLocation*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromInputStream:input] build];
++ (LYLocation*) parseFromInputStream:(NSInputStream*) input {
+  return (LYLocation*)[[[LYLocation builder] mergeFromInputStream:input] build];
 }
-+ (TSSLocation*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYLocation*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYLocation*)[[[LYLocation builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromCodedInputStream:input] build];
++ (LYLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYLocation*)[[[LYLocation builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSLocation*)[[[TSSLocation builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYLocation*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYLocation*)[[[LYLocation builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSLocation_Builder*) builder {
-  return [[[TSSLocation_Builder alloc] init] autorelease];
++ (LYLocation_Builder*) builder {
+  return [[[LYLocation_Builder alloc] init] autorelease];
 }
-+ (TSSLocation_Builder*) builderWithPrototype:(TSSLocation*) prototype {
-  return [[TSSLocation builder] mergeFrom:prototype];
++ (LYLocation_Builder*) builderWithPrototype:(LYLocation*) prototype {
+  return [[LYLocation builder] mergeFrom:prototype];
 }
-- (TSSLocation_Builder*) builder {
-  return [TSSLocation builder];
+- (LYLocation_Builder*) builder {
+  return [LYLocation builder];
 }
 @end
 
-@interface TSSLocation_Builder()
-@property (retain) TSSLocation* result;
+@interface LYLocation_Builder()
+@property (retain) LYLocation* result;
 @end
 
-@implementation TSSLocation_Builder
+@implementation LYLocation_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -462,34 +443,34 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSLocation alloc] init] autorelease];
+    self.result = [[[LYLocation alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSLocation_Builder*) clear {
-  self.result = [[[TSSLocation alloc] init] autorelease];
+- (LYLocation_Builder*) clear {
+  self.result = [[[LYLocation alloc] init] autorelease];
   return self;
 }
-- (TSSLocation_Builder*) clone {
-  return [TSSLocation builderWithPrototype:result];
+- (LYLocation_Builder*) clone {
+  return [LYLocation builderWithPrototype:result];
 }
-- (TSSLocation*) defaultInstance {
-  return [TSSLocation defaultInstance];
+- (LYLocation*) defaultInstance {
+  return [LYLocation defaultInstance];
 }
-- (TSSLocation*) build {
+- (LYLocation*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSLocation*) buildPartial {
-  TSSLocation* returnMe = [[result retain] autorelease];
+- (LYLocation*) buildPartial {
+  LYLocation* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSLocation_Builder*) mergeFrom:(TSSLocation*) other {
-  if (other == [TSSLocation defaultInstance]) {
+- (LYLocation_Builder*) mergeFrom:(LYLocation*) other {
+  if (other == [LYLocation defaultInstance]) {
     return self;
   }
   if (other.hasLng) {
@@ -507,10 +488,10 @@ static TSSLocation* defaultTSSLocationInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYLocation_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -550,12 +531,12 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 - (Float64) lng {
   return result.lng;
 }
-- (TSSLocation_Builder*) setLng:(Float64) value {
+- (LYLocation_Builder*) setLng:(Float64) value {
   result.hasLng = YES;
   result.lng = value;
   return self;
 }
-- (TSSLocation_Builder*) clearLng {
+- (LYLocation_Builder*) clearLng {
   result.hasLng = NO;
   result.lng = 0;
   return self;
@@ -566,12 +547,12 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 - (Float64) lat {
   return result.lat;
 }
-- (TSSLocation_Builder*) setLat:(Float64) value {
+- (LYLocation_Builder*) setLat:(Float64) value {
   result.hasLat = YES;
   result.lat = value;
   return self;
 }
-- (TSSLocation_Builder*) clearLat {
+- (LYLocation_Builder*) clearLat {
   result.hasLat = NO;
   result.lat = 0;
   return self;
@@ -582,12 +563,12 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 - (NSString*) name {
   return result.name;
 }
-- (TSSLocation_Builder*) setName:(NSString*) value {
+- (LYLocation_Builder*) setName:(NSString*) value {
   result.hasName = YES;
   result.name = value;
   return self;
 }
-- (TSSLocation_Builder*) clearName {
+- (LYLocation_Builder*) clearName {
   result.hasName = NO;
   result.name = @"";
   return self;
@@ -598,25 +579,25 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 - (NSString*) adt {
   return result.adt;
 }
-- (TSSLocation_Builder*) setAdt:(NSString*) value {
+- (LYLocation_Builder*) setAdt:(NSString*) value {
   result.hasAdt = YES;
   result.adt = value;
   return self;
 }
-- (TSSLocation_Builder*) clearAdt {
+- (LYLocation_Builder*) clearAdt {
   result.hasAdt = NO;
   result.adt = @"";
   return self;
 }
 @end
 
-@interface TSSSegment ()
-@property (retain) TSSCoordinate* start;
-@property (retain) TSSCoordinate* end;
+@interface LYSegment ()
+@property (retain) LYCoordinate* start;
+@property (retain) LYCoordinate* end;
 @property (retain) NSString* road;
 @end
 
-@implementation TSSSegment
+@implementation LYSegment
 
 - (BOOL) hasStart {
   return !!hasStart_;
@@ -647,23 +628,23 @@ static TSSLocation* defaultTSSLocationInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.start = [TSSCoordinate defaultInstance];
-    self.end = [TSSCoordinate defaultInstance];
+    self.start = [LYCoordinate defaultInstance];
+    self.end = [LYCoordinate defaultInstance];
     self.road = @"";
   }
   return self;
 }
-static TSSSegment* defaultTSSSegmentInstance = nil;
+static LYSegment* defaultLYSegmentInstance = nil;
 + (void) initialize {
-  if (self == [TSSSegment class]) {
-    defaultTSSSegmentInstance = [[TSSSegment alloc] init];
+  if (self == [LYSegment class]) {
+    defaultLYSegmentInstance = [[LYSegment alloc] init];
   }
 }
-+ (TSSSegment*) defaultInstance {
-  return defaultTSSSegmentInstance;
++ (LYSegment*) defaultInstance {
+  return defaultLYSegmentInstance;
 }
-- (TSSSegment*) defaultInstance {
-  return defaultTSSSegmentInstance;
+- (LYSegment*) defaultInstance {
+  return defaultLYSegmentInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasStart) {
@@ -712,40 +693,40 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSSegment*) parseFromData:(NSData*) data {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromData:data] build];
++ (LYSegment*) parseFromData:(NSData*) data {
+  return (LYSegment*)[[[LYSegment builder] mergeFromData:data] build];
 }
-+ (TSSSegment*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYSegment*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegment*)[[[LYSegment builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegment*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromInputStream:input] build];
++ (LYSegment*) parseFromInputStream:(NSInputStream*) input {
+  return (LYSegment*)[[[LYSegment builder] mergeFromInputStream:input] build];
 }
-+ (TSSSegment*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYSegment*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegment*)[[[LYSegment builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromCodedInputStream:input] build];
++ (LYSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYSegment*)[[[LYSegment builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegment*)[[[TSSSegment builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYSegment*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegment*)[[[LYSegment builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegment_Builder*) builder {
-  return [[[TSSSegment_Builder alloc] init] autorelease];
++ (LYSegment_Builder*) builder {
+  return [[[LYSegment_Builder alloc] init] autorelease];
 }
-+ (TSSSegment_Builder*) builderWithPrototype:(TSSSegment*) prototype {
-  return [[TSSSegment builder] mergeFrom:prototype];
++ (LYSegment_Builder*) builderWithPrototype:(LYSegment*) prototype {
+  return [[LYSegment builder] mergeFrom:prototype];
 }
-- (TSSSegment_Builder*) builder {
-  return [TSSSegment builder];
+- (LYSegment_Builder*) builder {
+  return [LYSegment builder];
 }
 @end
 
-@interface TSSSegment_Builder()
-@property (retain) TSSSegment* result;
+@interface LYSegment_Builder()
+@property (retain) LYSegment* result;
 @end
 
-@implementation TSSSegment_Builder
+@implementation LYSegment_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -753,34 +734,34 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSSegment alloc] init] autorelease];
+    self.result = [[[LYSegment alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSSegment_Builder*) clear {
-  self.result = [[[TSSSegment alloc] init] autorelease];
+- (LYSegment_Builder*) clear {
+  self.result = [[[LYSegment alloc] init] autorelease];
   return self;
 }
-- (TSSSegment_Builder*) clone {
-  return [TSSSegment builderWithPrototype:result];
+- (LYSegment_Builder*) clone {
+  return [LYSegment builderWithPrototype:result];
 }
-- (TSSSegment*) defaultInstance {
-  return [TSSSegment defaultInstance];
+- (LYSegment*) defaultInstance {
+  return [LYSegment defaultInstance];
 }
-- (TSSSegment*) build {
+- (LYSegment*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSSegment*) buildPartial {
-  TSSSegment* returnMe = [[result retain] autorelease];
+- (LYSegment*) buildPartial {
+  LYSegment* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSSegment_Builder*) mergeFrom:(TSSSegment*) other {
-  if (other == [TSSSegment defaultInstance]) {
+- (LYSegment_Builder*) mergeFrom:(LYSegment*) other {
+  if (other == [LYSegment defaultInstance]) {
     return self;
   }
   if (other.hasStart) {
@@ -795,10 +776,10 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYSegment_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -814,7 +795,7 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
         break;
       }
       case 10: {
-        TSSCoordinate_Builder* subBuilder = [TSSCoordinate builder];
+        LYCoordinate_Builder* subBuilder = [LYCoordinate builder];
         if (self.hasStart) {
           [subBuilder mergeFrom:self.start];
         }
@@ -823,7 +804,7 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
         break;
       }
       case 18: {
-        TSSCoordinate_Builder* subBuilder = [TSSCoordinate builder];
+        LYCoordinate_Builder* subBuilder = [LYCoordinate builder];
         if (self.hasEnd) {
           [subBuilder mergeFrom:self.end];
         }
@@ -841,61 +822,61 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
 - (BOOL) hasStart {
   return result.hasStart;
 }
-- (TSSCoordinate*) start {
+- (LYCoordinate*) start {
   return result.start;
 }
-- (TSSSegment_Builder*) setStart:(TSSCoordinate*) value {
+- (LYSegment_Builder*) setStart:(LYCoordinate*) value {
   result.hasStart = YES;
   result.start = value;
   return self;
 }
-- (TSSSegment_Builder*) setStartBuilder:(TSSCoordinate_Builder*) builderForValue {
+- (LYSegment_Builder*) setStartBuilder:(LYCoordinate_Builder*) builderForValue {
   return [self setStart:[builderForValue build]];
 }
-- (TSSSegment_Builder*) mergeStart:(TSSCoordinate*) value {
+- (LYSegment_Builder*) mergeStart:(LYCoordinate*) value {
   if (result.hasStart &&
-      result.start != [TSSCoordinate defaultInstance]) {
+      result.start != [LYCoordinate defaultInstance]) {
     result.start =
-      [[[TSSCoordinate builderWithPrototype:result.start] mergeFrom:value] buildPartial];
+      [[[LYCoordinate builderWithPrototype:result.start] mergeFrom:value] buildPartial];
   } else {
     result.start = value;
   }
   result.hasStart = YES;
   return self;
 }
-- (TSSSegment_Builder*) clearStart {
+- (LYSegment_Builder*) clearStart {
   result.hasStart = NO;
-  result.start = [TSSCoordinate defaultInstance];
+  result.start = [LYCoordinate defaultInstance];
   return self;
 }
 - (BOOL) hasEnd {
   return result.hasEnd;
 }
-- (TSSCoordinate*) end {
+- (LYCoordinate*) end {
   return result.end;
 }
-- (TSSSegment_Builder*) setEnd:(TSSCoordinate*) value {
+- (LYSegment_Builder*) setEnd:(LYCoordinate*) value {
   result.hasEnd = YES;
   result.end = value;
   return self;
 }
-- (TSSSegment_Builder*) setEndBuilder:(TSSCoordinate_Builder*) builderForValue {
+- (LYSegment_Builder*) setEndBuilder:(LYCoordinate_Builder*) builderForValue {
   return [self setEnd:[builderForValue build]];
 }
-- (TSSSegment_Builder*) mergeEnd:(TSSCoordinate*) value {
+- (LYSegment_Builder*) mergeEnd:(LYCoordinate*) value {
   if (result.hasEnd &&
-      result.end != [TSSCoordinate defaultInstance]) {
+      result.end != [LYCoordinate defaultInstance]) {
     result.end =
-      [[[TSSCoordinate builderWithPrototype:result.end] mergeFrom:value] buildPartial];
+      [[[LYCoordinate builderWithPrototype:result.end] mergeFrom:value] buildPartial];
   } else {
     result.end = value;
   }
   result.hasEnd = YES;
   return self;
 }
-- (TSSSegment_Builder*) clearEnd {
+- (LYSegment_Builder*) clearEnd {
   result.hasEnd = NO;
-  result.end = [TSSCoordinate defaultInstance];
+  result.end = [LYCoordinate defaultInstance];
   return self;
 }
 - (BOOL) hasRoad {
@@ -904,24 +885,24 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
 - (NSString*) road {
   return result.road;
 }
-- (TSSSegment_Builder*) setRoad:(NSString*) value {
+- (LYSegment_Builder*) setRoad:(NSString*) value {
   result.hasRoad = YES;
   result.road = value;
   return self;
 }
-- (TSSSegment_Builder*) clearRoad {
+- (LYSegment_Builder*) clearRoad {
   result.hasRoad = NO;
   result.road = @"";
   return self;
 }
 @end
 
-@interface TSSRoute ()
-@property int64_t identity;
+@interface LYRoute ()
+@property int32_t identity;
 @property (retain) NSMutableArray* mutableSegmentsList;
 @end
 
-@implementation TSSRoute
+@implementation LYRoute
 
 - (BOOL) hasIdentity {
   return !!hasIdentity_;
@@ -937,26 +918,26 @@ static TSSSegment* defaultTSSSegmentInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.identity = 0L;
+    self.identity = 0;
   }
   return self;
 }
-static TSSRoute* defaultTSSRouteInstance = nil;
+static LYRoute* defaultLYRouteInstance = nil;
 + (void) initialize {
-  if (self == [TSSRoute class]) {
-    defaultTSSRouteInstance = [[TSSRoute alloc] init];
+  if (self == [LYRoute class]) {
+    defaultLYRouteInstance = [[LYRoute alloc] init];
   }
 }
-+ (TSSRoute*) defaultInstance {
-  return defaultTSSRouteInstance;
++ (LYRoute*) defaultInstance {
+  return defaultLYRouteInstance;
 }
-- (TSSRoute*) defaultInstance {
-  return defaultTSSRouteInstance;
+- (LYRoute*) defaultInstance {
+  return defaultLYRouteInstance;
 }
 - (NSArray*) segmentsList {
   return mutableSegmentsList;
 }
-- (TSSSegment*) segmentsAtIndex:(int32_t) index {
+- (LYSegment*) segmentsAtIndex:(int32_t) index {
   id value = [mutableSegmentsList objectAtIndex:index];
   return value;
 }
@@ -964,7 +945,7 @@ static TSSRoute* defaultTSSRouteInstance = nil;
   if (!self.hasIdentity) {
     return NO;
   }
-  for (TSSSegment* element in self.segmentsList) {
+  for (LYSegment* element in self.segmentsList) {
     if (!element.isInitialized) {
       return NO;
     }
@@ -973,9 +954,9 @@ static TSSRoute* defaultTSSRouteInstance = nil;
 }
 - (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
   if (self.hasIdentity) {
-    [output writeInt64:1 value:self.identity];
+    [output writeInt32:1 value:self.identity];
   }
-  for (TSSSegment* element in self.segmentsList) {
+  for (LYSegment* element in self.segmentsList) {
     [output writeMessage:2 value:element];
   }
   [self.unknownFields writeToCodedOutputStream:output];
@@ -988,49 +969,49 @@ static TSSRoute* defaultTSSRouteInstance = nil;
 
   size = 0;
   if (self.hasIdentity) {
-    size += computeInt64Size(1, self.identity);
+    size += computeInt32Size(1, self.identity);
   }
-  for (TSSSegment* element in self.segmentsList) {
+  for (LYSegment* element in self.segmentsList) {
     size += computeMessageSize(2, element);
   }
   size += self.unknownFields.serializedSize;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSRoute*) parseFromData:(NSData*) data {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromData:data] build];
++ (LYRoute*) parseFromData:(NSData*) data {
+  return (LYRoute*)[[[LYRoute builder] mergeFromData:data] build];
 }
-+ (TSSRoute*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYRoute*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoute*)[[[LYRoute builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoute*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromInputStream:input] build];
++ (LYRoute*) parseFromInputStream:(NSInputStream*) input {
+  return (LYRoute*)[[[LYRoute builder] mergeFromInputStream:input] build];
 }
-+ (TSSRoute*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYRoute*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoute*)[[[LYRoute builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromCodedInputStream:input] build];
++ (LYRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYRoute*)[[[LYRoute builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoute*)[[[TSSRoute builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYRoute*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoute*)[[[LYRoute builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoute_Builder*) builder {
-  return [[[TSSRoute_Builder alloc] init] autorelease];
++ (LYRoute_Builder*) builder {
+  return [[[LYRoute_Builder alloc] init] autorelease];
 }
-+ (TSSRoute_Builder*) builderWithPrototype:(TSSRoute*) prototype {
-  return [[TSSRoute builder] mergeFrom:prototype];
++ (LYRoute_Builder*) builderWithPrototype:(LYRoute*) prototype {
+  return [[LYRoute builder] mergeFrom:prototype];
 }
-- (TSSRoute_Builder*) builder {
-  return [TSSRoute builder];
+- (LYRoute_Builder*) builder {
+  return [LYRoute builder];
 }
 @end
 
-@interface TSSRoute_Builder()
-@property (retain) TSSRoute* result;
+@interface LYRoute_Builder()
+@property (retain) LYRoute* result;
 @end
 
-@implementation TSSRoute_Builder
+@implementation LYRoute_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -1038,34 +1019,34 @@ static TSSRoute* defaultTSSRouteInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSRoute alloc] init] autorelease];
+    self.result = [[[LYRoute alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSRoute_Builder*) clear {
-  self.result = [[[TSSRoute alloc] init] autorelease];
+- (LYRoute_Builder*) clear {
+  self.result = [[[LYRoute alloc] init] autorelease];
   return self;
 }
-- (TSSRoute_Builder*) clone {
-  return [TSSRoute builderWithPrototype:result];
+- (LYRoute_Builder*) clone {
+  return [LYRoute builderWithPrototype:result];
 }
-- (TSSRoute*) defaultInstance {
-  return [TSSRoute defaultInstance];
+- (LYRoute*) defaultInstance {
+  return [LYRoute defaultInstance];
 }
-- (TSSRoute*) build {
+- (LYRoute*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSRoute*) buildPartial {
-  TSSRoute* returnMe = [[result retain] autorelease];
+- (LYRoute*) buildPartial {
+  LYRoute* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSRoute_Builder*) mergeFrom:(TSSRoute*) other {
-  if (other == [TSSRoute defaultInstance]) {
+- (LYRoute_Builder*) mergeFrom:(LYRoute*) other {
+  if (other == [LYRoute defaultInstance]) {
     return self;
   }
   if (other.hasIdentity) {
@@ -1080,10 +1061,10 @@ static TSSRoute* defaultTSSRouteInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYRoute_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -1099,11 +1080,11 @@ static TSSRoute* defaultTSSRouteInstance = nil;
         break;
       }
       case 8: {
-        [self setIdentity:[input readInt64]];
+        [self setIdentity:[input readInt32]];
         break;
       }
       case 18: {
-        TSSSegment_Builder* subBuilder = [TSSSegment builder];
+        LYSegment_Builder* subBuilder = [LYSegment builder];
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
         [self addSegments:[subBuilder buildPartial]];
         break;
@@ -1114,42 +1095,42 @@ static TSSRoute* defaultTSSRouteInstance = nil;
 - (BOOL) hasIdentity {
   return result.hasIdentity;
 }
-- (int64_t) identity {
+- (int32_t) identity {
   return result.identity;
 }
-- (TSSRoute_Builder*) setIdentity:(int64_t) value {
+- (LYRoute_Builder*) setIdentity:(int32_t) value {
   result.hasIdentity = YES;
   result.identity = value;
   return self;
 }
-- (TSSRoute_Builder*) clearIdentity {
+- (LYRoute_Builder*) clearIdentity {
   result.hasIdentity = NO;
-  result.identity = 0L;
+  result.identity = 0;
   return self;
 }
 - (NSArray*) segmentsList {
   if (result.mutableSegmentsList == nil) { return [NSArray array]; }
   return result.mutableSegmentsList;
 }
-- (TSSSegment*) segmentsAtIndex:(int32_t) index {
+- (LYSegment*) segmentsAtIndex:(int32_t) index {
   return [result segmentsAtIndex:index];
 }
-- (TSSRoute_Builder*) replaceSegmentsAtIndex:(int32_t) index with:(TSSSegment*) value {
+- (LYRoute_Builder*) replaceSegmentsAtIndex:(int32_t) index with:(LYSegment*) value {
   [result.mutableSegmentsList replaceObjectAtIndex:index withObject:value];
   return self;
 }
-- (TSSRoute_Builder*) addAllSegments:(NSArray*) values {
+- (LYRoute_Builder*) addAllSegments:(NSArray*) values {
   if (result.mutableSegmentsList == nil) {
     result.mutableSegmentsList = [NSMutableArray array];
   }
   [result.mutableSegmentsList addObjectsFromArray:values];
   return self;
 }
-- (TSSRoute_Builder*) clearSegmentsList {
+- (LYRoute_Builder*) clearSegmentsList {
   result.mutableSegmentsList = nil;
   return self;
 }
-- (TSSRoute_Builder*) addSegments:(TSSSegment*) value {
+- (LYRoute_Builder*) addSegments:(LYSegment*) value {
   if (result.mutableSegmentsList == nil) {
     result.mutableSegmentsList = [NSMutableArray array];
   }
@@ -1158,443 +1139,15 @@ static TSSRoute* defaultTSSRouteInstance = nil;
 }
 @end
 
-@interface TSSTrafficProbe ()
-@property (retain) TSSSegment* segment;
-@property (retain) TSSCoordinate* location;
+@interface LYSegmentTraffic ()
+@property (retain) LYSegment* segment;
 @property int64_t timestamp;
-@property TSSDirection direction;
-@property int32_t speed;
-@property int32_t acceleration;
-@end
-
-@implementation TSSTrafficProbe
-
-- (BOOL) hasSegment {
-  return !!hasSegment_;
-}
-- (void) setHasSegment:(BOOL) value {
-  hasSegment_ = !!value;
-}
-@synthesize segment;
-- (BOOL) hasLocation {
-  return !!hasLocation_;
-}
-- (void) setHasLocation:(BOOL) value {
-  hasLocation_ = !!value;
-}
-@synthesize location;
-- (BOOL) hasTimestamp {
-  return !!hasTimestamp_;
-}
-- (void) setHasTimestamp:(BOOL) value {
-  hasTimestamp_ = !!value;
-}
-@synthesize timestamp;
-- (BOOL) hasDirection {
-  return !!hasDirection_;
-}
-- (void) setHasDirection:(BOOL) value {
-  hasDirection_ = !!value;
-}
-@synthesize direction;
-- (BOOL) hasSpeed {
-  return !!hasSpeed_;
-}
-- (void) setHasSpeed:(BOOL) value {
-  hasSpeed_ = !!value;
-}
-@synthesize speed;
-- (BOOL) hasAcceleration {
-  return !!hasAcceleration_;
-}
-- (void) setHasAcceleration:(BOOL) value {
-  hasAcceleration_ = !!value;
-}
-@synthesize acceleration;
-- (void) dealloc {
-  self.segment = nil;
-  self.location = nil;
-  [super dealloc];
-}
-- (id) init {
-  if ((self = [super init])) {
-    self.segment = [TSSSegment defaultInstance];
-    self.location = [TSSCoordinate defaultInstance];
-    self.timestamp = 0L;
-    self.direction = TSSDirectionUnknown;
-    self.speed = 0;
-    self.acceleration = 0;
-  }
-  return self;
-}
-static TSSTrafficProbe* defaultTSSTrafficProbeInstance = nil;
-+ (void) initialize {
-  if (self == [TSSTrafficProbe class]) {
-    defaultTSSTrafficProbeInstance = [[TSSTrafficProbe alloc] init];
-  }
-}
-+ (TSSTrafficProbe*) defaultInstance {
-  return defaultTSSTrafficProbeInstance;
-}
-- (TSSTrafficProbe*) defaultInstance {
-  return defaultTSSTrafficProbeInstance;
-}
-- (BOOL) isInitialized {
-  if (!self.hasDirection) {
-    return NO;
-  }
-  if (!self.hasSpeed) {
-    return NO;
-  }
-  if (self.hasSegment) {
-    if (!self.segment.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasLocation) {
-    if (!self.location.isInitialized) {
-      return NO;
-    }
-  }
-  return YES;
-}
-- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
-  if (self.hasSegment) {
-    [output writeMessage:1 value:self.segment];
-  }
-  if (self.hasLocation) {
-    [output writeMessage:2 value:self.location];
-  }
-  if (self.hasTimestamp) {
-    [output writeInt64:3 value:self.timestamp];
-  }
-  if (self.hasDirection) {
-    [output writeEnum:4 value:self.direction];
-  }
-  if (self.hasSpeed) {
-    [output writeInt32:5 value:self.speed];
-  }
-  if (self.hasAcceleration) {
-    [output writeInt32:6 value:self.acceleration];
-  }
-  [self.unknownFields writeToCodedOutputStream:output];
-}
-- (int32_t) serializedSize {
-  int32_t size = memoizedSerializedSize;
-  if (size != -1) {
-    return size;
-  }
-
-  size = 0;
-  if (self.hasSegment) {
-    size += computeMessageSize(1, self.segment);
-  }
-  if (self.hasLocation) {
-    size += computeMessageSize(2, self.location);
-  }
-  if (self.hasTimestamp) {
-    size += computeInt64Size(3, self.timestamp);
-  }
-  if (self.hasDirection) {
-    size += computeEnumSize(4, self.direction);
-  }
-  if (self.hasSpeed) {
-    size += computeInt32Size(5, self.speed);
-  }
-  if (self.hasAcceleration) {
-    size += computeInt32Size(6, self.acceleration);
-  }
-  size += self.unknownFields.serializedSize;
-  memoizedSerializedSize = size;
-  return size;
-}
-+ (TSSTrafficProbe*) parseFromData:(NSData*) data {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromData:data] build];
-}
-+ (TSSTrafficProbe*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
-}
-+ (TSSTrafficProbe*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromInputStream:input] build];
-}
-+ (TSSTrafficProbe*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
-}
-+ (TSSTrafficProbe*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromCodedInputStream:input] build];
-}
-+ (TSSTrafficProbe*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficProbe*)[[[TSSTrafficProbe builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
-}
-+ (TSSTrafficProbe_Builder*) builder {
-  return [[[TSSTrafficProbe_Builder alloc] init] autorelease];
-}
-+ (TSSTrafficProbe_Builder*) builderWithPrototype:(TSSTrafficProbe*) prototype {
-  return [[TSSTrafficProbe builder] mergeFrom:prototype];
-}
-- (TSSTrafficProbe_Builder*) builder {
-  return [TSSTrafficProbe builder];
-}
-@end
-
-@interface TSSTrafficProbe_Builder()
-@property (retain) TSSTrafficProbe* result;
-@end
-
-@implementation TSSTrafficProbe_Builder
-@synthesize result;
-- (void) dealloc {
-  self.result = nil;
-  [super dealloc];
-}
-- (id) init {
-  if ((self = [super init])) {
-    self.result = [[[TSSTrafficProbe alloc] init] autorelease];
-  }
-  return self;
-}
-- (PBGeneratedMessage*) internalGetResult {
-  return result;
-}
-- (TSSTrafficProbe_Builder*) clear {
-  self.result = [[[TSSTrafficProbe alloc] init] autorelease];
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clone {
-  return [TSSTrafficProbe builderWithPrototype:result];
-}
-- (TSSTrafficProbe*) defaultInstance {
-  return [TSSTrafficProbe defaultInstance];
-}
-- (TSSTrafficProbe*) build {
-  [self checkInitialized];
-  return [self buildPartial];
-}
-- (TSSTrafficProbe*) buildPartial {
-  TSSTrafficProbe* returnMe = [[result retain] autorelease];
-  self.result = nil;
-  return returnMe;
-}
-- (TSSTrafficProbe_Builder*) mergeFrom:(TSSTrafficProbe*) other {
-  if (other == [TSSTrafficProbe defaultInstance]) {
-    return self;
-  }
-  if (other.hasSegment) {
-    [self mergeSegment:other.segment];
-  }
-  if (other.hasLocation) {
-    [self mergeLocation:other.location];
-  }
-  if (other.hasTimestamp) {
-    [self setTimestamp:other.timestamp];
-  }
-  if (other.hasDirection) {
-    [self setDirection:other.direction];
-  }
-  if (other.hasSpeed) {
-    [self setSpeed:other.speed];
-  }
-  if (other.hasAcceleration) {
-    [self setAcceleration:other.acceleration];
-  }
-  [self mergeUnknownFields:other.unknownFields];
-  return self;
-}
-- (TSSTrafficProbe_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
-  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
-}
-- (TSSTrafficProbe_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
-  while (YES) {
-    int32_t tag = [input readTag];
-    switch (tag) {
-      case 0:
-        [self setUnknownFields:[unknownFields build]];
-        return self;
-      default: {
-        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
-          [self setUnknownFields:[unknownFields build]];
-          return self;
-        }
-        break;
-      }
-      case 10: {
-        TSSSegment_Builder* subBuilder = [TSSSegment builder];
-        if (self.hasSegment) {
-          [subBuilder mergeFrom:self.segment];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setSegment:[subBuilder buildPartial]];
-        break;
-      }
-      case 18: {
-        TSSCoordinate_Builder* subBuilder = [TSSCoordinate builder];
-        if (self.hasLocation) {
-          [subBuilder mergeFrom:self.location];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setLocation:[subBuilder buildPartial]];
-        break;
-      }
-      case 24: {
-        [self setTimestamp:[input readInt64]];
-        break;
-      }
-      case 32: {
-        int32_t value = [input readEnum];
-        if (TSSDirectionIsValidValue(value)) {
-          [self setDirection:value];
-        } else {
-          [unknownFields mergeVarintField:4 value:value];
-        }
-        break;
-      }
-      case 40: {
-        [self setSpeed:[input readInt32]];
-        break;
-      }
-      case 48: {
-        [self setAcceleration:[input readInt32]];
-        break;
-      }
-    }
-  }
-}
-- (BOOL) hasSegment {
-  return result.hasSegment;
-}
-- (TSSSegment*) segment {
-  return result.segment;
-}
-- (TSSTrafficProbe_Builder*) setSegment:(TSSSegment*) value {
-  result.hasSegment = YES;
-  result.segment = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue {
-  return [self setSegment:[builderForValue build]];
-}
-- (TSSTrafficProbe_Builder*) mergeSegment:(TSSSegment*) value {
-  if (result.hasSegment &&
-      result.segment != [TSSSegment defaultInstance]) {
-    result.segment =
-      [[[TSSSegment builderWithPrototype:result.segment] mergeFrom:value] buildPartial];
-  } else {
-    result.segment = value;
-  }
-  result.hasSegment = YES;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearSegment {
-  result.hasSegment = NO;
-  result.segment = [TSSSegment defaultInstance];
-  return self;
-}
-- (BOOL) hasLocation {
-  return result.hasLocation;
-}
-- (TSSCoordinate*) location {
-  return result.location;
-}
-- (TSSTrafficProbe_Builder*) setLocation:(TSSCoordinate*) value {
-  result.hasLocation = YES;
-  result.location = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) setLocationBuilder:(TSSCoordinate_Builder*) builderForValue {
-  return [self setLocation:[builderForValue build]];
-}
-- (TSSTrafficProbe_Builder*) mergeLocation:(TSSCoordinate*) value {
-  if (result.hasLocation &&
-      result.location != [TSSCoordinate defaultInstance]) {
-    result.location =
-      [[[TSSCoordinate builderWithPrototype:result.location] mergeFrom:value] buildPartial];
-  } else {
-    result.location = value;
-  }
-  result.hasLocation = YES;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearLocation {
-  result.hasLocation = NO;
-  result.location = [TSSCoordinate defaultInstance];
-  return self;
-}
-- (BOOL) hasTimestamp {
-  return result.hasTimestamp;
-}
-- (int64_t) timestamp {
-  return result.timestamp;
-}
-- (TSSTrafficProbe_Builder*) setTimestamp:(int64_t) value {
-  result.hasTimestamp = YES;
-  result.timestamp = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearTimestamp {
-  result.hasTimestamp = NO;
-  result.timestamp = 0L;
-  return self;
-}
-- (BOOL) hasDirection {
-  return result.hasDirection;
-}
-- (TSSDirection) direction {
-  return result.direction;
-}
-- (TSSTrafficProbe_Builder*) setDirection:(TSSDirection) value {
-  result.hasDirection = YES;
-  result.direction = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearDirection {
-  result.hasDirection = NO;
-  result.direction = TSSDirectionUnknown;
-  return self;
-}
-- (BOOL) hasSpeed {
-  return result.hasSpeed;
-}
-- (int32_t) speed {
-  return result.speed;
-}
-- (TSSTrafficProbe_Builder*) setSpeed:(int32_t) value {
-  result.hasSpeed = YES;
-  result.speed = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearSpeed {
-  result.hasSpeed = NO;
-  result.speed = 0;
-  return self;
-}
-- (BOOL) hasAcceleration {
-  return result.hasAcceleration;
-}
-- (int32_t) acceleration {
-  return result.acceleration;
-}
-- (TSSTrafficProbe_Builder*) setAcceleration:(int32_t) value {
-  result.hasAcceleration = YES;
-  result.acceleration = value;
-  return self;
-}
-- (TSSTrafficProbe_Builder*) clearAcceleration {
-  result.hasAcceleration = NO;
-  result.acceleration = 0;
-  return self;
-}
-@end
-
-@interface TSSSegmentTraffic ()
-@property (retain) TSSSegment* segment;
-@property int64_t timestamp;
-@property TSSDirection direction;
+@property LYDirection direction;
 @property int32_t speed;
 @property (retain) NSString* details;
 @end
 
-@implementation TSSSegmentTraffic
+@implementation LYSegmentTraffic
 
 - (BOOL) hasSegment {
   return !!hasSegment_;
@@ -1638,25 +1191,25 @@ static TSSTrafficProbe* defaultTSSTrafficProbeInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.segment = [TSSSegment defaultInstance];
+    self.segment = [LYSegment defaultInstance];
     self.timestamp = 0L;
-    self.direction = TSSDirectionUnknown;
+    self.direction = LYDirectionLyUnknown;
     self.speed = 0;
     self.details = @"";
   }
   return self;
 }
-static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
+static LYSegmentTraffic* defaultLYSegmentTrafficInstance = nil;
 + (void) initialize {
-  if (self == [TSSSegmentTraffic class]) {
-    defaultTSSSegmentTrafficInstance = [[TSSSegmentTraffic alloc] init];
+  if (self == [LYSegmentTraffic class]) {
+    defaultLYSegmentTrafficInstance = [[LYSegmentTraffic alloc] init];
   }
 }
-+ (TSSSegmentTraffic*) defaultInstance {
-  return defaultTSSSegmentTrafficInstance;
++ (LYSegmentTraffic*) defaultInstance {
+  return defaultLYSegmentTrafficInstance;
 }
-- (TSSSegmentTraffic*) defaultInstance {
-  return defaultTSSSegmentTrafficInstance;
+- (LYSegmentTraffic*) defaultInstance {
+  return defaultLYSegmentTrafficInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasSegment) {
@@ -1717,40 +1270,40 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSSegmentTraffic*) parseFromData:(NSData*) data {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromData:data] build];
++ (LYSegmentTraffic*) parseFromData:(NSData*) data {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromData:data] build];
 }
-+ (TSSSegmentTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYSegmentTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegmentTraffic*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromInputStream:input] build];
++ (LYSegmentTraffic*) parseFromInputStream:(NSInputStream*) input {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromInputStream:input] build];
 }
-+ (TSSSegmentTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYSegmentTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromCodedInputStream:input] build];
++ (LYSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSSegmentTraffic*)[[[TSSSegmentTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYSegmentTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSegmentTraffic*)[[[LYSegmentTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSSegmentTraffic_Builder*) builder {
-  return [[[TSSSegmentTraffic_Builder alloc] init] autorelease];
++ (LYSegmentTraffic_Builder*) builder {
+  return [[[LYSegmentTraffic_Builder alloc] init] autorelease];
 }
-+ (TSSSegmentTraffic_Builder*) builderWithPrototype:(TSSSegmentTraffic*) prototype {
-  return [[TSSSegmentTraffic builder] mergeFrom:prototype];
++ (LYSegmentTraffic_Builder*) builderWithPrototype:(LYSegmentTraffic*) prototype {
+  return [[LYSegmentTraffic builder] mergeFrom:prototype];
 }
-- (TSSSegmentTraffic_Builder*) builder {
-  return [TSSSegmentTraffic builder];
+- (LYSegmentTraffic_Builder*) builder {
+  return [LYSegmentTraffic builder];
 }
 @end
 
-@interface TSSSegmentTraffic_Builder()
-@property (retain) TSSSegmentTraffic* result;
+@interface LYSegmentTraffic_Builder()
+@property (retain) LYSegmentTraffic* result;
 @end
 
-@implementation TSSSegmentTraffic_Builder
+@implementation LYSegmentTraffic_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -1758,34 +1311,34 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSSegmentTraffic alloc] init] autorelease];
+    self.result = [[[LYSegmentTraffic alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSSegmentTraffic_Builder*) clear {
-  self.result = [[[TSSSegmentTraffic alloc] init] autorelease];
+- (LYSegmentTraffic_Builder*) clear {
+  self.result = [[[LYSegmentTraffic alloc] init] autorelease];
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clone {
-  return [TSSSegmentTraffic builderWithPrototype:result];
+- (LYSegmentTraffic_Builder*) clone {
+  return [LYSegmentTraffic builderWithPrototype:result];
 }
-- (TSSSegmentTraffic*) defaultInstance {
-  return [TSSSegmentTraffic defaultInstance];
+- (LYSegmentTraffic*) defaultInstance {
+  return [LYSegmentTraffic defaultInstance];
 }
-- (TSSSegmentTraffic*) build {
+- (LYSegmentTraffic*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSSegmentTraffic*) buildPartial {
-  TSSSegmentTraffic* returnMe = [[result retain] autorelease];
+- (LYSegmentTraffic*) buildPartial {
+  LYSegmentTraffic* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSSegmentTraffic_Builder*) mergeFrom:(TSSSegmentTraffic*) other {
-  if (other == [TSSSegmentTraffic defaultInstance]) {
+- (LYSegmentTraffic_Builder*) mergeFrom:(LYSegmentTraffic*) other {
+  if (other == [LYSegmentTraffic defaultInstance]) {
     return self;
   }
   if (other.hasSegment) {
@@ -1806,10 +1359,10 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYSegmentTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -1825,7 +1378,7 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
         break;
       }
       case 10: {
-        TSSSegment_Builder* subBuilder = [TSSSegment builder];
+        LYSegment_Builder* subBuilder = [LYSegment builder];
         if (self.hasSegment) {
           [subBuilder mergeFrom:self.segment];
         }
@@ -1839,7 +1392,7 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
       }
       case 32: {
         int32_t value = [input readEnum];
-        if (TSSDirectionIsValidValue(value)) {
+        if (LYDirectionIsValidValue(value)) {
           [self setDirection:value];
         } else {
           [unknownFields mergeVarintField:4 value:value];
@@ -1860,31 +1413,31 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 - (BOOL) hasSegment {
   return result.hasSegment;
 }
-- (TSSSegment*) segment {
+- (LYSegment*) segment {
   return result.segment;
 }
-- (TSSSegmentTraffic_Builder*) setSegment:(TSSSegment*) value {
+- (LYSegmentTraffic_Builder*) setSegment:(LYSegment*) value {
   result.hasSegment = YES;
   result.segment = value;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue {
+- (LYSegmentTraffic_Builder*) setSegmentBuilder:(LYSegment_Builder*) builderForValue {
   return [self setSegment:[builderForValue build]];
 }
-- (TSSSegmentTraffic_Builder*) mergeSegment:(TSSSegment*) value {
+- (LYSegmentTraffic_Builder*) mergeSegment:(LYSegment*) value {
   if (result.hasSegment &&
-      result.segment != [TSSSegment defaultInstance]) {
+      result.segment != [LYSegment defaultInstance]) {
     result.segment =
-      [[[TSSSegment builderWithPrototype:result.segment] mergeFrom:value] buildPartial];
+      [[[LYSegment builderWithPrototype:result.segment] mergeFrom:value] buildPartial];
   } else {
     result.segment = value;
   }
   result.hasSegment = YES;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clearSegment {
+- (LYSegmentTraffic_Builder*) clearSegment {
   result.hasSegment = NO;
-  result.segment = [TSSSegment defaultInstance];
+  result.segment = [LYSegment defaultInstance];
   return self;
 }
 - (BOOL) hasTimestamp {
@@ -1893,12 +1446,12 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 - (int64_t) timestamp {
   return result.timestamp;
 }
-- (TSSSegmentTraffic_Builder*) setTimestamp:(int64_t) value {
+- (LYSegmentTraffic_Builder*) setTimestamp:(int64_t) value {
   result.hasTimestamp = YES;
   result.timestamp = value;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clearTimestamp {
+- (LYSegmentTraffic_Builder*) clearTimestamp {
   result.hasTimestamp = NO;
   result.timestamp = 0L;
   return self;
@@ -1906,17 +1459,17 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 - (BOOL) hasDirection {
   return result.hasDirection;
 }
-- (TSSDirection) direction {
+- (LYDirection) direction {
   return result.direction;
 }
-- (TSSSegmentTraffic_Builder*) setDirection:(TSSDirection) value {
+- (LYSegmentTraffic_Builder*) setDirection:(LYDirection) value {
   result.hasDirection = YES;
   result.direction = value;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clearDirection {
+- (LYSegmentTraffic_Builder*) clearDirection {
   result.hasDirection = NO;
-  result.direction = TSSDirectionUnknown;
+  result.direction = LYDirectionLyUnknown;
   return self;
 }
 - (BOOL) hasSpeed {
@@ -1925,12 +1478,12 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 - (int32_t) speed {
   return result.speed;
 }
-- (TSSSegmentTraffic_Builder*) setSpeed:(int32_t) value {
+- (LYSegmentTraffic_Builder*) setSpeed:(int32_t) value {
   result.hasSpeed = YES;
   result.speed = value;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clearSpeed {
+- (LYSegmentTraffic_Builder*) clearSpeed {
   result.hasSpeed = NO;
   result.speed = 0;
   return self;
@@ -1941,19 +1494,19 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 - (NSString*) details {
   return result.details;
 }
-- (TSSSegmentTraffic_Builder*) setDetails:(NSString*) value {
+- (LYSegmentTraffic_Builder*) setDetails:(NSString*) value {
   result.hasDetails = YES;
   result.details = value;
   return self;
 }
-- (TSSSegmentTraffic_Builder*) clearDetails {
+- (LYSegmentTraffic_Builder*) clearDetails {
   result.hasDetails = NO;
   result.details = @"";
   return self;
 }
 @end
 
-@interface TSSRoadTraffic ()
+@interface LYRoadTraffic ()
 @property (retain) NSString* road;
 @property int64_t timestamp;
 @property (retain) NSMutableArray* mutableSegmentTrafficsList;
@@ -1961,7 +1514,7 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
 @property (retain) NSString* desc;
 @end
 
-@implementation TSSRoadTraffic
+@implementation LYRoadTraffic
 
 - (BOOL) hasRoad {
   return !!hasRoad_;
@@ -2008,22 +1561,22 @@ static TSSSegmentTraffic* defaultTSSSegmentTrafficInstance = nil;
   }
   return self;
 }
-static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
+static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
 + (void) initialize {
-  if (self == [TSSRoadTraffic class]) {
-    defaultTSSRoadTrafficInstance = [[TSSRoadTraffic alloc] init];
+  if (self == [LYRoadTraffic class]) {
+    defaultLYRoadTrafficInstance = [[LYRoadTraffic alloc] init];
   }
 }
-+ (TSSRoadTraffic*) defaultInstance {
-  return defaultTSSRoadTrafficInstance;
++ (LYRoadTraffic*) defaultInstance {
+  return defaultLYRoadTrafficInstance;
 }
-- (TSSRoadTraffic*) defaultInstance {
-  return defaultTSSRoadTrafficInstance;
+- (LYRoadTraffic*) defaultInstance {
+  return defaultLYRoadTrafficInstance;
 }
 - (NSArray*) segmentTrafficsList {
   return mutableSegmentTrafficsList;
 }
-- (TSSSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index {
+- (LYSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index {
   id value = [mutableSegmentTrafficsList objectAtIndex:index];
   return value;
 }
@@ -2031,7 +1584,7 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   if (!self.hasRoad) {
     return NO;
   }
-  for (TSSSegmentTraffic* element in self.segmentTrafficsList) {
+  for (LYSegmentTraffic* element in self.segmentTrafficsList) {
     if (!element.isInitialized) {
       return NO;
     }
@@ -2045,7 +1598,7 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   if (self.hasTimestamp) {
     [output writeInt64:2 value:self.timestamp];
   }
-  for (TSSSegmentTraffic* element in self.segmentTrafficsList) {
+  for (LYSegmentTraffic* element in self.segmentTrafficsList) {
     [output writeMessage:3 value:element];
   }
   if (self.hasDesc) {
@@ -2069,7 +1622,7 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   if (self.hasTimestamp) {
     size += computeInt64Size(2, self.timestamp);
   }
-  for (TSSSegmentTraffic* element in self.segmentTrafficsList) {
+  for (LYSegmentTraffic* element in self.segmentTrafficsList) {
     size += computeMessageSize(3, element);
   }
   if (self.hasDesc) {
@@ -2082,40 +1635,40 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSRoadTraffic*) parseFromData:(NSData*) data {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromData:data] build];
++ (LYRoadTraffic*) parseFromData:(NSData*) data {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromData:data] build];
 }
-+ (TSSRoadTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYRoadTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoadTraffic*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromInputStream:input] build];
++ (LYRoadTraffic*) parseFromInputStream:(NSInputStream*) input {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromInputStream:input] build];
 }
-+ (TSSRoadTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYRoadTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromCodedInputStream:input] build];
++ (LYRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSRoadTraffic*)[[[TSSRoadTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYRoadTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYRoadTraffic*)[[[LYRoadTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSRoadTraffic_Builder*) builder {
-  return [[[TSSRoadTraffic_Builder alloc] init] autorelease];
++ (LYRoadTraffic_Builder*) builder {
+  return [[[LYRoadTraffic_Builder alloc] init] autorelease];
 }
-+ (TSSRoadTraffic_Builder*) builderWithPrototype:(TSSRoadTraffic*) prototype {
-  return [[TSSRoadTraffic builder] mergeFrom:prototype];
++ (LYRoadTraffic_Builder*) builderWithPrototype:(LYRoadTraffic*) prototype {
+  return [[LYRoadTraffic builder] mergeFrom:prototype];
 }
-- (TSSRoadTraffic_Builder*) builder {
-  return [TSSRoadTraffic builder];
+- (LYRoadTraffic_Builder*) builder {
+  return [LYRoadTraffic builder];
 }
 @end
 
-@interface TSSRoadTraffic_Builder()
-@property (retain) TSSRoadTraffic* result;
+@interface LYRoadTraffic_Builder()
+@property (retain) LYRoadTraffic* result;
 @end
 
-@implementation TSSRoadTraffic_Builder
+@implementation LYRoadTraffic_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -2123,34 +1676,34 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSRoadTraffic alloc] init] autorelease];
+    self.result = [[[LYRoadTraffic alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSRoadTraffic_Builder*) clear {
-  self.result = [[[TSSRoadTraffic alloc] init] autorelease];
+- (LYRoadTraffic_Builder*) clear {
+  self.result = [[[LYRoadTraffic alloc] init] autorelease];
   return self;
 }
-- (TSSRoadTraffic_Builder*) clone {
-  return [TSSRoadTraffic builderWithPrototype:result];
+- (LYRoadTraffic_Builder*) clone {
+  return [LYRoadTraffic builderWithPrototype:result];
 }
-- (TSSRoadTraffic*) defaultInstance {
-  return [TSSRoadTraffic defaultInstance];
+- (LYRoadTraffic*) defaultInstance {
+  return [LYRoadTraffic defaultInstance];
 }
-- (TSSRoadTraffic*) build {
+- (LYRoadTraffic*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSRoadTraffic*) buildPartial {
-  TSSRoadTraffic* returnMe = [[result retain] autorelease];
+- (LYRoadTraffic*) buildPartial {
+  LYRoadTraffic* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSRoadTraffic_Builder*) mergeFrom:(TSSRoadTraffic*) other {
-  if (other == [TSSRoadTraffic defaultInstance]) {
+- (LYRoadTraffic_Builder*) mergeFrom:(LYRoadTraffic*) other {
+  if (other == [LYRoadTraffic defaultInstance]) {
     return self;
   }
   if (other.hasRoad) {
@@ -2174,10 +1727,10 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYRoadTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -2201,7 +1754,7 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
         break;
       }
       case 26: {
-        TSSSegmentTraffic_Builder* subBuilder = [TSSSegmentTraffic builder];
+        LYSegmentTraffic_Builder* subBuilder = [LYSegmentTraffic builder];
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
         [self addSegmentTraffics:[subBuilder buildPartial]];
         break;
@@ -2223,12 +1776,12 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
 - (NSString*) road {
   return result.road;
 }
-- (TSSRoadTraffic_Builder*) setRoad:(NSString*) value {
+- (LYRoadTraffic_Builder*) setRoad:(NSString*) value {
   result.hasRoad = YES;
   result.road = value;
   return self;
 }
-- (TSSRoadTraffic_Builder*) clearRoad {
+- (LYRoadTraffic_Builder*) clearRoad {
   result.hasRoad = NO;
   result.road = @"";
   return self;
@@ -2239,12 +1792,12 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
 - (int64_t) timestamp {
   return result.timestamp;
 }
-- (TSSRoadTraffic_Builder*) setTimestamp:(int64_t) value {
+- (LYRoadTraffic_Builder*) setTimestamp:(int64_t) value {
   result.hasTimestamp = YES;
   result.timestamp = value;
   return self;
 }
-- (TSSRoadTraffic_Builder*) clearTimestamp {
+- (LYRoadTraffic_Builder*) clearTimestamp {
   result.hasTimestamp = NO;
   result.timestamp = 0L;
   return self;
@@ -2253,25 +1806,25 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   if (result.mutableSegmentTrafficsList == nil) { return [NSArray array]; }
   return result.mutableSegmentTrafficsList;
 }
-- (TSSSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index {
+- (LYSegmentTraffic*) segmentTrafficsAtIndex:(int32_t) index {
   return [result segmentTrafficsAtIndex:index];
 }
-- (TSSRoadTraffic_Builder*) replaceSegmentTrafficsAtIndex:(int32_t) index with:(TSSSegmentTraffic*) value {
+- (LYRoadTraffic_Builder*) replaceSegmentTrafficsAtIndex:(int32_t) index with:(LYSegmentTraffic*) value {
   [result.mutableSegmentTrafficsList replaceObjectAtIndex:index withObject:value];
   return self;
 }
-- (TSSRoadTraffic_Builder*) addAllSegmentTraffics:(NSArray*) values {
+- (LYRoadTraffic_Builder*) addAllSegmentTraffics:(NSArray*) values {
   if (result.mutableSegmentTrafficsList == nil) {
     result.mutableSegmentTrafficsList = [NSMutableArray array];
   }
   [result.mutableSegmentTrafficsList addObjectsFromArray:values];
   return self;
 }
-- (TSSRoadTraffic_Builder*) clearSegmentTrafficsList {
+- (LYRoadTraffic_Builder*) clearSegmentTrafficsList {
   result.mutableSegmentTrafficsList = nil;
   return self;
 }
-- (TSSRoadTraffic_Builder*) addSegmentTraffics:(TSSSegmentTraffic*) value {
+- (LYRoadTraffic_Builder*) addSegmentTraffics:(LYSegmentTraffic*) value {
   if (result.mutableSegmentTrafficsList == nil) {
     result.mutableSegmentTrafficsList = [NSMutableArray array];
   }
@@ -2284,12 +1837,12 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
 - (NSString*) href {
   return result.href;
 }
-- (TSSRoadTraffic_Builder*) setHref:(NSString*) value {
+- (LYRoadTraffic_Builder*) setHref:(NSString*) value {
   result.hasHref = YES;
   result.href = value;
   return self;
 }
-- (TSSRoadTraffic_Builder*) clearHref {
+- (LYRoadTraffic_Builder*) clearHref {
   result.hasHref = NO;
   result.href = @"";
   return self;
@@ -2300,25 +1853,25 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
 - (NSString*) desc {
   return result.desc;
 }
-- (TSSRoadTraffic_Builder*) setDesc:(NSString*) value {
+- (LYRoadTraffic_Builder*) setDesc:(NSString*) value {
   result.hasDesc = YES;
   result.desc = value;
   return self;
 }
-- (TSSRoadTraffic_Builder*) clearDesc {
+- (LYRoadTraffic_Builder*) clearDesc {
   result.hasDesc = NO;
   result.desc = @"";
   return self;
 }
 @end
 
-@interface TSSCityTraffic ()
+@interface LYCityTraffic ()
 @property (retain) NSString* city;
 @property int64_t timestamp;
 @property (retain) NSMutableArray* mutableRoadTrafficsList;
 @end
 
-@implementation TSSCityTraffic
+@implementation LYCityTraffic
 
 - (BOOL) hasCity {
   return !!hasCity_;
@@ -2347,27 +1900,27 @@ static TSSRoadTraffic* defaultTSSRoadTrafficInstance = nil;
   }
   return self;
 }
-static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
+static LYCityTraffic* defaultLYCityTrafficInstance = nil;
 + (void) initialize {
-  if (self == [TSSCityTraffic class]) {
-    defaultTSSCityTrafficInstance = [[TSSCityTraffic alloc] init];
+  if (self == [LYCityTraffic class]) {
+    defaultLYCityTrafficInstance = [[LYCityTraffic alloc] init];
   }
 }
-+ (TSSCityTraffic*) defaultInstance {
-  return defaultTSSCityTrafficInstance;
++ (LYCityTraffic*) defaultInstance {
+  return defaultLYCityTrafficInstance;
 }
-- (TSSCityTraffic*) defaultInstance {
-  return defaultTSSCityTrafficInstance;
+- (LYCityTraffic*) defaultInstance {
+  return defaultLYCityTrafficInstance;
 }
 - (NSArray*) roadTrafficsList {
   return mutableRoadTrafficsList;
 }
-- (TSSRoadTraffic*) roadTrafficsAtIndex:(int32_t) index {
+- (LYRoadTraffic*) roadTrafficsAtIndex:(int32_t) index {
   id value = [mutableRoadTrafficsList objectAtIndex:index];
   return value;
 }
 - (BOOL) isInitialized {
-  for (TSSRoadTraffic* element in self.roadTrafficsList) {
+  for (LYRoadTraffic* element in self.roadTrafficsList) {
     if (!element.isInitialized) {
       return NO;
     }
@@ -2381,7 +1934,7 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
   if (self.hasTimestamp) {
     [output writeInt64:2 value:self.timestamp];
   }
-  for (TSSRoadTraffic* element in self.roadTrafficsList) {
+  for (LYRoadTraffic* element in self.roadTrafficsList) {
     [output writeMessage:3 value:element];
   }
   [self.unknownFields writeToCodedOutputStream:output];
@@ -2399,47 +1952,47 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
   if (self.hasTimestamp) {
     size += computeInt64Size(2, self.timestamp);
   }
-  for (TSSRoadTraffic* element in self.roadTrafficsList) {
+  for (LYRoadTraffic* element in self.roadTrafficsList) {
     size += computeMessageSize(3, element);
   }
   size += self.unknownFields.serializedSize;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSCityTraffic*) parseFromData:(NSData*) data {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromData:data] build];
++ (LYCityTraffic*) parseFromData:(NSData*) data {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromData:data] build];
 }
-+ (TSSCityTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYCityTraffic*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCityTraffic*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromInputStream:input] build];
++ (LYCityTraffic*) parseFromInputStream:(NSInputStream*) input {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromInputStream:input] build];
 }
-+ (TSSCityTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYCityTraffic*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromCodedInputStream:input] build];
++ (LYCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSCityTraffic*)[[[TSSCityTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYCityTraffic*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCityTraffic*)[[[LYCityTraffic builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSCityTraffic_Builder*) builder {
-  return [[[TSSCityTraffic_Builder alloc] init] autorelease];
++ (LYCityTraffic_Builder*) builder {
+  return [[[LYCityTraffic_Builder alloc] init] autorelease];
 }
-+ (TSSCityTraffic_Builder*) builderWithPrototype:(TSSCityTraffic*) prototype {
-  return [[TSSCityTraffic builder] mergeFrom:prototype];
++ (LYCityTraffic_Builder*) builderWithPrototype:(LYCityTraffic*) prototype {
+  return [[LYCityTraffic builder] mergeFrom:prototype];
 }
-- (TSSCityTraffic_Builder*) builder {
-  return [TSSCityTraffic builder];
+- (LYCityTraffic_Builder*) builder {
+  return [LYCityTraffic builder];
 }
 @end
 
-@interface TSSCityTraffic_Builder()
-@property (retain) TSSCityTraffic* result;
+@interface LYCityTraffic_Builder()
+@property (retain) LYCityTraffic* result;
 @end
 
-@implementation TSSCityTraffic_Builder
+@implementation LYCityTraffic_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -2447,34 +2000,34 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSCityTraffic alloc] init] autorelease];
+    self.result = [[[LYCityTraffic alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSCityTraffic_Builder*) clear {
-  self.result = [[[TSSCityTraffic alloc] init] autorelease];
+- (LYCityTraffic_Builder*) clear {
+  self.result = [[[LYCityTraffic alloc] init] autorelease];
   return self;
 }
-- (TSSCityTraffic_Builder*) clone {
-  return [TSSCityTraffic builderWithPrototype:result];
+- (LYCityTraffic_Builder*) clone {
+  return [LYCityTraffic builderWithPrototype:result];
 }
-- (TSSCityTraffic*) defaultInstance {
-  return [TSSCityTraffic defaultInstance];
+- (LYCityTraffic*) defaultInstance {
+  return [LYCityTraffic defaultInstance];
 }
-- (TSSCityTraffic*) build {
+- (LYCityTraffic*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSCityTraffic*) buildPartial {
-  TSSCityTraffic* returnMe = [[result retain] autorelease];
+- (LYCityTraffic*) buildPartial {
+  LYCityTraffic* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSCityTraffic_Builder*) mergeFrom:(TSSCityTraffic*) other {
-  if (other == [TSSCityTraffic defaultInstance]) {
+- (LYCityTraffic_Builder*) mergeFrom:(LYCityTraffic*) other {
+  if (other == [LYCityTraffic defaultInstance]) {
     return self;
   }
   if (other.hasCity) {
@@ -2492,10 +2045,10 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYCityTraffic_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -2519,7 +2072,7 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
         break;
       }
       case 26: {
-        TSSRoadTraffic_Builder* subBuilder = [TSSRoadTraffic builder];
+        LYRoadTraffic_Builder* subBuilder = [LYRoadTraffic builder];
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
         [self addRoadTraffics:[subBuilder buildPartial]];
         break;
@@ -2533,12 +2086,12 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
 - (NSString*) city {
   return result.city;
 }
-- (TSSCityTraffic_Builder*) setCity:(NSString*) value {
+- (LYCityTraffic_Builder*) setCity:(NSString*) value {
   result.hasCity = YES;
   result.city = value;
   return self;
 }
-- (TSSCityTraffic_Builder*) clearCity {
+- (LYCityTraffic_Builder*) clearCity {
   result.hasCity = NO;
   result.city = @"";
   return self;
@@ -2549,12 +2102,12 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
 - (int64_t) timestamp {
   return result.timestamp;
 }
-- (TSSCityTraffic_Builder*) setTimestamp:(int64_t) value {
+- (LYCityTraffic_Builder*) setTimestamp:(int64_t) value {
   result.hasTimestamp = YES;
   result.timestamp = value;
   return self;
 }
-- (TSSCityTraffic_Builder*) clearTimestamp {
+- (LYCityTraffic_Builder*) clearTimestamp {
   result.hasTimestamp = NO;
   result.timestamp = 0L;
   return self;
@@ -2563,25 +2116,25 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
   if (result.mutableRoadTrafficsList == nil) { return [NSArray array]; }
   return result.mutableRoadTrafficsList;
 }
-- (TSSRoadTraffic*) roadTrafficsAtIndex:(int32_t) index {
+- (LYRoadTraffic*) roadTrafficsAtIndex:(int32_t) index {
   return [result roadTrafficsAtIndex:index];
 }
-- (TSSCityTraffic_Builder*) replaceRoadTrafficsAtIndex:(int32_t) index with:(TSSRoadTraffic*) value {
+- (LYCityTraffic_Builder*) replaceRoadTrafficsAtIndex:(int32_t) index with:(LYRoadTraffic*) value {
   [result.mutableRoadTrafficsList replaceObjectAtIndex:index withObject:value];
   return self;
 }
-- (TSSCityTraffic_Builder*) addAllRoadTraffics:(NSArray*) values {
+- (LYCityTraffic_Builder*) addAllRoadTraffics:(NSArray*) values {
   if (result.mutableRoadTrafficsList == nil) {
     result.mutableRoadTrafficsList = [NSMutableArray array];
   }
   [result.mutableRoadTrafficsList addObjectsFromArray:values];
   return self;
 }
-- (TSSCityTraffic_Builder*) clearRoadTrafficsList {
+- (LYCityTraffic_Builder*) clearRoadTrafficsList {
   result.mutableRoadTrafficsList = nil;
   return self;
 }
-- (TSSCityTraffic_Builder*) addRoadTraffics:(TSSRoadTraffic*) value {
+- (LYCityTraffic_Builder*) addRoadTraffics:(LYRoadTraffic*) value {
   if (result.mutableRoadTrafficsList == nil) {
     result.mutableRoadTrafficsList = [NSMutableArray array];
   }
@@ -2590,15 +2143,403 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
 }
 @end
 
-@interface TSSTrafficSub ()
-@property (retain) NSString* city;
-@property (retain) TSSRoute* route;
-@property TSSOprType oprType;
-@property TSSPubType pubType;
-@property int32_t expires;
+@interface LYCrontab ()
+@property LYCrontab_LYCronType cronType;
+@property int64_t minute;
+@property int64_t hour;
+@property int32_t dom;
+@property int32_t month;
+@property int32_t dow;
 @end
 
-@implementation TSSTrafficSub
+@implementation LYCrontab
+
+- (BOOL) hasCronType {
+  return !!hasCronType_;
+}
+- (void) setHasCronType:(BOOL) value {
+  hasCronType_ = !!value;
+}
+@synthesize cronType;
+- (BOOL) hasMinute {
+  return !!hasMinute_;
+}
+- (void) setHasMinute:(BOOL) value {
+  hasMinute_ = !!value;
+}
+@synthesize minute;
+- (BOOL) hasHour {
+  return !!hasHour_;
+}
+- (void) setHasHour:(BOOL) value {
+  hasHour_ = !!value;
+}
+@synthesize hour;
+- (BOOL) hasDom {
+  return !!hasDom_;
+}
+- (void) setHasDom:(BOOL) value {
+  hasDom_ = !!value;
+}
+@synthesize dom;
+- (BOOL) hasMonth {
+  return !!hasMonth_;
+}
+- (void) setHasMonth:(BOOL) value {
+  hasMonth_ = !!value;
+}
+@synthesize month;
+- (BOOL) hasDow {
+  return !!hasDow_;
+}
+- (void) setHasDow:(BOOL) value {
+  hasDow_ = !!value;
+}
+@synthesize dow;
+- (void) dealloc {
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.cronType = LYCrontab_LYCronTypeLyRepMinute;
+    self.minute = 0L;
+    self.hour = 0L;
+    self.dom = 0;
+    self.month = 0;
+    self.dow = 0;
+  }
+  return self;
+}
+static LYCrontab* defaultLYCrontabInstance = nil;
++ (void) initialize {
+  if (self == [LYCrontab class]) {
+    defaultLYCrontabInstance = [[LYCrontab alloc] init];
+  }
+}
++ (LYCrontab*) defaultInstance {
+  return defaultLYCrontabInstance;
+}
+- (LYCrontab*) defaultInstance {
+  return defaultLYCrontabInstance;
+}
+- (BOOL) isInitialized {
+  if (!self.hasCronType) {
+    return NO;
+  }
+  return YES;
+}
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
+  if (self.hasCronType) {
+    [output writeEnum:1 value:self.cronType];
+  }
+  if (self.hasMinute) {
+    [output writeInt64:2 value:self.minute];
+  }
+  if (self.hasHour) {
+    [output writeInt64:3 value:self.hour];
+  }
+  if (self.hasDom) {
+    [output writeInt32:4 value:self.dom];
+  }
+  if (self.hasMonth) {
+    [output writeInt32:5 value:self.month];
+  }
+  if (self.hasDow) {
+    [output writeInt32:6 value:self.dow];
+  }
+  [self.unknownFields writeToCodedOutputStream:output];
+}
+- (int32_t) serializedSize {
+  int32_t size = memoizedSerializedSize;
+  if (size != -1) {
+    return size;
+  }
+
+  size = 0;
+  if (self.hasCronType) {
+    size += computeEnumSize(1, self.cronType);
+  }
+  if (self.hasMinute) {
+    size += computeInt64Size(2, self.minute);
+  }
+  if (self.hasHour) {
+    size += computeInt64Size(3, self.hour);
+  }
+  if (self.hasDom) {
+    size += computeInt32Size(4, self.dom);
+  }
+  if (self.hasMonth) {
+    size += computeInt32Size(5, self.month);
+  }
+  if (self.hasDow) {
+    size += computeInt32Size(6, self.dow);
+  }
+  size += self.unknownFields.serializedSize;
+  memoizedSerializedSize = size;
+  return size;
+}
++ (LYCrontab*) parseFromData:(NSData*) data {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromData:data] build];
+}
++ (LYCrontab*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
+}
++ (LYCrontab*) parseFromInputStream:(NSInputStream*) input {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromInputStream:input] build];
+}
++ (LYCrontab*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYCrontab*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromCodedInputStream:input] build];
+}
++ (LYCrontab*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCrontab*)[[[LYCrontab builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYCrontab_Builder*) builder {
+  return [[[LYCrontab_Builder alloc] init] autorelease];
+}
++ (LYCrontab_Builder*) builderWithPrototype:(LYCrontab*) prototype {
+  return [[LYCrontab builder] mergeFrom:prototype];
+}
+- (LYCrontab_Builder*) builder {
+  return [LYCrontab builder];
+}
+@end
+
+BOOL LYCrontab_LYCronTypeIsValidValue(LYCrontab_LYCronType value) {
+  switch (value) {
+    case LYCrontab_LYCronTypeLyRepMinute:
+    case LYCrontab_LYCronTypeLyRepHour:
+    case LYCrontab_LYCronTypeLyRepDom:
+    case LYCrontab_LYCronTypeLyRepMonth:
+    case LYCrontab_LYCronTypeLyRepDow:
+      return YES;
+    default:
+      return NO;
+  }
+}
+@interface LYCrontab_Builder()
+@property (retain) LYCrontab* result;
+@end
+
+@implementation LYCrontab_Builder
+@synthesize result;
+- (void) dealloc {
+  self.result = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.result = [[[LYCrontab alloc] init] autorelease];
+  }
+  return self;
+}
+- (PBGeneratedMessage*) internalGetResult {
+  return result;
+}
+- (LYCrontab_Builder*) clear {
+  self.result = [[[LYCrontab alloc] init] autorelease];
+  return self;
+}
+- (LYCrontab_Builder*) clone {
+  return [LYCrontab builderWithPrototype:result];
+}
+- (LYCrontab*) defaultInstance {
+  return [LYCrontab defaultInstance];
+}
+- (LYCrontab*) build {
+  [self checkInitialized];
+  return [self buildPartial];
+}
+- (LYCrontab*) buildPartial {
+  LYCrontab* returnMe = [[result retain] autorelease];
+  self.result = nil;
+  return returnMe;
+}
+- (LYCrontab_Builder*) mergeFrom:(LYCrontab*) other {
+  if (other == [LYCrontab defaultInstance]) {
+    return self;
+  }
+  if (other.hasCronType) {
+    [self setCronType:other.cronType];
+  }
+  if (other.hasMinute) {
+    [self setMinute:other.minute];
+  }
+  if (other.hasHour) {
+    [self setHour:other.hour];
+  }
+  if (other.hasDom) {
+    [self setDom:other.dom];
+  }
+  if (other.hasMonth) {
+    [self setMonth:other.month];
+  }
+  if (other.hasDow) {
+    [self setDow:other.dow];
+  }
+  [self mergeUnknownFields:other.unknownFields];
+  return self;
+}
+- (LYCrontab_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
+}
+- (LYCrontab_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
+  while (YES) {
+    int32_t tag = [input readTag];
+    switch (tag) {
+      case 0:
+        [self setUnknownFields:[unknownFields build]];
+        return self;
+      default: {
+        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
+          [self setUnknownFields:[unknownFields build]];
+          return self;
+        }
+        break;
+      }
+      case 8: {
+        int32_t value = [input readEnum];
+        if (LYCrontab_LYCronTypeIsValidValue(value)) {
+          [self setCronType:value];
+        } else {
+          [unknownFields mergeVarintField:1 value:value];
+        }
+        break;
+      }
+      case 16: {
+        [self setMinute:[input readInt64]];
+        break;
+      }
+      case 24: {
+        [self setHour:[input readInt64]];
+        break;
+      }
+      case 32: {
+        [self setDom:[input readInt32]];
+        break;
+      }
+      case 40: {
+        [self setMonth:[input readInt32]];
+        break;
+      }
+      case 48: {
+        [self setDow:[input readInt32]];
+        break;
+      }
+    }
+  }
+}
+- (BOOL) hasCronType {
+  return result.hasCronType;
+}
+- (LYCrontab_LYCronType) cronType {
+  return result.cronType;
+}
+- (LYCrontab_Builder*) setCronType:(LYCrontab_LYCronType) value {
+  result.hasCronType = YES;
+  result.cronType = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearCronType {
+  result.hasCronType = NO;
+  result.cronType = LYCrontab_LYCronTypeLyRepMinute;
+  return self;
+}
+- (BOOL) hasMinute {
+  return result.hasMinute;
+}
+- (int64_t) minute {
+  return result.minute;
+}
+- (LYCrontab_Builder*) setMinute:(int64_t) value {
+  result.hasMinute = YES;
+  result.minute = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearMinute {
+  result.hasMinute = NO;
+  result.minute = 0L;
+  return self;
+}
+- (BOOL) hasHour {
+  return result.hasHour;
+}
+- (int64_t) hour {
+  return result.hour;
+}
+- (LYCrontab_Builder*) setHour:(int64_t) value {
+  result.hasHour = YES;
+  result.hour = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearHour {
+  result.hasHour = NO;
+  result.hour = 0L;
+  return self;
+}
+- (BOOL) hasDom {
+  return result.hasDom;
+}
+- (int32_t) dom {
+  return result.dom;
+}
+- (LYCrontab_Builder*) setDom:(int32_t) value {
+  result.hasDom = YES;
+  result.dom = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearDom {
+  result.hasDom = NO;
+  result.dom = 0;
+  return self;
+}
+- (BOOL) hasMonth {
+  return result.hasMonth;
+}
+- (int32_t) month {
+  return result.month;
+}
+- (LYCrontab_Builder*) setMonth:(int32_t) value {
+  result.hasMonth = YES;
+  result.month = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearMonth {
+  result.hasMonth = NO;
+  result.month = 0;
+  return self;
+}
+- (BOOL) hasDow {
+  return result.hasDow;
+}
+- (int32_t) dow {
+  return result.dow;
+}
+- (LYCrontab_Builder*) setDow:(int32_t) value {
+  result.hasDow = YES;
+  result.dow = value;
+  return self;
+}
+- (LYCrontab_Builder*) clearDow {
+  result.hasDow = NO;
+  result.dow = 0;
+  return self;
+}
+@end
+
+@interface LYTrafficSub ()
+@property (retain) NSString* city;
+@property (retain) LYRoute* route;
+@property LYTrafficSub_LYOprType oprType;
+@property LYTrafficSub_LYPubType pubType;
+@property int32_t expires;
+@property (retain) LYCrontab* cronTab;
+@end
+
+@implementation LYTrafficSub
 
 - (BOOL) hasCity {
   return !!hasCity_;
@@ -2635,32 +2576,41 @@ static TSSCityTraffic* defaultTSSCityTrafficInstance = nil;
   hasExpires_ = !!value;
 }
 @synthesize expires;
+- (BOOL) hasCronTab {
+  return !!hasCronTab_;
+}
+- (void) setHasCronTab:(BOOL) value {
+  hasCronTab_ = !!value;
+}
+@synthesize cronTab;
 - (void) dealloc {
   self.city = nil;
   self.route = nil;
+  self.cronTab = nil;
   [super dealloc];
 }
 - (id) init {
   if ((self = [super init])) {
     self.city = @"";
-    self.route = [TSSRoute defaultInstance];
-    self.oprType = TSSOprTypeSubCreate;
-    self.pubType = TSSPubTypePubOnce;
+    self.route = [LYRoute defaultInstance];
+    self.oprType = LYTrafficSub_LYOprTypeLySubCreate;
+    self.pubType = LYTrafficSub_LYPubTypeLyPubAdhoc;
     self.expires = 30;
+    self.cronTab = [LYCrontab defaultInstance];
   }
   return self;
 }
-static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
+static LYTrafficSub* defaultLYTrafficSubInstance = nil;
 + (void) initialize {
-  if (self == [TSSTrafficSub class]) {
-    defaultTSSTrafficSubInstance = [[TSSTrafficSub alloc] init];
+  if (self == [LYTrafficSub class]) {
+    defaultLYTrafficSubInstance = [[LYTrafficSub alloc] init];
   }
 }
-+ (TSSTrafficSub*) defaultInstance {
-  return defaultTSSTrafficSubInstance;
++ (LYTrafficSub*) defaultInstance {
+  return defaultLYTrafficSubInstance;
 }
-- (TSSTrafficSub*) defaultInstance {
-  return defaultTSSTrafficSubInstance;
+- (LYTrafficSub*) defaultInstance {
+  return defaultLYTrafficSubInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasCity) {
@@ -2677,6 +2627,11 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
   }
   if (!self.route.isInitialized) {
     return NO;
+  }
+  if (self.hasCronTab) {
+    if (!self.cronTab.isInitialized) {
+      return NO;
+    }
   }
   return YES;
 }
@@ -2695,6 +2650,9 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
   }
   if (self.hasExpires) {
     [output writeInt32:5 value:self.expires];
+  }
+  if (self.hasCronTab) {
+    [output writeMessage:6 value:self.cronTab];
   }
   [self.unknownFields writeToCodedOutputStream:output];
 }
@@ -2720,44 +2678,67 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
   if (self.hasExpires) {
     size += computeInt32Size(5, self.expires);
   }
+  if (self.hasCronTab) {
+    size += computeMessageSize(6, self.cronTab);
+  }
   size += self.unknownFields.serializedSize;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSTrafficSub*) parseFromData:(NSData*) data {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromData:data] build];
++ (LYTrafficSub*) parseFromData:(NSData*) data {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromData:data] build];
 }
-+ (TSSTrafficSub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYTrafficSub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSTrafficSub*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromInputStream:input] build];
++ (LYTrafficSub*) parseFromInputStream:(NSInputStream*) input {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromInputStream:input] build];
 }
-+ (TSSTrafficSub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYTrafficSub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromCodedInputStream:input] build];
++ (LYTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSTrafficSub*)[[[TSSTrafficSub builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYTrafficSub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficSub*)[[[LYTrafficSub builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSTrafficSub_Builder*) builder {
-  return [[[TSSTrafficSub_Builder alloc] init] autorelease];
++ (LYTrafficSub_Builder*) builder {
+  return [[[LYTrafficSub_Builder alloc] init] autorelease];
 }
-+ (TSSTrafficSub_Builder*) builderWithPrototype:(TSSTrafficSub*) prototype {
-  return [[TSSTrafficSub builder] mergeFrom:prototype];
++ (LYTrafficSub_Builder*) builderWithPrototype:(LYTrafficSub*) prototype {
+  return [[LYTrafficSub builder] mergeFrom:prototype];
 }
-- (TSSTrafficSub_Builder*) builder {
-  return [TSSTrafficSub builder];
+- (LYTrafficSub_Builder*) builder {
+  return [LYTrafficSub builder];
 }
 @end
 
-@interface TSSTrafficSub_Builder()
-@property (retain) TSSTrafficSub* result;
+BOOL LYTrafficSub_LYOprTypeIsValidValue(LYTrafficSub_LYOprType value) {
+  switch (value) {
+    case LYTrafficSub_LYOprTypeLySubCreate:
+    case LYTrafficSub_LYOprTypeLySubDelete:
+    case LYTrafficSub_LYOprTypeLySubUpdate:
+      return YES;
+    default:
+      return NO;
+  }
+}
+BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value) {
+  switch (value) {
+    case LYTrafficSub_LYPubTypeLyPubAdhoc:
+    case LYTrafficSub_LYPubTypeLyPubEvent:
+    case LYTrafficSub_LYPubTypeLyPubCron:
+      return YES;
+    default:
+      return NO;
+  }
+}
+@interface LYTrafficSub_Builder()
+@property (retain) LYTrafficSub* result;
 @end
 
-@implementation TSSTrafficSub_Builder
+@implementation LYTrafficSub_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -2765,34 +2746,34 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSTrafficSub alloc] init] autorelease];
+    self.result = [[[LYTrafficSub alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSTrafficSub_Builder*) clear {
-  self.result = [[[TSSTrafficSub alloc] init] autorelease];
+- (LYTrafficSub_Builder*) clear {
+  self.result = [[[LYTrafficSub alloc] init] autorelease];
   return self;
 }
-- (TSSTrafficSub_Builder*) clone {
-  return [TSSTrafficSub builderWithPrototype:result];
+- (LYTrafficSub_Builder*) clone {
+  return [LYTrafficSub builderWithPrototype:result];
 }
-- (TSSTrafficSub*) defaultInstance {
-  return [TSSTrafficSub defaultInstance];
+- (LYTrafficSub*) defaultInstance {
+  return [LYTrafficSub defaultInstance];
 }
-- (TSSTrafficSub*) build {
+- (LYTrafficSub*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSTrafficSub*) buildPartial {
-  TSSTrafficSub* returnMe = [[result retain] autorelease];
+- (LYTrafficSub*) buildPartial {
+  LYTrafficSub* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSTrafficSub_Builder*) mergeFrom:(TSSTrafficSub*) other {
-  if (other == [TSSTrafficSub defaultInstance]) {
+- (LYTrafficSub_Builder*) mergeFrom:(LYTrafficSub*) other {
+  if (other == [LYTrafficSub defaultInstance]) {
     return self;
   }
   if (other.hasCity) {
@@ -2810,13 +2791,16 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
   if (other.hasExpires) {
     [self setExpires:other.expires];
   }
+  if (other.hasCronTab) {
+    [self mergeCronTab:other.cronTab];
+  }
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYTrafficSub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -2836,7 +2820,7 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
         break;
       }
       case 18: {
-        TSSRoute_Builder* subBuilder = [TSSRoute builder];
+        LYRoute_Builder* subBuilder = [LYRoute builder];
         if (self.hasRoute) {
           [subBuilder mergeFrom:self.route];
         }
@@ -2846,7 +2830,7 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
       }
       case 24: {
         int32_t value = [input readEnum];
-        if (TSSOprTypeIsValidValue(value)) {
+        if (LYTrafficSub_LYOprTypeIsValidValue(value)) {
           [self setOprType:value];
         } else {
           [unknownFields mergeVarintField:3 value:value];
@@ -2855,7 +2839,7 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
       }
       case 32: {
         int32_t value = [input readEnum];
-        if (TSSPubTypeIsValidValue(value)) {
+        if (LYTrafficSub_LYPubTypeIsValidValue(value)) {
           [self setPubType:value];
         } else {
           [unknownFields mergeVarintField:4 value:value];
@@ -2864,6 +2848,15 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
       }
       case 40: {
         [self setExpires:[input readInt32]];
+        break;
+      }
+      case 50: {
+        LYCrontab_Builder* subBuilder = [LYCrontab builder];
+        if (self.hasCronTab) {
+          [subBuilder mergeFrom:self.cronTab];
+        }
+        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
+        [self setCronTab:[subBuilder buildPartial]];
         break;
       }
     }
@@ -2875,12 +2868,12 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
 - (NSString*) city {
   return result.city;
 }
-- (TSSTrafficSub_Builder*) setCity:(NSString*) value {
+- (LYTrafficSub_Builder*) setCity:(NSString*) value {
   result.hasCity = YES;
   result.city = value;
   return self;
 }
-- (TSSTrafficSub_Builder*) clearCity {
+- (LYTrafficSub_Builder*) clearCity {
   result.hasCity = NO;
   result.city = @"";
   return self;
@@ -2888,63 +2881,63 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
 - (BOOL) hasRoute {
   return result.hasRoute;
 }
-- (TSSRoute*) route {
+- (LYRoute*) route {
   return result.route;
 }
-- (TSSTrafficSub_Builder*) setRoute:(TSSRoute*) value {
+- (LYTrafficSub_Builder*) setRoute:(LYRoute*) value {
   result.hasRoute = YES;
   result.route = value;
   return self;
 }
-- (TSSTrafficSub_Builder*) setRouteBuilder:(TSSRoute_Builder*) builderForValue {
+- (LYTrafficSub_Builder*) setRouteBuilder:(LYRoute_Builder*) builderForValue {
   return [self setRoute:[builderForValue build]];
 }
-- (TSSTrafficSub_Builder*) mergeRoute:(TSSRoute*) value {
+- (LYTrafficSub_Builder*) mergeRoute:(LYRoute*) value {
   if (result.hasRoute &&
-      result.route != [TSSRoute defaultInstance]) {
+      result.route != [LYRoute defaultInstance]) {
     result.route =
-      [[[TSSRoute builderWithPrototype:result.route] mergeFrom:value] buildPartial];
+      [[[LYRoute builderWithPrototype:result.route] mergeFrom:value] buildPartial];
   } else {
     result.route = value;
   }
   result.hasRoute = YES;
   return self;
 }
-- (TSSTrafficSub_Builder*) clearRoute {
+- (LYTrafficSub_Builder*) clearRoute {
   result.hasRoute = NO;
-  result.route = [TSSRoute defaultInstance];
+  result.route = [LYRoute defaultInstance];
   return self;
 }
 - (BOOL) hasOprType {
   return result.hasOprType;
 }
-- (TSSOprType) oprType {
+- (LYTrafficSub_LYOprType) oprType {
   return result.oprType;
 }
-- (TSSTrafficSub_Builder*) setOprType:(TSSOprType) value {
+- (LYTrafficSub_Builder*) setOprType:(LYTrafficSub_LYOprType) value {
   result.hasOprType = YES;
   result.oprType = value;
   return self;
 }
-- (TSSTrafficSub_Builder*) clearOprType {
+- (LYTrafficSub_Builder*) clearOprType {
   result.hasOprType = NO;
-  result.oprType = TSSOprTypeSubCreate;
+  result.oprType = LYTrafficSub_LYOprTypeLySubCreate;
   return self;
 }
 - (BOOL) hasPubType {
   return result.hasPubType;
 }
-- (TSSPubType) pubType {
+- (LYTrafficSub_LYPubType) pubType {
   return result.pubType;
 }
-- (TSSTrafficSub_Builder*) setPubType:(TSSPubType) value {
+- (LYTrafficSub_Builder*) setPubType:(LYTrafficSub_LYPubType) value {
   result.hasPubType = YES;
   result.pubType = value;
   return self;
 }
-- (TSSTrafficSub_Builder*) clearPubType {
+- (LYTrafficSub_Builder*) clearPubType {
   result.hasPubType = NO;
-  result.pubType = TSSPubTypePubOnce;
+  result.pubType = LYTrafficSub_LYPubTypeLyPubAdhoc;
   return self;
 }
 - (BOOL) hasExpires {
@@ -2953,19 +2946,293 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
 - (int32_t) expires {
   return result.expires;
 }
-- (TSSTrafficSub_Builder*) setExpires:(int32_t) value {
+- (LYTrafficSub_Builder*) setExpires:(int32_t) value {
   result.hasExpires = YES;
   result.expires = value;
   return self;
 }
-- (TSSTrafficSub_Builder*) clearExpires {
+- (LYTrafficSub_Builder*) clearExpires {
   result.hasExpires = NO;
   result.expires = 30;
   return self;
 }
+- (BOOL) hasCronTab {
+  return result.hasCronTab;
+}
+- (LYCrontab*) cronTab {
+  return result.cronTab;
+}
+- (LYTrafficSub_Builder*) setCronTab:(LYCrontab*) value {
+  result.hasCronTab = YES;
+  result.cronTab = value;
+  return self;
+}
+- (LYTrafficSub_Builder*) setCronTabBuilder:(LYCrontab_Builder*) builderForValue {
+  return [self setCronTab:[builderForValue build]];
+}
+- (LYTrafficSub_Builder*) mergeCronTab:(LYCrontab*) value {
+  if (result.hasCronTab &&
+      result.cronTab != [LYCrontab defaultInstance]) {
+    result.cronTab =
+      [[[LYCrontab builderWithPrototype:result.cronTab] mergeFrom:value] buildPartial];
+  } else {
+    result.cronTab = value;
+  }
+  result.hasCronTab = YES;
+  return self;
+}
+- (LYTrafficSub_Builder*) clearCronTab {
+  result.hasCronTab = NO;
+  result.cronTab = [LYCrontab defaultInstance];
+  return self;
+}
 @end
 
-@interface TSSDeviceReport ()
+@interface LYTrafficPub ()
+@property int32_t routeId;
+@property (retain) LYCityTraffic* cityTraffic;
+@end
+
+@implementation LYTrafficPub
+
+- (BOOL) hasRouteId {
+  return !!hasRouteId_;
+}
+- (void) setHasRouteId:(BOOL) value {
+  hasRouteId_ = !!value;
+}
+@synthesize routeId;
+- (BOOL) hasCityTraffic {
+  return !!hasCityTraffic_;
+}
+- (void) setHasCityTraffic:(BOOL) value {
+  hasCityTraffic_ = !!value;
+}
+@synthesize cityTraffic;
+- (void) dealloc {
+  self.cityTraffic = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.routeId = 0;
+    self.cityTraffic = [LYCityTraffic defaultInstance];
+  }
+  return self;
+}
+static LYTrafficPub* defaultLYTrafficPubInstance = nil;
++ (void) initialize {
+  if (self == [LYTrafficPub class]) {
+    defaultLYTrafficPubInstance = [[LYTrafficPub alloc] init];
+  }
+}
++ (LYTrafficPub*) defaultInstance {
+  return defaultLYTrafficPubInstance;
+}
+- (LYTrafficPub*) defaultInstance {
+  return defaultLYTrafficPubInstance;
+}
+- (BOOL) isInitialized {
+  if (!self.hasRouteId) {
+    return NO;
+  }
+  if (!self.hasCityTraffic) {
+    return NO;
+  }
+  if (!self.cityTraffic.isInitialized) {
+    return NO;
+  }
+  return YES;
+}
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
+  if (self.hasRouteId) {
+    [output writeInt32:1 value:self.routeId];
+  }
+  if (self.hasCityTraffic) {
+    [output writeMessage:2 value:self.cityTraffic];
+  }
+  [self.unknownFields writeToCodedOutputStream:output];
+}
+- (int32_t) serializedSize {
+  int32_t size = memoizedSerializedSize;
+  if (size != -1) {
+    return size;
+  }
+
+  size = 0;
+  if (self.hasRouteId) {
+    size += computeInt32Size(1, self.routeId);
+  }
+  if (self.hasCityTraffic) {
+    size += computeMessageSize(2, self.cityTraffic);
+  }
+  size += self.unknownFields.serializedSize;
+  memoizedSerializedSize = size;
+  return size;
+}
++ (LYTrafficPub*) parseFromData:(NSData*) data {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromData:data] build];
+}
++ (LYTrafficPub*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficPub*) parseFromInputStream:(NSInputStream*) input {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromInputStream:input] build];
+}
++ (LYTrafficPub*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficPub*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromCodedInputStream:input] build];
+}
++ (LYTrafficPub*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficPub*)[[[LYTrafficPub builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficPub_Builder*) builder {
+  return [[[LYTrafficPub_Builder alloc] init] autorelease];
+}
++ (LYTrafficPub_Builder*) builderWithPrototype:(LYTrafficPub*) prototype {
+  return [[LYTrafficPub builder] mergeFrom:prototype];
+}
+- (LYTrafficPub_Builder*) builder {
+  return [LYTrafficPub builder];
+}
+@end
+
+@interface LYTrafficPub_Builder()
+@property (retain) LYTrafficPub* result;
+@end
+
+@implementation LYTrafficPub_Builder
+@synthesize result;
+- (void) dealloc {
+  self.result = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.result = [[[LYTrafficPub alloc] init] autorelease];
+  }
+  return self;
+}
+- (PBGeneratedMessage*) internalGetResult {
+  return result;
+}
+- (LYTrafficPub_Builder*) clear {
+  self.result = [[[LYTrafficPub alloc] init] autorelease];
+  return self;
+}
+- (LYTrafficPub_Builder*) clone {
+  return [LYTrafficPub builderWithPrototype:result];
+}
+- (LYTrafficPub*) defaultInstance {
+  return [LYTrafficPub defaultInstance];
+}
+- (LYTrafficPub*) build {
+  [self checkInitialized];
+  return [self buildPartial];
+}
+- (LYTrafficPub*) buildPartial {
+  LYTrafficPub* returnMe = [[result retain] autorelease];
+  self.result = nil;
+  return returnMe;
+}
+- (LYTrafficPub_Builder*) mergeFrom:(LYTrafficPub*) other {
+  if (other == [LYTrafficPub defaultInstance]) {
+    return self;
+  }
+  if (other.hasRouteId) {
+    [self setRouteId:other.routeId];
+  }
+  if (other.hasCityTraffic) {
+    [self mergeCityTraffic:other.cityTraffic];
+  }
+  [self mergeUnknownFields:other.unknownFields];
+  return self;
+}
+- (LYTrafficPub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
+}
+- (LYTrafficPub_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
+  while (YES) {
+    int32_t tag = [input readTag];
+    switch (tag) {
+      case 0:
+        [self setUnknownFields:[unknownFields build]];
+        return self;
+      default: {
+        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
+          [self setUnknownFields:[unknownFields build]];
+          return self;
+        }
+        break;
+      }
+      case 8: {
+        [self setRouteId:[input readInt32]];
+        break;
+      }
+      case 18: {
+        LYCityTraffic_Builder* subBuilder = [LYCityTraffic builder];
+        if (self.hasCityTraffic) {
+          [subBuilder mergeFrom:self.cityTraffic];
+        }
+        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
+        [self setCityTraffic:[subBuilder buildPartial]];
+        break;
+      }
+    }
+  }
+}
+- (BOOL) hasRouteId {
+  return result.hasRouteId;
+}
+- (int32_t) routeId {
+  return result.routeId;
+}
+- (LYTrafficPub_Builder*) setRouteId:(int32_t) value {
+  result.hasRouteId = YES;
+  result.routeId = value;
+  return self;
+}
+- (LYTrafficPub_Builder*) clearRouteId {
+  result.hasRouteId = NO;
+  result.routeId = 0;
+  return self;
+}
+- (BOOL) hasCityTraffic {
+  return result.hasCityTraffic;
+}
+- (LYCityTraffic*) cityTraffic {
+  return result.cityTraffic;
+}
+- (LYTrafficPub_Builder*) setCityTraffic:(LYCityTraffic*) value {
+  result.hasCityTraffic = YES;
+  result.cityTraffic = value;
+  return self;
+}
+- (LYTrafficPub_Builder*) setCityTrafficBuilder:(LYCityTraffic_Builder*) builderForValue {
+  return [self setCityTraffic:[builderForValue build]];
+}
+- (LYTrafficPub_Builder*) mergeCityTraffic:(LYCityTraffic*) value {
+  if (result.hasCityTraffic &&
+      result.cityTraffic != [LYCityTraffic defaultInstance]) {
+    result.cityTraffic =
+      [[[LYCityTraffic builderWithPrototype:result.cityTraffic] mergeFrom:value] buildPartial];
+  } else {
+    result.cityTraffic = value;
+  }
+  result.hasCityTraffic = YES;
+  return self;
+}
+- (LYTrafficPub_Builder*) clearCityTraffic {
+  result.hasCityTraffic = NO;
+  result.cityTraffic = [LYCityTraffic defaultInstance];
+  return self;
+}
+@end
+
+@interface LYDeviceReport ()
 @property (retain) NSString* deviceId;
 @property (retain) NSData* deviceToken;
 @property (retain) NSString* deviceName;
@@ -2973,7 +3240,7 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
 @property (retain) NSString* deviceOsVersion;
 @end
 
-@implementation TSSDeviceReport
+@implementation LYDeviceReport
 
 - (BOOL) hasDeviceId {
   return !!hasDeviceId_;
@@ -3028,17 +3295,17 @@ static TSSTrafficSub* defaultTSSTrafficSubInstance = nil;
   }
   return self;
 }
-static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
+static LYDeviceReport* defaultLYDeviceReportInstance = nil;
 + (void) initialize {
-  if (self == [TSSDeviceReport class]) {
-    defaultTSSDeviceReportInstance = [[TSSDeviceReport alloc] init];
+  if (self == [LYDeviceReport class]) {
+    defaultLYDeviceReportInstance = [[LYDeviceReport alloc] init];
   }
 }
-+ (TSSDeviceReport*) defaultInstance {
-  return defaultTSSDeviceReportInstance;
++ (LYDeviceReport*) defaultInstance {
+  return defaultLYDeviceReportInstance;
 }
-- (TSSDeviceReport*) defaultInstance {
-  return defaultTSSDeviceReportInstance;
+- (LYDeviceReport*) defaultInstance {
+  return defaultLYDeviceReportInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasDeviceId) {
@@ -3102,40 +3369,40 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSDeviceReport*) parseFromData:(NSData*) data {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromData:data] build];
++ (LYDeviceReport*) parseFromData:(NSData*) data {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromData:data] build];
 }
-+ (TSSDeviceReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYDeviceReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSDeviceReport*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromInputStream:input] build];
++ (LYDeviceReport*) parseFromInputStream:(NSInputStream*) input {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromInputStream:input] build];
 }
-+ (TSSDeviceReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYDeviceReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromCodedInputStream:input] build];
++ (LYDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSDeviceReport*)[[[TSSDeviceReport builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYDeviceReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYDeviceReport*)[[[LYDeviceReport builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSDeviceReport_Builder*) builder {
-  return [[[TSSDeviceReport_Builder alloc] init] autorelease];
++ (LYDeviceReport_Builder*) builder {
+  return [[[LYDeviceReport_Builder alloc] init] autorelease];
 }
-+ (TSSDeviceReport_Builder*) builderWithPrototype:(TSSDeviceReport*) prototype {
-  return [[TSSDeviceReport builder] mergeFrom:prototype];
++ (LYDeviceReport_Builder*) builderWithPrototype:(LYDeviceReport*) prototype {
+  return [[LYDeviceReport builder] mergeFrom:prototype];
 }
-- (TSSDeviceReport_Builder*) builder {
-  return [TSSDeviceReport builder];
+- (LYDeviceReport_Builder*) builder {
+  return [LYDeviceReport builder];
 }
 @end
 
-@interface TSSDeviceReport_Builder()
-@property (retain) TSSDeviceReport* result;
+@interface LYDeviceReport_Builder()
+@property (retain) LYDeviceReport* result;
 @end
 
-@implementation TSSDeviceReport_Builder
+@implementation LYDeviceReport_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -3143,34 +3410,34 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSDeviceReport alloc] init] autorelease];
+    self.result = [[[LYDeviceReport alloc] init] autorelease];
   }
   return self;
 }
 - (PBGeneratedMessage*) internalGetResult {
   return result;
 }
-- (TSSDeviceReport_Builder*) clear {
-  self.result = [[[TSSDeviceReport alloc] init] autorelease];
+- (LYDeviceReport_Builder*) clear {
+  self.result = [[[LYDeviceReport alloc] init] autorelease];
   return self;
 }
-- (TSSDeviceReport_Builder*) clone {
-  return [TSSDeviceReport builderWithPrototype:result];
+- (LYDeviceReport_Builder*) clone {
+  return [LYDeviceReport builderWithPrototype:result];
 }
-- (TSSDeviceReport*) defaultInstance {
-  return [TSSDeviceReport defaultInstance];
+- (LYDeviceReport*) defaultInstance {
+  return [LYDeviceReport defaultInstance];
 }
-- (TSSDeviceReport*) build {
+- (LYDeviceReport*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSDeviceReport*) buildPartial {
-  TSSDeviceReport* returnMe = [[result retain] autorelease];
+- (LYDeviceReport*) buildPartial {
+  LYDeviceReport* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSDeviceReport_Builder*) mergeFrom:(TSSDeviceReport*) other {
-  if (other == [TSSDeviceReport defaultInstance]) {
+- (LYDeviceReport_Builder*) mergeFrom:(LYDeviceReport*) other {
+  if (other == [LYDeviceReport defaultInstance]) {
     return self;
   }
   if (other.hasDeviceId) {
@@ -3191,10 +3458,10 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYDeviceReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -3238,12 +3505,12 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 - (NSString*) deviceId {
   return result.deviceId;
 }
-- (TSSDeviceReport_Builder*) setDeviceId:(NSString*) value {
+- (LYDeviceReport_Builder*) setDeviceId:(NSString*) value {
   result.hasDeviceId = YES;
   result.deviceId = value;
   return self;
 }
-- (TSSDeviceReport_Builder*) clearDeviceId {
+- (LYDeviceReport_Builder*) clearDeviceId {
   result.hasDeviceId = NO;
   result.deviceId = @"";
   return self;
@@ -3254,12 +3521,12 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 - (NSData*) deviceToken {
   return result.deviceToken;
 }
-- (TSSDeviceReport_Builder*) setDeviceToken:(NSData*) value {
+- (LYDeviceReport_Builder*) setDeviceToken:(NSData*) value {
   result.hasDeviceToken = YES;
   result.deviceToken = value;
   return self;
 }
-- (TSSDeviceReport_Builder*) clearDeviceToken {
+- (LYDeviceReport_Builder*) clearDeviceToken {
   result.hasDeviceToken = NO;
   result.deviceToken = [NSData data];
   return self;
@@ -3270,12 +3537,12 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 - (NSString*) deviceName {
   return result.deviceName;
 }
-- (TSSDeviceReport_Builder*) setDeviceName:(NSString*) value {
+- (LYDeviceReport_Builder*) setDeviceName:(NSString*) value {
   result.hasDeviceName = YES;
   result.deviceName = value;
   return self;
 }
-- (TSSDeviceReport_Builder*) clearDeviceName {
+- (LYDeviceReport_Builder*) clearDeviceName {
   result.hasDeviceName = NO;
   result.deviceName = @"";
   return self;
@@ -3286,12 +3553,12 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 - (NSString*) deviceModel {
   return result.deviceModel;
 }
-- (TSSDeviceReport_Builder*) setDeviceModel:(NSString*) value {
+- (LYDeviceReport_Builder*) setDeviceModel:(NSString*) value {
   result.hasDeviceModel = YES;
   result.deviceModel = value;
   return self;
 }
-- (TSSDeviceReport_Builder*) clearDeviceModel {
+- (LYDeviceReport_Builder*) clearDeviceModel {
   result.hasDeviceModel = NO;
   result.deviceModel = @"";
   return self;
@@ -3302,39 +3569,554 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
 - (NSString*) deviceOsVersion {
   return result.deviceOsVersion;
 }
-- (TSSDeviceReport_Builder*) setDeviceOsVersion:(NSString*) value {
+- (LYDeviceReport_Builder*) setDeviceOsVersion:(NSString*) value {
   result.hasDeviceOsVersion = YES;
   result.deviceOsVersion = value;
   return self;
 }
-- (TSSDeviceReport_Builder*) clearDeviceOsVersion {
+- (LYDeviceReport_Builder*) clearDeviceOsVersion {
   result.hasDeviceOsVersion = NO;
   result.deviceOsVersion = @"";
   return self;
 }
 @end
 
-@interface TSSPackage ()
-@property int32_t version;
-@property TSSMsgDir msgDir;
-@property TSSMsgType msgType;
-@property int32_t msgId;
+@interface LYSamplePoint ()
+@property (retain) LYCoordinate* spCoordinate;
 @property int64_t timestamp;
-@property int32_t expires;
-@property (retain) NSData* userToken;
-@property TSSErrCode errCode;
-@property (retain) TSSDeviceReport* deviceReport;
-@property (retain) TSSLocation* location;
-@property (retain) TSSSegment* segment;
-@property (retain) TSSRoute* route;
-@property (retain) TSSTrafficSub* trafficSub;
-@property (retain) TSSSegmentTraffic* segmentTraffic;
-@property (retain) TSSRoadTraffic* roadTraffic;
-@property (retain) TSSCityTraffic* cityTraffic;
-@property (retain) TSSTrafficProbe* trafficProbe;
+@property Float64 altitude;
+@property int32_t course;
 @end
 
-@implementation TSSPackage
+@implementation LYSamplePoint
+
+- (BOOL) hasSpCoordinate {
+  return !!hasSpCoordinate_;
+}
+- (void) setHasSpCoordinate:(BOOL) value {
+  hasSpCoordinate_ = !!value;
+}
+@synthesize spCoordinate;
+- (BOOL) hasTimestamp {
+  return !!hasTimestamp_;
+}
+- (void) setHasTimestamp:(BOOL) value {
+  hasTimestamp_ = !!value;
+}
+@synthesize timestamp;
+- (BOOL) hasAltitude {
+  return !!hasAltitude_;
+}
+- (void) setHasAltitude:(BOOL) value {
+  hasAltitude_ = !!value;
+}
+@synthesize altitude;
+- (BOOL) hasCourse {
+  return !!hasCourse_;
+}
+- (void) setHasCourse:(BOOL) value {
+  hasCourse_ = !!value;
+}
+@synthesize course;
+- (void) dealloc {
+  self.spCoordinate = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.spCoordinate = [LYCoordinate defaultInstance];
+    self.timestamp = 0L;
+    self.altitude = 0;
+    self.course = 0;
+  }
+  return self;
+}
+static LYSamplePoint* defaultLYSamplePointInstance = nil;
++ (void) initialize {
+  if (self == [LYSamplePoint class]) {
+    defaultLYSamplePointInstance = [[LYSamplePoint alloc] init];
+  }
+}
++ (LYSamplePoint*) defaultInstance {
+  return defaultLYSamplePointInstance;
+}
+- (LYSamplePoint*) defaultInstance {
+  return defaultLYSamplePointInstance;
+}
+- (BOOL) isInitialized {
+  if (!self.hasSpCoordinate) {
+    return NO;
+  }
+  if (!self.hasTimestamp) {
+    return NO;
+  }
+  if (!self.spCoordinate.isInitialized) {
+    return NO;
+  }
+  return YES;
+}
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
+  if (self.hasSpCoordinate) {
+    [output writeMessage:1 value:self.spCoordinate];
+  }
+  if (self.hasTimestamp) {
+    [output writeInt64:2 value:self.timestamp];
+  }
+  if (self.hasAltitude) {
+    [output writeDouble:3 value:self.altitude];
+  }
+  if (self.hasCourse) {
+    [output writeInt32:4 value:self.course];
+  }
+  [self.unknownFields writeToCodedOutputStream:output];
+}
+- (int32_t) serializedSize {
+  int32_t size = memoizedSerializedSize;
+  if (size != -1) {
+    return size;
+  }
+
+  size = 0;
+  if (self.hasSpCoordinate) {
+    size += computeMessageSize(1, self.spCoordinate);
+  }
+  if (self.hasTimestamp) {
+    size += computeInt64Size(2, self.timestamp);
+  }
+  if (self.hasAltitude) {
+    size += computeDoubleSize(3, self.altitude);
+  }
+  if (self.hasCourse) {
+    size += computeInt32Size(4, self.course);
+  }
+  size += self.unknownFields.serializedSize;
+  memoizedSerializedSize = size;
+  return size;
+}
++ (LYSamplePoint*) parseFromData:(NSData*) data {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromData:data] build];
+}
++ (LYSamplePoint*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
+}
++ (LYSamplePoint*) parseFromInputStream:(NSInputStream*) input {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromInputStream:input] build];
+}
++ (LYSamplePoint*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYSamplePoint*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromCodedInputStream:input] build];
+}
++ (LYSamplePoint*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYSamplePoint*)[[[LYSamplePoint builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYSamplePoint_Builder*) builder {
+  return [[[LYSamplePoint_Builder alloc] init] autorelease];
+}
++ (LYSamplePoint_Builder*) builderWithPrototype:(LYSamplePoint*) prototype {
+  return [[LYSamplePoint builder] mergeFrom:prototype];
+}
+- (LYSamplePoint_Builder*) builder {
+  return [LYSamplePoint builder];
+}
+@end
+
+@interface LYSamplePoint_Builder()
+@property (retain) LYSamplePoint* result;
+@end
+
+@implementation LYSamplePoint_Builder
+@synthesize result;
+- (void) dealloc {
+  self.result = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.result = [[[LYSamplePoint alloc] init] autorelease];
+  }
+  return self;
+}
+- (PBGeneratedMessage*) internalGetResult {
+  return result;
+}
+- (LYSamplePoint_Builder*) clear {
+  self.result = [[[LYSamplePoint alloc] init] autorelease];
+  return self;
+}
+- (LYSamplePoint_Builder*) clone {
+  return [LYSamplePoint builderWithPrototype:result];
+}
+- (LYSamplePoint*) defaultInstance {
+  return [LYSamplePoint defaultInstance];
+}
+- (LYSamplePoint*) build {
+  [self checkInitialized];
+  return [self buildPartial];
+}
+- (LYSamplePoint*) buildPartial {
+  LYSamplePoint* returnMe = [[result retain] autorelease];
+  self.result = nil;
+  return returnMe;
+}
+- (LYSamplePoint_Builder*) mergeFrom:(LYSamplePoint*) other {
+  if (other == [LYSamplePoint defaultInstance]) {
+    return self;
+  }
+  if (other.hasSpCoordinate) {
+    [self mergeSpCoordinate:other.spCoordinate];
+  }
+  if (other.hasTimestamp) {
+    [self setTimestamp:other.timestamp];
+  }
+  if (other.hasAltitude) {
+    [self setAltitude:other.altitude];
+  }
+  if (other.hasCourse) {
+    [self setCourse:other.course];
+  }
+  [self mergeUnknownFields:other.unknownFields];
+  return self;
+}
+- (LYSamplePoint_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
+}
+- (LYSamplePoint_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
+  while (YES) {
+    int32_t tag = [input readTag];
+    switch (tag) {
+      case 0:
+        [self setUnknownFields:[unknownFields build]];
+        return self;
+      default: {
+        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
+          [self setUnknownFields:[unknownFields build]];
+          return self;
+        }
+        break;
+      }
+      case 10: {
+        LYCoordinate_Builder* subBuilder = [LYCoordinate builder];
+        if (self.hasSpCoordinate) {
+          [subBuilder mergeFrom:self.spCoordinate];
+        }
+        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
+        [self setSpCoordinate:[subBuilder buildPartial]];
+        break;
+      }
+      case 16: {
+        [self setTimestamp:[input readInt64]];
+        break;
+      }
+      case 25: {
+        [self setAltitude:[input readDouble]];
+        break;
+      }
+      case 32: {
+        [self setCourse:[input readInt32]];
+        break;
+      }
+    }
+  }
+}
+- (BOOL) hasSpCoordinate {
+  return result.hasSpCoordinate;
+}
+- (LYCoordinate*) spCoordinate {
+  return result.spCoordinate;
+}
+- (LYSamplePoint_Builder*) setSpCoordinate:(LYCoordinate*) value {
+  result.hasSpCoordinate = YES;
+  result.spCoordinate = value;
+  return self;
+}
+- (LYSamplePoint_Builder*) setSpCoordinateBuilder:(LYCoordinate_Builder*) builderForValue {
+  return [self setSpCoordinate:[builderForValue build]];
+}
+- (LYSamplePoint_Builder*) mergeSpCoordinate:(LYCoordinate*) value {
+  if (result.hasSpCoordinate &&
+      result.spCoordinate != [LYCoordinate defaultInstance]) {
+    result.spCoordinate =
+      [[[LYCoordinate builderWithPrototype:result.spCoordinate] mergeFrom:value] buildPartial];
+  } else {
+    result.spCoordinate = value;
+  }
+  result.hasSpCoordinate = YES;
+  return self;
+}
+- (LYSamplePoint_Builder*) clearSpCoordinate {
+  result.hasSpCoordinate = NO;
+  result.spCoordinate = [LYCoordinate defaultInstance];
+  return self;
+}
+- (BOOL) hasTimestamp {
+  return result.hasTimestamp;
+}
+- (int64_t) timestamp {
+  return result.timestamp;
+}
+- (LYSamplePoint_Builder*) setTimestamp:(int64_t) value {
+  result.hasTimestamp = YES;
+  result.timestamp = value;
+  return self;
+}
+- (LYSamplePoint_Builder*) clearTimestamp {
+  result.hasTimestamp = NO;
+  result.timestamp = 0L;
+  return self;
+}
+- (BOOL) hasAltitude {
+  return result.hasAltitude;
+}
+- (Float64) altitude {
+  return result.altitude;
+}
+- (LYSamplePoint_Builder*) setAltitude:(Float64) value {
+  result.hasAltitude = YES;
+  result.altitude = value;
+  return self;
+}
+- (LYSamplePoint_Builder*) clearAltitude {
+  result.hasAltitude = NO;
+  result.altitude = 0;
+  return self;
+}
+- (BOOL) hasCourse {
+  return result.hasCourse;
+}
+- (int32_t) course {
+  return result.course;
+}
+- (LYSamplePoint_Builder*) setCourse:(int32_t) value {
+  result.hasCourse = YES;
+  result.course = value;
+  return self;
+}
+- (LYSamplePoint_Builder*) clearCourse {
+  result.hasCourse = NO;
+  result.course = 0;
+  return self;
+}
+@end
+
+@interface LYTrafficReport ()
+@property (retain) NSMutableArray* mutablePointsList;
+@end
+
+@implementation LYTrafficReport
+
+@synthesize mutablePointsList;
+- (void) dealloc {
+  self.mutablePointsList = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+  }
+  return self;
+}
+static LYTrafficReport* defaultLYTrafficReportInstance = nil;
++ (void) initialize {
+  if (self == [LYTrafficReport class]) {
+    defaultLYTrafficReportInstance = [[LYTrafficReport alloc] init];
+  }
+}
++ (LYTrafficReport*) defaultInstance {
+  return defaultLYTrafficReportInstance;
+}
+- (LYTrafficReport*) defaultInstance {
+  return defaultLYTrafficReportInstance;
+}
+- (NSArray*) pointsList {
+  return mutablePointsList;
+}
+- (LYSamplePoint*) pointsAtIndex:(int32_t) index {
+  id value = [mutablePointsList objectAtIndex:index];
+  return value;
+}
+- (BOOL) isInitialized {
+  for (LYSamplePoint* element in self.pointsList) {
+    if (!element.isInitialized) {
+      return NO;
+    }
+  }
+  return YES;
+}
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
+  for (LYSamplePoint* element in self.pointsList) {
+    [output writeMessage:1 value:element];
+  }
+  [self.unknownFields writeToCodedOutputStream:output];
+}
+- (int32_t) serializedSize {
+  int32_t size = memoizedSerializedSize;
+  if (size != -1) {
+    return size;
+  }
+
+  size = 0;
+  for (LYSamplePoint* element in self.pointsList) {
+    size += computeMessageSize(1, element);
+  }
+  size += self.unknownFields.serializedSize;
+  memoizedSerializedSize = size;
+  return size;
+}
++ (LYTrafficReport*) parseFromData:(NSData*) data {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromData:data] build];
+}
++ (LYTrafficReport*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficReport*) parseFromInputStream:(NSInputStream*) input {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromInputStream:input] build];
+}
++ (LYTrafficReport*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficReport*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromCodedInputStream:input] build];
+}
++ (LYTrafficReport*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYTrafficReport*)[[[LYTrafficReport builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYTrafficReport_Builder*) builder {
+  return [[[LYTrafficReport_Builder alloc] init] autorelease];
+}
++ (LYTrafficReport_Builder*) builderWithPrototype:(LYTrafficReport*) prototype {
+  return [[LYTrafficReport builder] mergeFrom:prototype];
+}
+- (LYTrafficReport_Builder*) builder {
+  return [LYTrafficReport builder];
+}
+@end
+
+@interface LYTrafficReport_Builder()
+@property (retain) LYTrafficReport* result;
+@end
+
+@implementation LYTrafficReport_Builder
+@synthesize result;
+- (void) dealloc {
+  self.result = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.result = [[[LYTrafficReport alloc] init] autorelease];
+  }
+  return self;
+}
+- (PBGeneratedMessage*) internalGetResult {
+  return result;
+}
+- (LYTrafficReport_Builder*) clear {
+  self.result = [[[LYTrafficReport alloc] init] autorelease];
+  return self;
+}
+- (LYTrafficReport_Builder*) clone {
+  return [LYTrafficReport builderWithPrototype:result];
+}
+- (LYTrafficReport*) defaultInstance {
+  return [LYTrafficReport defaultInstance];
+}
+- (LYTrafficReport*) build {
+  [self checkInitialized];
+  return [self buildPartial];
+}
+- (LYTrafficReport*) buildPartial {
+  LYTrafficReport* returnMe = [[result retain] autorelease];
+  self.result = nil;
+  return returnMe;
+}
+- (LYTrafficReport_Builder*) mergeFrom:(LYTrafficReport*) other {
+  if (other == [LYTrafficReport defaultInstance]) {
+    return self;
+  }
+  if (other.mutablePointsList.count > 0) {
+    if (result.mutablePointsList == nil) {
+      result.mutablePointsList = [NSMutableArray array];
+    }
+    [result.mutablePointsList addObjectsFromArray:other.mutablePointsList];
+  }
+  [self mergeUnknownFields:other.unknownFields];
+  return self;
+}
+- (LYTrafficReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
+}
+- (LYTrafficReport_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
+  while (YES) {
+    int32_t tag = [input readTag];
+    switch (tag) {
+      case 0:
+        [self setUnknownFields:[unknownFields build]];
+        return self;
+      default: {
+        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
+          [self setUnknownFields:[unknownFields build]];
+          return self;
+        }
+        break;
+      }
+      case 10: {
+        LYSamplePoint_Builder* subBuilder = [LYSamplePoint builder];
+        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
+        [self addPoints:[subBuilder buildPartial]];
+        break;
+      }
+    }
+  }
+}
+- (NSArray*) pointsList {
+  if (result.mutablePointsList == nil) { return [NSArray array]; }
+  return result.mutablePointsList;
+}
+- (LYSamplePoint*) pointsAtIndex:(int32_t) index {
+  return [result pointsAtIndex:index];
+}
+- (LYTrafficReport_Builder*) replacePointsAtIndex:(int32_t) index with:(LYSamplePoint*) value {
+  [result.mutablePointsList replaceObjectAtIndex:index withObject:value];
+  return self;
+}
+- (LYTrafficReport_Builder*) addAllPoints:(NSArray*) values {
+  if (result.mutablePointsList == nil) {
+    result.mutablePointsList = [NSMutableArray array];
+  }
+  [result.mutablePointsList addObjectsFromArray:values];
+  return self;
+}
+- (LYTrafficReport_Builder*) clearPointsList {
+  result.mutablePointsList = nil;
+  return self;
+}
+- (LYTrafficReport_Builder*) addPoints:(LYSamplePoint*) value {
+  if (result.mutablePointsList == nil) {
+    result.mutablePointsList = [NSMutableArray array];
+  }
+  [result.mutablePointsList addObject:value];
+  return self;
+}
+@end
+
+@interface LYMsgOnAir ()
+@property int32_t version;
+@property int32_t msgId;
+@property int64_t timestamp;
+@property LYParty fromParty;
+@property LYParty toParty;
+@property LYMsgType msgType;
+@property LYRetCode retCode;
+@property (retain) LYDeviceReport* deviceReport;
+@property (retain) LYTrafficSub* trafficSub;
+@property (retain) LYTrafficPub* trafficPub;
+@property (retain) LYTrafficReport* trafficReport;
+@end
+
+@implementation LYMsgOnAir
 
 - (BOOL) hasVersion {
   return !!hasVersion_;
@@ -3343,20 +4125,6 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   hasVersion_ = !!value;
 }
 @synthesize version;
-- (BOOL) hasMsgDir {
-  return !!hasMsgDir_;
-}
-- (void) setHasMsgDir:(BOOL) value {
-  hasMsgDir_ = !!value;
-}
-@synthesize msgDir;
-- (BOOL) hasMsgType {
-  return !!hasMsgType_;
-}
-- (void) setHasMsgType:(BOOL) value {
-  hasMsgType_ = !!value;
-}
-@synthesize msgType;
 - (BOOL) hasMsgId {
   return !!hasMsgId_;
 }
@@ -3371,27 +4139,34 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   hasTimestamp_ = !!value;
 }
 @synthesize timestamp;
-- (BOOL) hasExpires {
-  return !!hasExpires_;
+- (BOOL) hasFromParty {
+  return !!hasFromParty_;
 }
-- (void) setHasExpires:(BOOL) value {
-  hasExpires_ = !!value;
+- (void) setHasFromParty:(BOOL) value {
+  hasFromParty_ = !!value;
 }
-@synthesize expires;
-- (BOOL) hasUserToken {
-  return !!hasUserToken_;
+@synthesize fromParty;
+- (BOOL) hasToParty {
+  return !!hasToParty_;
 }
-- (void) setHasUserToken:(BOOL) value {
-  hasUserToken_ = !!value;
+- (void) setHasToParty:(BOOL) value {
+  hasToParty_ = !!value;
 }
-@synthesize userToken;
-- (BOOL) hasErrCode {
-  return !!hasErrCode_;
+@synthesize toParty;
+- (BOOL) hasMsgType {
+  return !!hasMsgType_;
 }
-- (void) setHasErrCode:(BOOL) value {
-  hasErrCode_ = !!value;
+- (void) setHasMsgType:(BOOL) value {
+  hasMsgType_ = !!value;
 }
-@synthesize errCode;
+@synthesize msgType;
+- (BOOL) hasRetCode {
+  return !!hasRetCode_;
+}
+- (void) setHasRetCode:(BOOL) value {
+  hasRetCode_ = !!value;
+}
+@synthesize retCode;
 - (BOOL) hasDeviceReport {
   return !!hasDeviceReport_;
 }
@@ -3399,27 +4174,6 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   hasDeviceReport_ = !!value;
 }
 @synthesize deviceReport;
-- (BOOL) hasLocation {
-  return !!hasLocation_;
-}
-- (void) setHasLocation:(BOOL) value {
-  hasLocation_ = !!value;
-}
-@synthesize location;
-- (BOOL) hasSegment {
-  return !!hasSegment_;
-}
-- (void) setHasSegment:(BOOL) value {
-  hasSegment_ = !!value;
-}
-@synthesize segment;
-- (BOOL) hasRoute {
-  return !!hasRoute_;
-}
-- (void) setHasRoute:(BOOL) value {
-  hasRoute_ = !!value;
-}
-@synthesize route;
 - (BOOL) hasTrafficSub {
   return !!hasTrafficSub_;
 }
@@ -3427,89 +4181,57 @@ static TSSDeviceReport* defaultTSSDeviceReportInstance = nil;
   hasTrafficSub_ = !!value;
 }
 @synthesize trafficSub;
-- (BOOL) hasSegmentTraffic {
-  return !!hasSegmentTraffic_;
+- (BOOL) hasTrafficPub {
+  return !!hasTrafficPub_;
 }
-- (void) setHasSegmentTraffic:(BOOL) value {
-  hasSegmentTraffic_ = !!value;
+- (void) setHasTrafficPub:(BOOL) value {
+  hasTrafficPub_ = !!value;
 }
-@synthesize segmentTraffic;
-- (BOOL) hasRoadTraffic {
-  return !!hasRoadTraffic_;
+@synthesize trafficPub;
+- (BOOL) hasTrafficReport {
+  return !!hasTrafficReport_;
 }
-- (void) setHasRoadTraffic:(BOOL) value {
-  hasRoadTraffic_ = !!value;
+- (void) setHasTrafficReport:(BOOL) value {
+  hasTrafficReport_ = !!value;
 }
-@synthesize roadTraffic;
-- (BOOL) hasCityTraffic {
-  return !!hasCityTraffic_;
-}
-- (void) setHasCityTraffic:(BOOL) value {
-  hasCityTraffic_ = !!value;
-}
-@synthesize cityTraffic;
-- (BOOL) hasTrafficProbe {
-  return !!hasTrafficProbe_;
-}
-- (void) setHasTrafficProbe:(BOOL) value {
-  hasTrafficProbe_ = !!value;
-}
-@synthesize trafficProbe;
+@synthesize trafficReport;
 - (void) dealloc {
-  self.userToken = nil;
   self.deviceReport = nil;
-  self.location = nil;
-  self.segment = nil;
-  self.route = nil;
   self.trafficSub = nil;
-  self.segmentTraffic = nil;
-  self.roadTraffic = nil;
-  self.cityTraffic = nil;
-  self.trafficProbe = nil;
+  self.trafficPub = nil;
+  self.trafficReport = nil;
   [super dealloc];
 }
 - (id) init {
   if ((self = [super init])) {
     self.version = 0;
-    self.msgDir = TSSMsgDirClient2Tss;
-    self.msgType = TSSMsgTypeVoid;
     self.msgId = 0;
     self.timestamp = 0L;
-    self.expires = 30;
-    self.userToken = [NSData data];
-    self.errCode = TSSErrCodeVersionImcompatible;
-    self.deviceReport = [TSSDeviceReport defaultInstance];
-    self.location = [TSSLocation defaultInstance];
-    self.segment = [TSSSegment defaultInstance];
-    self.route = [TSSRoute defaultInstance];
-    self.trafficSub = [TSSTrafficSub defaultInstance];
-    self.segmentTraffic = [TSSSegmentTraffic defaultInstance];
-    self.roadTraffic = [TSSRoadTraffic defaultInstance];
-    self.cityTraffic = [TSSCityTraffic defaultInstance];
-    self.trafficProbe = [TSSTrafficProbe defaultInstance];
+    self.fromParty = LYPartyLyClient;
+    self.toParty = LYPartyLyClient;
+    self.msgType = LYMsgTypeLyVoid;
+    self.retCode = LYRetCodeLySuccess;
+    self.deviceReport = [LYDeviceReport defaultInstance];
+    self.trafficSub = [LYTrafficSub defaultInstance];
+    self.trafficPub = [LYTrafficPub defaultInstance];
+    self.trafficReport = [LYTrafficReport defaultInstance];
   }
   return self;
 }
-static TSSPackage* defaultTSSPackageInstance = nil;
+static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
 + (void) initialize {
-  if (self == [TSSPackage class]) {
-    defaultTSSPackageInstance = [[TSSPackage alloc] init];
+  if (self == [LYMsgOnAir class]) {
+    defaultLYMsgOnAirInstance = [[LYMsgOnAir alloc] init];
   }
 }
-+ (TSSPackage*) defaultInstance {
-  return defaultTSSPackageInstance;
++ (LYMsgOnAir*) defaultInstance {
+  return defaultLYMsgOnAirInstance;
 }
-- (TSSPackage*) defaultInstance {
-  return defaultTSSPackageInstance;
+- (LYMsgOnAir*) defaultInstance {
+  return defaultLYMsgOnAirInstance;
 }
 - (BOOL) isInitialized {
   if (!self.hasVersion) {
-    return NO;
-  }
-  if (!self.hasMsgDir) {
-    return NO;
-  }
-  if (!self.hasMsgType) {
     return NO;
   }
   if (!self.hasMsgId) {
@@ -3518,23 +4240,17 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (!self.hasTimestamp) {
     return NO;
   }
+  if (!self.hasFromParty) {
+    return NO;
+  }
+  if (!self.hasToParty) {
+    return NO;
+  }
+  if (!self.hasMsgType) {
+    return NO;
+  }
   if (self.hasDeviceReport) {
     if (!self.deviceReport.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasLocation) {
-    if (!self.location.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasSegment) {
-    if (!self.segment.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasRoute) {
-    if (!self.route.isInitialized) {
       return NO;
     }
   }
@@ -3543,23 +4259,13 @@ static TSSPackage* defaultTSSPackageInstance = nil;
       return NO;
     }
   }
-  if (self.hasSegmentTraffic) {
-    if (!self.segmentTraffic.isInitialized) {
+  if (self.hasTrafficPub) {
+    if (!self.trafficPub.isInitialized) {
       return NO;
     }
   }
-  if (self.hasRoadTraffic) {
-    if (!self.roadTraffic.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasCityTraffic) {
-    if (!self.cityTraffic.isInitialized) {
-      return NO;
-    }
-  }
-  if (self.hasTrafficProbe) {
-    if (!self.trafficProbe.isInitialized) {
+  if (self.hasTrafficReport) {
+    if (!self.trafficReport.isInitialized) {
       return NO;
     }
   }
@@ -3572,8 +4278,11 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (self.hasVersion) {
     [output writeInt32:1 value:self.version];
   }
-  if (self.hasMsgDir) {
-    [output writeEnum:3 value:self.msgDir];
+  if (self.hasFromParty) {
+    [output writeEnum:2 value:self.fromParty];
+  }
+  if (self.hasToParty) {
+    [output writeEnum:3 value:self.toParty];
   }
   if (self.hasMsgType) {
     [output writeEnum:4 value:self.msgType];
@@ -3584,41 +4293,20 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (self.hasTimestamp) {
     [output writeInt64:6 value:self.timestamp];
   }
-  if (self.hasExpires) {
-    [output writeInt32:7 value:self.expires];
-  }
-  if (self.hasUserToken) {
-    [output writeData:8 value:self.userToken];
-  }
-  if (self.hasErrCode) {
-    [output writeEnum:17 value:self.errCode];
+  if (self.hasRetCode) {
+    [output writeEnum:17 value:self.retCode];
   }
   if (self.hasDeviceReport) {
     [output writeMessage:19 value:self.deviceReport];
   }
-  if (self.hasLocation) {
-    [output writeMessage:33 value:self.location];
-  }
-  if (self.hasSegment) {
-    [output writeMessage:34 value:self.segment];
-  }
-  if (self.hasRoute) {
-    [output writeMessage:35 value:self.route];
-  }
   if (self.hasTrafficSub) {
     [output writeMessage:36 value:self.trafficSub];
   }
-  if (self.hasSegmentTraffic) {
-    [output writeMessage:49 value:self.segmentTraffic];
+  if (self.hasTrafficPub) {
+    [output writeMessage:51 value:self.trafficPub];
   }
-  if (self.hasRoadTraffic) {
-    [output writeMessage:50 value:self.roadTraffic];
-  }
-  if (self.hasCityTraffic) {
-    [output writeMessage:51 value:self.cityTraffic];
-  }
-  if (self.hasTrafficProbe) {
-    [output writeMessage:65 value:self.trafficProbe];
+  if (self.hasTrafficReport) {
+    [output writeMessage:65 value:self.trafficReport];
   }
   [self writeExtensionsToCodedOutputStream:output
                                       from:128
@@ -3635,8 +4323,11 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (self.hasVersion) {
     size += computeInt32Size(1, self.version);
   }
-  if (self.hasMsgDir) {
-    size += computeEnumSize(3, self.msgDir);
+  if (self.hasFromParty) {
+    size += computeEnumSize(2, self.fromParty);
+  }
+  if (self.hasToParty) {
+    size += computeEnumSize(3, self.toParty);
   }
   if (self.hasMsgType) {
     size += computeEnumSize(4, self.msgType);
@@ -3647,81 +4338,60 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (self.hasTimestamp) {
     size += computeInt64Size(6, self.timestamp);
   }
-  if (self.hasExpires) {
-    size += computeInt32Size(7, self.expires);
-  }
-  if (self.hasUserToken) {
-    size += computeDataSize(8, self.userToken);
-  }
-  if (self.hasErrCode) {
-    size += computeEnumSize(17, self.errCode);
+  if (self.hasRetCode) {
+    size += computeEnumSize(17, self.retCode);
   }
   if (self.hasDeviceReport) {
     size += computeMessageSize(19, self.deviceReport);
   }
-  if (self.hasLocation) {
-    size += computeMessageSize(33, self.location);
-  }
-  if (self.hasSegment) {
-    size += computeMessageSize(34, self.segment);
-  }
-  if (self.hasRoute) {
-    size += computeMessageSize(35, self.route);
-  }
   if (self.hasTrafficSub) {
     size += computeMessageSize(36, self.trafficSub);
   }
-  if (self.hasSegmentTraffic) {
-    size += computeMessageSize(49, self.segmentTraffic);
+  if (self.hasTrafficPub) {
+    size += computeMessageSize(51, self.trafficPub);
   }
-  if (self.hasRoadTraffic) {
-    size += computeMessageSize(50, self.roadTraffic);
-  }
-  if (self.hasCityTraffic) {
-    size += computeMessageSize(51, self.cityTraffic);
-  }
-  if (self.hasTrafficProbe) {
-    size += computeMessageSize(65, self.trafficProbe);
+  if (self.hasTrafficReport) {
+    size += computeMessageSize(65, self.trafficReport);
   }
   size += [self extensionsSerializedSize];
   size += self.unknownFields.serializedSize;
   memoizedSerializedSize = size;
   return size;
 }
-+ (TSSPackage*) parseFromData:(NSData*) data {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromData:data] build];
++ (LYMsgOnAir*) parseFromData:(NSData*) data {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromData:data] build];
 }
-+ (TSSPackage*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
++ (LYMsgOnAir*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
 }
-+ (TSSPackage*) parseFromInputStream:(NSInputStream*) input {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromInputStream:input] build];
++ (LYMsgOnAir*) parseFromInputStream:(NSInputStream*) input {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromInputStream:input] build];
 }
-+ (TSSPackage*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYMsgOnAir*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSPackage*) parseFromCodedInputStream:(PBCodedInputStream*) input {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromCodedInputStream:input] build];
++ (LYMsgOnAir*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromCodedInputStream:input] build];
 }
-+ (TSSPackage*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
-  return (TSSPackage*)[[[TSSPackage builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
++ (LYMsgOnAir*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYMsgOnAir*)[[[LYMsgOnAir builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
 }
-+ (TSSPackage_Builder*) builder {
-  return [[[TSSPackage_Builder alloc] init] autorelease];
++ (LYMsgOnAir_Builder*) builder {
+  return [[[LYMsgOnAir_Builder alloc] init] autorelease];
 }
-+ (TSSPackage_Builder*) builderWithPrototype:(TSSPackage*) prototype {
-  return [[TSSPackage builder] mergeFrom:prototype];
++ (LYMsgOnAir_Builder*) builderWithPrototype:(LYMsgOnAir*) prototype {
+  return [[LYMsgOnAir builder] mergeFrom:prototype];
 }
-- (TSSPackage_Builder*) builder {
-  return [TSSPackage builder];
+- (LYMsgOnAir_Builder*) builder {
+  return [LYMsgOnAir builder];
 }
 @end
 
-@interface TSSPackage_Builder()
-@property (retain) TSSPackage* result;
+@interface LYMsgOnAir_Builder()
+@property (retain) LYMsgOnAir* result;
 @end
 
-@implementation TSSPackage_Builder
+@implementation LYMsgOnAir_Builder
 @synthesize result;
 - (void) dealloc {
   self.result = nil;
@@ -3729,44 +4399,38 @@ static TSSPackage* defaultTSSPackageInstance = nil;
 }
 - (id) init {
   if ((self = [super init])) {
-    self.result = [[[TSSPackage alloc] init] autorelease];
+    self.result = [[[LYMsgOnAir alloc] init] autorelease];
   }
   return self;
 }
 - (PBExtendableMessage*) internalGetResult {
   return result;
 }
-- (TSSPackage_Builder*) clear {
-  self.result = [[[TSSPackage alloc] init] autorelease];
+- (LYMsgOnAir_Builder*) clear {
+  self.result = [[[LYMsgOnAir alloc] init] autorelease];
   return self;
 }
-- (TSSPackage_Builder*) clone {
-  return [TSSPackage builderWithPrototype:result];
+- (LYMsgOnAir_Builder*) clone {
+  return [LYMsgOnAir builderWithPrototype:result];
 }
-- (TSSPackage*) defaultInstance {
-  return [TSSPackage defaultInstance];
+- (LYMsgOnAir*) defaultInstance {
+  return [LYMsgOnAir defaultInstance];
 }
-- (TSSPackage*) build {
+- (LYMsgOnAir*) build {
   [self checkInitialized];
   return [self buildPartial];
 }
-- (TSSPackage*) buildPartial {
-  TSSPackage* returnMe = [[result retain] autorelease];
+- (LYMsgOnAir*) buildPartial {
+  LYMsgOnAir* returnMe = [[result retain] autorelease];
   self.result = nil;
   return returnMe;
 }
-- (TSSPackage_Builder*) mergeFrom:(TSSPackage*) other {
-  if (other == [TSSPackage defaultInstance]) {
+- (LYMsgOnAir_Builder*) mergeFrom:(LYMsgOnAir*) other {
+  if (other == [LYMsgOnAir defaultInstance]) {
     return self;
   }
   if (other.hasVersion) {
     [self setVersion:other.version];
-  }
-  if (other.hasMsgDir) {
-    [self setMsgDir:other.msgDir];
-  }
-  if (other.hasMsgType) {
-    [self setMsgType:other.msgType];
   }
   if (other.hasMsgId) {
     [self setMsgId:other.msgId];
@@ -3774,50 +4438,38 @@ static TSSPackage* defaultTSSPackageInstance = nil;
   if (other.hasTimestamp) {
     [self setTimestamp:other.timestamp];
   }
-  if (other.hasExpires) {
-    [self setExpires:other.expires];
+  if (other.hasFromParty) {
+    [self setFromParty:other.fromParty];
   }
-  if (other.hasUserToken) {
-    [self setUserToken:other.userToken];
+  if (other.hasToParty) {
+    [self setToParty:other.toParty];
   }
-  if (other.hasErrCode) {
-    [self setErrCode:other.errCode];
+  if (other.hasMsgType) {
+    [self setMsgType:other.msgType];
+  }
+  if (other.hasRetCode) {
+    [self setRetCode:other.retCode];
   }
   if (other.hasDeviceReport) {
     [self mergeDeviceReport:other.deviceReport];
   }
-  if (other.hasLocation) {
-    [self mergeLocation:other.location];
-  }
-  if (other.hasSegment) {
-    [self mergeSegment:other.segment];
-  }
-  if (other.hasRoute) {
-    [self mergeRoute:other.route];
-  }
   if (other.hasTrafficSub) {
     [self mergeTrafficSub:other.trafficSub];
   }
-  if (other.hasSegmentTraffic) {
-    [self mergeSegmentTraffic:other.segmentTraffic];
+  if (other.hasTrafficPub) {
+    [self mergeTrafficPub:other.trafficPub];
   }
-  if (other.hasRoadTraffic) {
-    [self mergeRoadTraffic:other.roadTraffic];
-  }
-  if (other.hasCityTraffic) {
-    [self mergeCityTraffic:other.cityTraffic];
-  }
-  if (other.hasTrafficProbe) {
-    [self mergeTrafficProbe:other.trafficProbe];
+  if (other.hasTrafficReport) {
+    [self mergeTrafficReport:other.trafficReport];
   }
   [self mergeExtensionFields:other];
   [self mergeUnknownFields:other.unknownFields];
   return self;
 }
-- (TSSPackage_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+- (LYMsgOnAir_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
   return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
 }
-- (TSSPackage_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+- (LYMsgOnAir_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
   PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
   while (YES) {
     int32_t tag = [input readTag];
@@ -3836,10 +4488,19 @@ static TSSPackage* defaultTSSPackageInstance = nil;
         [self setVersion:[input readInt32]];
         break;
       }
+      case 16: {
+        int32_t value = [input readEnum];
+        if (LYPartyIsValidValue(value)) {
+          [self setFromParty:value];
+        } else {
+          [unknownFields mergeVarintField:2 value:value];
+        }
+        break;
+      }
       case 24: {
         int32_t value = [input readEnum];
-        if (TSSMsgDirIsValidValue(value)) {
-          [self setMsgDir:value];
+        if (LYPartyIsValidValue(value)) {
+          [self setToParty:value];
         } else {
           [unknownFields mergeVarintField:3 value:value];
         }
@@ -3847,7 +4508,7 @@ static TSSPackage* defaultTSSPackageInstance = nil;
       }
       case 32: {
         int32_t value = [input readEnum];
-        if (TSSMsgTypeIsValidValue(value)) {
+        if (LYMsgTypeIsValidValue(value)) {
           [self setMsgType:value];
         } else {
           [unknownFields mergeVarintField:4 value:value];
@@ -3862,25 +4523,17 @@ static TSSPackage* defaultTSSPackageInstance = nil;
         [self setTimestamp:[input readInt64]];
         break;
       }
-      case 56: {
-        [self setExpires:[input readInt32]];
-        break;
-      }
-      case 66: {
-        [self setUserToken:[input readData]];
-        break;
-      }
       case 136: {
         int32_t value = [input readEnum];
-        if (TSSErrCodeIsValidValue(value)) {
-          [self setErrCode:value];
+        if (LYRetCodeIsValidValue(value)) {
+          [self setRetCode:value];
         } else {
           [unknownFields mergeVarintField:17 value:value];
         }
         break;
       }
       case 154: {
-        TSSDeviceReport_Builder* subBuilder = [TSSDeviceReport builder];
+        LYDeviceReport_Builder* subBuilder = [LYDeviceReport builder];
         if (self.hasDeviceReport) {
           [subBuilder mergeFrom:self.deviceReport];
         }
@@ -3888,35 +4541,8 @@ static TSSPackage* defaultTSSPackageInstance = nil;
         [self setDeviceReport:[subBuilder buildPartial]];
         break;
       }
-      case 266: {
-        TSSLocation_Builder* subBuilder = [TSSLocation builder];
-        if (self.hasLocation) {
-          [subBuilder mergeFrom:self.location];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setLocation:[subBuilder buildPartial]];
-        break;
-      }
-      case 274: {
-        TSSSegment_Builder* subBuilder = [TSSSegment builder];
-        if (self.hasSegment) {
-          [subBuilder mergeFrom:self.segment];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setSegment:[subBuilder buildPartial]];
-        break;
-      }
-      case 282: {
-        TSSRoute_Builder* subBuilder = [TSSRoute builder];
-        if (self.hasRoute) {
-          [subBuilder mergeFrom:self.route];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setRoute:[subBuilder buildPartial]];
-        break;
-      }
       case 290: {
-        TSSTrafficSub_Builder* subBuilder = [TSSTrafficSub builder];
+        LYTrafficSub_Builder* subBuilder = [LYTrafficSub builder];
         if (self.hasTrafficSub) {
           [subBuilder mergeFrom:self.trafficSub];
         }
@@ -3924,40 +4550,22 @@ static TSSPackage* defaultTSSPackageInstance = nil;
         [self setTrafficSub:[subBuilder buildPartial]];
         break;
       }
-      case 394: {
-        TSSSegmentTraffic_Builder* subBuilder = [TSSSegmentTraffic builder];
-        if (self.hasSegmentTraffic) {
-          [subBuilder mergeFrom:self.segmentTraffic];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setSegmentTraffic:[subBuilder buildPartial]];
-        break;
-      }
-      case 402: {
-        TSSRoadTraffic_Builder* subBuilder = [TSSRoadTraffic builder];
-        if (self.hasRoadTraffic) {
-          [subBuilder mergeFrom:self.roadTraffic];
-        }
-        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setRoadTraffic:[subBuilder buildPartial]];
-        break;
-      }
       case 410: {
-        TSSCityTraffic_Builder* subBuilder = [TSSCityTraffic builder];
-        if (self.hasCityTraffic) {
-          [subBuilder mergeFrom:self.cityTraffic];
+        LYTrafficPub_Builder* subBuilder = [LYTrafficPub builder];
+        if (self.hasTrafficPub) {
+          [subBuilder mergeFrom:self.trafficPub];
         }
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setCityTraffic:[subBuilder buildPartial]];
+        [self setTrafficPub:[subBuilder buildPartial]];
         break;
       }
       case 522: {
-        TSSTrafficProbe_Builder* subBuilder = [TSSTrafficProbe builder];
-        if (self.hasTrafficProbe) {
-          [subBuilder mergeFrom:self.trafficProbe];
+        LYTrafficReport_Builder* subBuilder = [LYTrafficReport builder];
+        if (self.hasTrafficReport) {
+          [subBuilder mergeFrom:self.trafficReport];
         }
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
-        [self setTrafficProbe:[subBuilder buildPartial]];
+        [self setTrafficReport:[subBuilder buildPartial]];
         break;
       }
     }
@@ -3969,46 +4577,14 @@ static TSSPackage* defaultTSSPackageInstance = nil;
 - (int32_t) version {
   return result.version;
 }
-- (TSSPackage_Builder*) setVersion:(int32_t) value {
+- (LYMsgOnAir_Builder*) setVersion:(int32_t) value {
   result.hasVersion = YES;
   result.version = value;
   return self;
 }
-- (TSSPackage_Builder*) clearVersion {
+- (LYMsgOnAir_Builder*) clearVersion {
   result.hasVersion = NO;
   result.version = 0;
-  return self;
-}
-- (BOOL) hasMsgDir {
-  return result.hasMsgDir;
-}
-- (TSSMsgDir) msgDir {
-  return result.msgDir;
-}
-- (TSSPackage_Builder*) setMsgDir:(TSSMsgDir) value {
-  result.hasMsgDir = YES;
-  result.msgDir = value;
-  return self;
-}
-- (TSSPackage_Builder*) clearMsgDir {
-  result.hasMsgDir = NO;
-  result.msgDir = TSSMsgDirClient2Tss;
-  return self;
-}
-- (BOOL) hasMsgType {
-  return result.hasMsgType;
-}
-- (TSSMsgType) msgType {
-  return result.msgType;
-}
-- (TSSPackage_Builder*) setMsgType:(TSSMsgType) value {
-  result.hasMsgType = YES;
-  result.msgType = value;
-  return self;
-}
-- (TSSPackage_Builder*) clearMsgType {
-  result.hasMsgType = NO;
-  result.msgType = TSSMsgTypeVoid;
   return self;
 }
 - (BOOL) hasMsgId {
@@ -4017,12 +4593,12 @@ static TSSPackage* defaultTSSPackageInstance = nil;
 - (int32_t) msgId {
   return result.msgId;
 }
-- (TSSPackage_Builder*) setMsgId:(int32_t) value {
+- (LYMsgOnAir_Builder*) setMsgId:(int32_t) value {
   result.hasMsgId = YES;
   result.msgId = value;
   return self;
 }
-- (TSSPackage_Builder*) clearMsgId {
+- (LYMsgOnAir_Builder*) clearMsgId {
   result.hasMsgId = NO;
   result.msgId = 0;
   return self;
@@ -4033,332 +4609,198 @@ static TSSPackage* defaultTSSPackageInstance = nil;
 - (int64_t) timestamp {
   return result.timestamp;
 }
-- (TSSPackage_Builder*) setTimestamp:(int64_t) value {
+- (LYMsgOnAir_Builder*) setTimestamp:(int64_t) value {
   result.hasTimestamp = YES;
   result.timestamp = value;
   return self;
 }
-- (TSSPackage_Builder*) clearTimestamp {
+- (LYMsgOnAir_Builder*) clearTimestamp {
   result.hasTimestamp = NO;
   result.timestamp = 0L;
   return self;
 }
-- (BOOL) hasExpires {
-  return result.hasExpires;
+- (BOOL) hasFromParty {
+  return result.hasFromParty;
 }
-- (int32_t) expires {
-  return result.expires;
+- (LYParty) fromParty {
+  return result.fromParty;
 }
-- (TSSPackage_Builder*) setExpires:(int32_t) value {
-  result.hasExpires = YES;
-  result.expires = value;
+- (LYMsgOnAir_Builder*) setFromParty:(LYParty) value {
+  result.hasFromParty = YES;
+  result.fromParty = value;
   return self;
 }
-- (TSSPackage_Builder*) clearExpires {
-  result.hasExpires = NO;
-  result.expires = 30;
+- (LYMsgOnAir_Builder*) clearFromParty {
+  result.hasFromParty = NO;
+  result.fromParty = LYPartyLyClient;
   return self;
 }
-- (BOOL) hasUserToken {
-  return result.hasUserToken;
+- (BOOL) hasToParty {
+  return result.hasToParty;
 }
-- (NSData*) userToken {
-  return result.userToken;
+- (LYParty) toParty {
+  return result.toParty;
 }
-- (TSSPackage_Builder*) setUserToken:(NSData*) value {
-  result.hasUserToken = YES;
-  result.userToken = value;
+- (LYMsgOnAir_Builder*) setToParty:(LYParty) value {
+  result.hasToParty = YES;
+  result.toParty = value;
   return self;
 }
-- (TSSPackage_Builder*) clearUserToken {
-  result.hasUserToken = NO;
-  result.userToken = [NSData data];
+- (LYMsgOnAir_Builder*) clearToParty {
+  result.hasToParty = NO;
+  result.toParty = LYPartyLyClient;
   return self;
 }
-- (BOOL) hasErrCode {
-  return result.hasErrCode;
+- (BOOL) hasMsgType {
+  return result.hasMsgType;
 }
-- (TSSErrCode) errCode {
-  return result.errCode;
+- (LYMsgType) msgType {
+  return result.msgType;
 }
-- (TSSPackage_Builder*) setErrCode:(TSSErrCode) value {
-  result.hasErrCode = YES;
-  result.errCode = value;
+- (LYMsgOnAir_Builder*) setMsgType:(LYMsgType) value {
+  result.hasMsgType = YES;
+  result.msgType = value;
   return self;
 }
-- (TSSPackage_Builder*) clearErrCode {
-  result.hasErrCode = NO;
-  result.errCode = TSSErrCodeVersionImcompatible;
+- (LYMsgOnAir_Builder*) clearMsgType {
+  result.hasMsgType = NO;
+  result.msgType = LYMsgTypeLyVoid;
+  return self;
+}
+- (BOOL) hasRetCode {
+  return result.hasRetCode;
+}
+- (LYRetCode) retCode {
+  return result.retCode;
+}
+- (LYMsgOnAir_Builder*) setRetCode:(LYRetCode) value {
+  result.hasRetCode = YES;
+  result.retCode = value;
+  return self;
+}
+- (LYMsgOnAir_Builder*) clearRetCode {
+  result.hasRetCode = NO;
+  result.retCode = LYRetCodeLySuccess;
   return self;
 }
 - (BOOL) hasDeviceReport {
   return result.hasDeviceReport;
 }
-- (TSSDeviceReport*) deviceReport {
+- (LYDeviceReport*) deviceReport {
   return result.deviceReport;
 }
-- (TSSPackage_Builder*) setDeviceReport:(TSSDeviceReport*) value {
+- (LYMsgOnAir_Builder*) setDeviceReport:(LYDeviceReport*) value {
   result.hasDeviceReport = YES;
   result.deviceReport = value;
   return self;
 }
-- (TSSPackage_Builder*) setDeviceReportBuilder:(TSSDeviceReport_Builder*) builderForValue {
+- (LYMsgOnAir_Builder*) setDeviceReportBuilder:(LYDeviceReport_Builder*) builderForValue {
   return [self setDeviceReport:[builderForValue build]];
 }
-- (TSSPackage_Builder*) mergeDeviceReport:(TSSDeviceReport*) value {
+- (LYMsgOnAir_Builder*) mergeDeviceReport:(LYDeviceReport*) value {
   if (result.hasDeviceReport &&
-      result.deviceReport != [TSSDeviceReport defaultInstance]) {
+      result.deviceReport != [LYDeviceReport defaultInstance]) {
     result.deviceReport =
-      [[[TSSDeviceReport builderWithPrototype:result.deviceReport] mergeFrom:value] buildPartial];
+      [[[LYDeviceReport builderWithPrototype:result.deviceReport] mergeFrom:value] buildPartial];
   } else {
     result.deviceReport = value;
   }
   result.hasDeviceReport = YES;
   return self;
 }
-- (TSSPackage_Builder*) clearDeviceReport {
+- (LYMsgOnAir_Builder*) clearDeviceReport {
   result.hasDeviceReport = NO;
-  result.deviceReport = [TSSDeviceReport defaultInstance];
-  return self;
-}
-- (BOOL) hasLocation {
-  return result.hasLocation;
-}
-- (TSSLocation*) location {
-  return result.location;
-}
-- (TSSPackage_Builder*) setLocation:(TSSLocation*) value {
-  result.hasLocation = YES;
-  result.location = value;
-  return self;
-}
-- (TSSPackage_Builder*) setLocationBuilder:(TSSLocation_Builder*) builderForValue {
-  return [self setLocation:[builderForValue build]];
-}
-- (TSSPackage_Builder*) mergeLocation:(TSSLocation*) value {
-  if (result.hasLocation &&
-      result.location != [TSSLocation defaultInstance]) {
-    result.location =
-      [[[TSSLocation builderWithPrototype:result.location] mergeFrom:value] buildPartial];
-  } else {
-    result.location = value;
-  }
-  result.hasLocation = YES;
-  return self;
-}
-- (TSSPackage_Builder*) clearLocation {
-  result.hasLocation = NO;
-  result.location = [TSSLocation defaultInstance];
-  return self;
-}
-- (BOOL) hasSegment {
-  return result.hasSegment;
-}
-- (TSSSegment*) segment {
-  return result.segment;
-}
-- (TSSPackage_Builder*) setSegment:(TSSSegment*) value {
-  result.hasSegment = YES;
-  result.segment = value;
-  return self;
-}
-- (TSSPackage_Builder*) setSegmentBuilder:(TSSSegment_Builder*) builderForValue {
-  return [self setSegment:[builderForValue build]];
-}
-- (TSSPackage_Builder*) mergeSegment:(TSSSegment*) value {
-  if (result.hasSegment &&
-      result.segment != [TSSSegment defaultInstance]) {
-    result.segment =
-      [[[TSSSegment builderWithPrototype:result.segment] mergeFrom:value] buildPartial];
-  } else {
-    result.segment = value;
-  }
-  result.hasSegment = YES;
-  return self;
-}
-- (TSSPackage_Builder*) clearSegment {
-  result.hasSegment = NO;
-  result.segment = [TSSSegment defaultInstance];
-  return self;
-}
-- (BOOL) hasRoute {
-  return result.hasRoute;
-}
-- (TSSRoute*) route {
-  return result.route;
-}
-- (TSSPackage_Builder*) setRoute:(TSSRoute*) value {
-  result.hasRoute = YES;
-  result.route = value;
-  return self;
-}
-- (TSSPackage_Builder*) setRouteBuilder:(TSSRoute_Builder*) builderForValue {
-  return [self setRoute:[builderForValue build]];
-}
-- (TSSPackage_Builder*) mergeRoute:(TSSRoute*) value {
-  if (result.hasRoute &&
-      result.route != [TSSRoute defaultInstance]) {
-    result.route =
-      [[[TSSRoute builderWithPrototype:result.route] mergeFrom:value] buildPartial];
-  } else {
-    result.route = value;
-  }
-  result.hasRoute = YES;
-  return self;
-}
-- (TSSPackage_Builder*) clearRoute {
-  result.hasRoute = NO;
-  result.route = [TSSRoute defaultInstance];
+  result.deviceReport = [LYDeviceReport defaultInstance];
   return self;
 }
 - (BOOL) hasTrafficSub {
   return result.hasTrafficSub;
 }
-- (TSSTrafficSub*) trafficSub {
+- (LYTrafficSub*) trafficSub {
   return result.trafficSub;
 }
-- (TSSPackage_Builder*) setTrafficSub:(TSSTrafficSub*) value {
+- (LYMsgOnAir_Builder*) setTrafficSub:(LYTrafficSub*) value {
   result.hasTrafficSub = YES;
   result.trafficSub = value;
   return self;
 }
-- (TSSPackage_Builder*) setTrafficSubBuilder:(TSSTrafficSub_Builder*) builderForValue {
+- (LYMsgOnAir_Builder*) setTrafficSubBuilder:(LYTrafficSub_Builder*) builderForValue {
   return [self setTrafficSub:[builderForValue build]];
 }
-- (TSSPackage_Builder*) mergeTrafficSub:(TSSTrafficSub*) value {
+- (LYMsgOnAir_Builder*) mergeTrafficSub:(LYTrafficSub*) value {
   if (result.hasTrafficSub &&
-      result.trafficSub != [TSSTrafficSub defaultInstance]) {
+      result.trafficSub != [LYTrafficSub defaultInstance]) {
     result.trafficSub =
-      [[[TSSTrafficSub builderWithPrototype:result.trafficSub] mergeFrom:value] buildPartial];
+      [[[LYTrafficSub builderWithPrototype:result.trafficSub] mergeFrom:value] buildPartial];
   } else {
     result.trafficSub = value;
   }
   result.hasTrafficSub = YES;
   return self;
 }
-- (TSSPackage_Builder*) clearTrafficSub {
+- (LYMsgOnAir_Builder*) clearTrafficSub {
   result.hasTrafficSub = NO;
-  result.trafficSub = [TSSTrafficSub defaultInstance];
+  result.trafficSub = [LYTrafficSub defaultInstance];
   return self;
 }
-- (BOOL) hasSegmentTraffic {
-  return result.hasSegmentTraffic;
+- (BOOL) hasTrafficPub {
+  return result.hasTrafficPub;
 }
-- (TSSSegmentTraffic*) segmentTraffic {
-  return result.segmentTraffic;
+- (LYTrafficPub*) trafficPub {
+  return result.trafficPub;
 }
-- (TSSPackage_Builder*) setSegmentTraffic:(TSSSegmentTraffic*) value {
-  result.hasSegmentTraffic = YES;
-  result.segmentTraffic = value;
+- (LYMsgOnAir_Builder*) setTrafficPub:(LYTrafficPub*) value {
+  result.hasTrafficPub = YES;
+  result.trafficPub = value;
   return self;
 }
-- (TSSPackage_Builder*) setSegmentTrafficBuilder:(TSSSegmentTraffic_Builder*) builderForValue {
-  return [self setSegmentTraffic:[builderForValue build]];
+- (LYMsgOnAir_Builder*) setTrafficPubBuilder:(LYTrafficPub_Builder*) builderForValue {
+  return [self setTrafficPub:[builderForValue build]];
 }
-- (TSSPackage_Builder*) mergeSegmentTraffic:(TSSSegmentTraffic*) value {
-  if (result.hasSegmentTraffic &&
-      result.segmentTraffic != [TSSSegmentTraffic defaultInstance]) {
-    result.segmentTraffic =
-      [[[TSSSegmentTraffic builderWithPrototype:result.segmentTraffic] mergeFrom:value] buildPartial];
+- (LYMsgOnAir_Builder*) mergeTrafficPub:(LYTrafficPub*) value {
+  if (result.hasTrafficPub &&
+      result.trafficPub != [LYTrafficPub defaultInstance]) {
+    result.trafficPub =
+      [[[LYTrafficPub builderWithPrototype:result.trafficPub] mergeFrom:value] buildPartial];
   } else {
-    result.segmentTraffic = value;
+    result.trafficPub = value;
   }
-  result.hasSegmentTraffic = YES;
+  result.hasTrafficPub = YES;
   return self;
 }
-- (TSSPackage_Builder*) clearSegmentTraffic {
-  result.hasSegmentTraffic = NO;
-  result.segmentTraffic = [TSSSegmentTraffic defaultInstance];
+- (LYMsgOnAir_Builder*) clearTrafficPub {
+  result.hasTrafficPub = NO;
+  result.trafficPub = [LYTrafficPub defaultInstance];
   return self;
 }
-- (BOOL) hasRoadTraffic {
-  return result.hasRoadTraffic;
+- (BOOL) hasTrafficReport {
+  return result.hasTrafficReport;
 }
-- (TSSRoadTraffic*) roadTraffic {
-  return result.roadTraffic;
+- (LYTrafficReport*) trafficReport {
+  return result.trafficReport;
 }
-- (TSSPackage_Builder*) setRoadTraffic:(TSSRoadTraffic*) value {
-  result.hasRoadTraffic = YES;
-  result.roadTraffic = value;
+- (LYMsgOnAir_Builder*) setTrafficReport:(LYTrafficReport*) value {
+  result.hasTrafficReport = YES;
+  result.trafficReport = value;
   return self;
 }
-- (TSSPackage_Builder*) setRoadTrafficBuilder:(TSSRoadTraffic_Builder*) builderForValue {
-  return [self setRoadTraffic:[builderForValue build]];
+- (LYMsgOnAir_Builder*) setTrafficReportBuilder:(LYTrafficReport_Builder*) builderForValue {
+  return [self setTrafficReport:[builderForValue build]];
 }
-- (TSSPackage_Builder*) mergeRoadTraffic:(TSSRoadTraffic*) value {
-  if (result.hasRoadTraffic &&
-      result.roadTraffic != [TSSRoadTraffic defaultInstance]) {
-    result.roadTraffic =
-      [[[TSSRoadTraffic builderWithPrototype:result.roadTraffic] mergeFrom:value] buildPartial];
+- (LYMsgOnAir_Builder*) mergeTrafficReport:(LYTrafficReport*) value {
+  if (result.hasTrafficReport &&
+      result.trafficReport != [LYTrafficReport defaultInstance]) {
+    result.trafficReport =
+      [[[LYTrafficReport builderWithPrototype:result.trafficReport] mergeFrom:value] buildPartial];
   } else {
-    result.roadTraffic = value;
+    result.trafficReport = value;
   }
-  result.hasRoadTraffic = YES;
+  result.hasTrafficReport = YES;
   return self;
 }
-- (TSSPackage_Builder*) clearRoadTraffic {
-  result.hasRoadTraffic = NO;
-  result.roadTraffic = [TSSRoadTraffic defaultInstance];
-  return self;
-}
-- (BOOL) hasCityTraffic {
-  return result.hasCityTraffic;
-}
-- (TSSCityTraffic*) cityTraffic {
-  return result.cityTraffic;
-}
-- (TSSPackage_Builder*) setCityTraffic:(TSSCityTraffic*) value {
-  result.hasCityTraffic = YES;
-  result.cityTraffic = value;
-  return self;
-}
-- (TSSPackage_Builder*) setCityTrafficBuilder:(TSSCityTraffic_Builder*) builderForValue {
-  return [self setCityTraffic:[builderForValue build]];
-}
-- (TSSPackage_Builder*) mergeCityTraffic:(TSSCityTraffic*) value {
-  if (result.hasCityTraffic &&
-      result.cityTraffic != [TSSCityTraffic defaultInstance]) {
-    result.cityTraffic =
-      [[[TSSCityTraffic builderWithPrototype:result.cityTraffic] mergeFrom:value] buildPartial];
-  } else {
-    result.cityTraffic = value;
-  }
-  result.hasCityTraffic = YES;
-  return self;
-}
-- (TSSPackage_Builder*) clearCityTraffic {
-  result.hasCityTraffic = NO;
-  result.cityTraffic = [TSSCityTraffic defaultInstance];
-  return self;
-}
-- (BOOL) hasTrafficProbe {
-  return result.hasTrafficProbe;
-}
-- (TSSTrafficProbe*) trafficProbe {
-  return result.trafficProbe;
-}
-- (TSSPackage_Builder*) setTrafficProbe:(TSSTrafficProbe*) value {
-  result.hasTrafficProbe = YES;
-  result.trafficProbe = value;
-  return self;
-}
-- (TSSPackage_Builder*) setTrafficProbeBuilder:(TSSTrafficProbe_Builder*) builderForValue {
-  return [self setTrafficProbe:[builderForValue build]];
-}
-- (TSSPackage_Builder*) mergeTrafficProbe:(TSSTrafficProbe*) value {
-  if (result.hasTrafficProbe &&
-      result.trafficProbe != [TSSTrafficProbe defaultInstance]) {
-    result.trafficProbe =
-      [[[TSSTrafficProbe builderWithPrototype:result.trafficProbe] mergeFrom:value] buildPartial];
-  } else {
-    result.trafficProbe = value;
-  }
-  result.hasTrafficProbe = YES;
-  return self;
-}
-- (TSSPackage_Builder*) clearTrafficProbe {
-  result.hasTrafficProbe = NO;
-  result.trafficProbe = [TSSTrafficProbe defaultInstance];
+- (LYMsgOnAir_Builder*) clearTrafficReport {
+  result.hasTrafficReport = NO;
+  result.trafficReport = [LYTrafficReport defaultInstance];
   return self;
 }
 @end

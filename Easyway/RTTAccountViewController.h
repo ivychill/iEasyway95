@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RTTVCDelegate.h"
 
 @interface RTTAccountViewController : UIViewController <UIWebViewDelegate>
 @property (strong, nonatomic) IBOutlet UIWebView *accountPageVIEW;
 @property NSString *webpageStr;
 @property UIActivityIndicatorView *activityIndicatorView;
+@property id <RTTVCDelegate> delegate;
 
 @end

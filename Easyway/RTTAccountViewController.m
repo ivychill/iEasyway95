@@ -16,6 +16,7 @@
 @synthesize accountPageVIEW;
 @synthesize webpageStr;
 @synthesize activityIndicatorView;
+@synthesize delegate;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -31,7 +32,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     //webpageStr = @"https://www.roadclouding.com/users/sign_up";
-    webpageStr = @"http://www.roadclouding.com/users/edit";
+    webpageStr = @"http://www.roadclouding.com/users/profile";
     NSLog(@"%@", webpageStr);
     NSURL *url =[NSURL URLWithString:webpageStr];
     NSURLRequest *request =[NSURLRequest requestWithURL:url];
@@ -69,9 +70,36 @@
 {
     [activityIndicatorView startAnimating] ;
 }
+
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     [activityIndicatorView stopAnimating];
+    
+    NSString* token = [self getTokenFromCookie];
+    if (token != nil) {
+        NSLog(@"Cookie Session Value=%@", token);
+        [self.delegate gotUserLoginToken:token];
+        //[self.navigationController popViewControllerAnimated:YES];
+    }
+
+    
 }
+
+- (NSString*)getTokenFromCookie {
+    NSHTTPCookie *cookie;
+    NSHTTPCookieStorage *cookieJar = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+
+    for (cookie in [cookieJar cookies]) {
+        NSLog(@"Cookie Domain=%@, name=%@", cookie.domain, cookie.name);
+        if ([[cookie domain] isEqualToString:@"www.roadclouding.com"])
+        {
+            if ([[cookie name] isEqualToString:@"_roadclouding_session"]) {
+                return [cookie value];
+            }
+        }
+    }
+    return nil;
+}
+
 
 @end

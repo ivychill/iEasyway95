@@ -42,6 +42,7 @@
 #import "RTTTrafficBoardView.h"
 #import "RTTModeActivityIndicatorView.h"
 #import "RTTComm4TSS.h"
+#import "RTTSynthesizeTTS.h"
 
 
 #pragma mark -
@@ -287,7 +288,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     mMapView.delegate = self;
     CLLocationCoordinate2D centerlocation = CLLocationCoordinate2DMake(22.546154, 114.06859);
-    [mMapView setCenterCoordinate:(centerlocation)];
+    //[mMapView setCenterCoordinate:(centerlocation)];
+    [self setCenterOfMapView:centerlocation];
+    
     //百度地图API，允许获取和显示用户当前位置
     [mMapView setShowsUserLocation:YES];
     // 地图比例尺级别，在手机上当前可使用的级别为3-18级
@@ -300,8 +303,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //    overlayCover.backgroundColor = [[[UIColor brownColor] colorWithAlphaComponent:0.8] CGColor];
 //    [mMapView.layer addSublayer:overlayCover];
     
-    [mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
-
+    //[mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
+    [self setCenterOfMapView:(mMapView.userLocation.coordinate)];
     
     if (!mBMKSearch)
     {
@@ -373,6 +376,13 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     mSpeedIndex = 0;
     mSpeedSedList = [[NSMutableArray alloc] initWithCapacity:1000];
+    
+    mIsOutofRange = NO;
+    
+    
+    dev = [UIDevice currentDevice];
+    deviceVersion = dev.systemVersion;
+    deviceUuid = dev.uniqueIdentifier;
 }
 
 - (void) initCommUnit
@@ -380,8 +390,10 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //初始化和启动通信模块
     mTSSMessageSerialNum = 0; //消息序列号
     
-    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://42.121.18.140:6001" delegate:self];
+    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:7001" delegate:self];
     
+    
+    mSynTTS = [[RTTSynthesizeTTS alloc] init:10];
 }
 
 - (void) initLoadData
@@ -579,15 +591,33 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //    [mLeftView setHidden:NO];
 //}
 
+- (void) gotUserLoginToken:(NSString*) token
+{
+    [runningDataset setUserToken:token];
+    //[self sendUserProfile2Server:token];
+    NSLog(@"Will Send Profile to Server");
+}
+
+
 - (IBAction)didSaveSpeedSegs:(id)sender
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docPath = [paths objectAtIndex:0];
-    NSString *myFile = [docPath stringByAppendingPathComponent:@"SpeedInfo.data"];
-
-    [mSpeedSedList writeToFile:myFile atomically:YES];
+    //路况1
+    //6.0对讯飞支持不好
+    float verValue = deviceVersion.floatValue;
+    if (verValue < 6.0)
+    {
+        [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
+        
+        [mSynTTS addTrafficStr:@"深南大道 前方拥堵：南山大道路口到南新路路口 方向：西向"];
+        
+        [mSynTTS addTrafficStr:@"南海大道 前方拥堵: 北环立交到东滨路路口 方向：蛇口方向"];
+    }
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//    NSString *docPath = [paths objectAtIndex:0];
+//    NSString *myFile = [docPath stringByAppendingPathComponent:@"SpeedInfo.data"];
+//
+//    [mSpeedSedList writeToFile:myFile atomically:YES];
     
-    //[myDictionary writeToFile:myFile atomically:NO];
 }
 
 - (IBAction)didShowTraffic:(id)sender 
@@ -712,11 +742,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         }   
     } 
     
-    [topSeachBar showsCancelButton];
+    //[topSeachBar showsCancelButton];
     topSeachBar.delegate = self;
     mAddrSearchBar = topSeachBar;
     self.navigationItem.titleView = topSeachBar;
-    [topSeachBar showsCancelButton];
+    //[topSeachBar showsCancelButton];
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     
 //    UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithTitle:@"取消键盘" 
@@ -725,6 +755,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     // UIBarButtonItemStylePlain
 //    UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc]initWithTitle:@"退出设置" 
 //                                                                     style:UIBarButtonItemStylePlain target:self action:@selector(didQuiteHomeSetting)];
+//    UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithImage:([UIImage imageNamed:@"keyboardv2.png"]) style:UIBarButtonItemStylePlain target:self action:@selector(didSearchKeyboardDiss)];
+    
     UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithImage:([UIImage imageNamed:@"keyboardv2.png"]) style:UIBarButtonItemStylePlain target:self action:@selector(didSearchKeyboardDiss)];
     
     
@@ -760,11 +792,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         runningDataset.currentlyRoute = ROUTEUNKNOW;
     }
     
-    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您可以通过搜索条或者直接在地图上长按设置您的家庭地址" 
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您可以通过搜索条或者在地图上长时间触摸相应位置以设置您的家庭地址\r\n注意：目前只限于在深圳市范围使用"
                                                       delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
     [alertView show];
     
-    [mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
+    //[mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
+    [self setCenterOfMapView:(mMapView.userLocation.coordinate)];
 
 }
 
@@ -779,14 +812,30 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (void)didToolbarGoHomeBTN:(id)sender
 {
+    if (runningDataset.homeAddrInfo == nil)
+    {
+        
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您的家庭地址未设置，请先进行设置"
+                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+        [alertView show];
+        return;
+    }
     [self routePlantoHome];
 
 }
 
 - (void)didToolbarGoOfficeBTN:(id)sender
 {
+    if (runningDataset.homeAddrInfo == nil)
+    {
+        
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您的家庭地址未设置，请先进行设置"
+                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+        [alertView show];
+        return;
+    }
+    
     [self routePlantoOffice];
-
 }
 
 
@@ -859,7 +908,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (IBAction)didBack2UserLocation:(id)sender 
 {
-    [mMapView setCenterCoordinate:[mMapView userLocation].coordinate animated:0];
+    //[mMapView setCenterCoordinate:[mMapView userLocation].coordinate animated:0];
+    [self setCenterOfMapView:([mMapView userLocation].coordinate)];
+
 }
 
 
@@ -983,7 +1034,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 //{
 //    // Return the number of rows in the section.
-//    //int iTrfSegCnt = runtimeDataset.trafficInfoList.count;
+//    //int iTrfSegCnt = runtimeDataset.filteredRouteTrafficList.count;
 //    //NSLog(@"SegCnt=%d", iTrfSegCnt);
 //    if (section == 1)
 //    {
@@ -1008,11 +1059,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //    
 //    [[cell textLabel] setText:@"Routes"];
 //    
-////    int iSegCnt = runtimeDataset.trafficInfoList.count;
+////    int iSegCnt = runtimeDataset.filteredRouteTrafficList.count;
 ////    
 ////    if (indexPath.row < iSegCnt)
 ////    {
-////        RttGTrafficInfo *ptrfInfo = [runtimeDataset.trafficInfoList objectAtIndex:indexPath.row];
+////        RttGTrafficInfo *ptrfInfo = [runtimeDataset.filteredRouteTrafficList objectAtIndex:indexPath.row];
 ////        if (ptrfInfo)
 ////        {
 ////            NSString *cellString = ptrfInfo.roadname;
@@ -1257,7 +1308,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             }
             
             
-            [mMapView setCenterCoordinate:poi.pt];
+            //[mMapView setCenterCoordinate:poi.pt];
+            [self setCenterOfMapView:poi.pt];
         }
 	}
     else 
@@ -1472,9 +1524,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     [runningDataset setIsPlaned:YES];
     
+    //清理地图和路况数据
     [self DrawTrafficPolyline:YES];
     [trafficPolylineList removeAllObjects];
-    [runningDataset.trafficInfoList removeAllObjects];
+    [runningDataset.filteredRouteTrafficList removeAllObjects];
+    [runningDataset.allRouteTrafficFromTSS removeAllObjects];
+
     
     [mAddrSearchBar setHidden:YES];
     [mSwipeBar toggle:NO];
@@ -1502,7 +1557,24 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         return;
     }    
     
-    
+    if (!((userLocation.location.coordinate.latitude >= 18.0 && userLocation.location.coordinate.latitude <= 54.0)
+          && (userLocation.location.coordinate.longitude >= 73.0 && userLocation.location.coordinate.longitude <= 135.0)) )
+    {
+        if (!mIsOutofRange)
+        {
+            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"抱歉！\r\n本应用目前只支持中国深圳市范围内的路况播报，您当前所在的位置不在此范围中，对此造成的不便我们表示十分的歉意！"
+                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+            [alertView show];
+            
+            mIsOutofRange = YES;
+        }
+        return;
+    }
+    else
+    {
+        mIsOutofRange = NO;
+    }
+        
     //判断和上次更新的距离，用于获取速度，以及减少路径相关计算
     CLLocationDistance distance = 0.0;
     distance = BMKMetersBetweenMapPoints(BMKMapPointForCoordinate(userLocation.location.coordinate),
@@ -1527,6 +1599,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             return;
         }
     }
+    
+
     
     avgSegSpeed = distance/locupdateTimeInterval*3600.0/1000.0;
     //avgSegSpeed = avgSegSpeed/4000.0*80.0;
@@ -1559,7 +1633,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     temp_userLocation = userLocation.location.coordinate;
     if (runningDataset.isDriving)
     {
-        [pmapview setCenterCoordinate:temp_userLocation animated:0];
+        //[pmapview setCenterCoordinate:temp_userLocation animated:0];
+        [self setCenterOfMapView:temp_userLocation];
     }
         
     BMKMapPoint LocationPoint = BMKMapPointForCoordinate(temp_userLocation);
@@ -1585,7 +1660,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         if (runningDataset.currentRoadStep !=  stepIndex)
         {
             [self changeMapVisibleRect:runningDataset.drivingRoute withIndex:stepIndex+1];
-            [pmapview setCenterCoordinate:temp_userLocation animated:0];
+            //[pmapview setCenterCoordinate:temp_userLocation animated:0];
+            [self setCenterOfMapView:temp_userLocation];
         }
 #endif
         //保存当前在Step的哪一步了
@@ -1632,10 +1708,10 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         }
         
         //判断拥堵提示
-        int trafficSegCnt = runningDataset.trafficInfoList.count;
+        int trafficSegCnt = runningDataset.filteredRouteTrafficList.count;
         for (int trfindex = 0; trfindex < trafficSegCnt; trfindex++)
         {
-            RttGTrafficInfo *trfinfo = [runningDataset.trafficInfoList objectAtIndex:trfindex];
+            RttGTrafficInfo *trfinfo = [runningDataset.filteredRouteTrafficList objectAtIndex:trfindex];
             
             //如果当前点的Step位置和拥堵点相同，并且路径点中下一点小于拥堵点在路径点中相关位置（意味着还没到）
             //或者当前点的Step位置比拥堵点小
@@ -1654,6 +1730,31 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
                     [self showTrafficBoard];
 
                     NSLog(@"%@", trafficInfoText);
+                    
+                    //播放语音，每隔500M
+                    if (![runningDataset.trffTTSPlayRec ifRecorded:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex])
+                    {
+                        [runningDataset.trffTTSPlayRec record:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex];
+                        NSString *distanceStr;
+                        if (nextTrafficDistance > 1000.0)
+                        {
+                            distanceStr = [[NSString alloc] initWithFormat:@"%.1f公里", nextTrafficDistance/1000.0];
+                        }
+                        else
+                        {
+                            distanceStr  = [[NSString alloc] initWithFormat:@"%d米", (int)nextTrafficDistance];
+                        }
+                        
+                        //6.0对讯飞支持不好
+                        float verValue = deviceVersion.floatValue;
+                        if (verValue < 6.0)
+                        {
+                            NSString *strInfo = [[NSString alloc] initWithFormat:@"路况提示：前方约%@，%@，%@", distanceStr, trfinfo.roadname, trfinfo.detail];
+                            [mSynTTS addGuideStr:strInfo];
+                        }
+                    }
+                    
+                    //if (nextTrafficDistance)
                 }
                 else 
                 {
@@ -1685,6 +1786,13 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             {
 #warning 调试屏蔽重规划
                 [self RePlanRouting:temp_userLocation];
+                
+                //6.0对讯飞支持不好
+                float verValue = deviceVersion.floatValue;
+                if (verValue < 6.0)
+                {
+                    [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
+                }
 //                //[self showModeIndicator:@"路径重算中..." seconds:0];
             }
 
@@ -2170,48 +2278,174 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 #pragma mark -
 #pragma mark Process View for Map
 
-
-- (void) AddTrafficOverlay:(TSSCityTraffic*) trafficinfo
+- (void) setCenterOfMapView:(CLLocationCoordinate2D)coordinate
 {
-    [runningDataset.trafficInfoList removeAllObjects];
-    
-    //int iSegRdCnt = trafficinfo.roadtrafficList.count;
-    int iSegRdCnt = trafficinfo.roadTrafficsList.count;
-
-    
-    TSSRoadTraffic *pRdTrc;
-    
-    for (int i=0; i<iSegRdCnt; i++)
+    //Lon: 73-135, Lat:18-54
+    if ((coordinate.latitude >= 18.0 && coordinate.latitude <= 54.0)
+        && (coordinate.longitude >= 73.0 && coordinate.longitude <= 135.0) )
     {
-        pRdTrc = [trafficinfo.roadTrafficsList objectAtIndex:i];
-        int iSegCnt = pRdTrc.segmentTrafficsList.count;
-        
-        int iRoadCnt = runningDataset.formatedRouteInfo.roadlist.count;
-        for (int j = 0; j < iRoadCnt; j++)
+        [mMapView setCenterCoordinate:coordinate animated:0];
+    }
+}
+
+//修改协议后废弃
+//- (void) AddTrafficOverlay:(LYCityTraffic*) trafficinfo
+//{
+//    [runningDataset.filteredRouteTrafficList removeAllObjects];
+//    
+//    //int iSegRdCnt = trafficinfo.roadtrafficList.count;
+//    int iSegRdCnt = trafficinfo.roadTrafficsList.count;
+//
+//    
+//    LYRoadTraffic *pRdTrc;
+//    
+//    for (int i=0; i<iSegRdCnt; i++)
+//    {
+//        pRdTrc = [trafficinfo.roadTrafficsList objectAtIndex:i];
+//        int iSegCnt = pRdTrc.segmentTrafficsList.count;
+//        
+//        int iRoadCnt = runningDataset.formatedRouteInfo.roadlist.count;
+//        for (int j = 0; j < iRoadCnt; j++)
+//        {
+//            RttGRoadInfo *road = [runningDataset.formatedRouteInfo.roadlist objectAtIndex:j];
+//            
+//            //int iPoincnt = [road.pointlist count];
+//            //NSLog(@"===RoadName:%@, SegName:%@", road.roadname, pRdTrc.road);
+//            
+//            //判断路名是否相同，这里用相同路名的拥堵路段和路径中的相同路名的路段进行比较得到拟合线段
+//            if ([road.roadname isEqualToString:pRdTrc.road])
+//            {
+//                //NSLog(road.roadname);
+//                for (int k=0; k<iSegCnt; k++)
+//                {
+//                    LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:k];
+//                    BOOL ret = [self createTrafficPolylineInfo:pSegTrf withRttgRoadInfo:road];
+//                    if (ret)
+//                    {
+//                        [self DrawTrafficPolyline:NO];
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    
+//    [self DrawTrafficPolyline:NO];
+//}
+
+
+- (void) formatAndSaveTrafficData:(LYCityTraffic*) trafficinfo
+{
+    [runningDataset.filteredRouteTrafficList removeAllObjects];
+    
+    int iRdCnt = trafficinfo.roadTrafficsList.count;
+    
+    
+    LYRoadTraffic *pRdTrc;
+    
+    [self clearOutofDateTrafficData];//先清理超时的路况信息
+    
+    for (LYRoadTraffic *pRdTrc in trafficinfo.roadTrafficsList)
+    {
+        for (LYSegmentTraffic *pSegTrf in pRdTrc.segmentTrafficsList)
         {
-            RttGRoadInfo *road = [runningDataset.formatedRouteInfo.roadlist objectAtIndex:j];
             
-            //int iPoincnt = [road.pointlist count];
-            //NSLog(@"===RoadName:%@, SegName:%@", road.roadname, pRdTrc.road);
+            //把所有的拥堵路段都加入队列中
+//            RTTFormatedTrafficFromTSS *trfSegInfo = [[RTTFormatedTrafficFromTSS alloc] init];
+//            trfSegInfo.roadName = pRdTrc.road;
+//            trfSegInfo.details = pSegTrf.details;
+//            trfSegInfo.speedKMPH = pSegTrf.speed;
+//            trfSegInfo.timestamp = pSegTrf.timestamp;
+//            
+//            CLLocationCoordinate2D tmpStCoord;
+//            tmpStCoord.latitude = pSegTrf.segment.start.lat;
+//            tmpStCoord.longitude = pSegTrf.segment.start.lng;
+//            [trfSegInfo setStartCoord:tmpStCoord];
+//            
+//            CLLocationCoordinate2D tmpEdCoord;
+//            tmpEdCoord.latitude = pSegTrf.segment.end.lat;
+//            tmpEdCoord.longitude = pSegTrf.segment.end.lng;
+//            [trfSegInfo setEndCoord:tmpEdCoord];
+//            
+//            [runningDataset.allRouteTrafficFromTSS addObject:trfSegInfo];
             
-            //判断路名是否相同，这里用相同路名的拥堵路段和路径中的相同路名的路段进行比较得到拟合线段
-            if ([road.roadname isEqualToString:pRdTrc.road])
-            {
-                //NSLog(road.roadname);
-                for (int k=0; k<iSegCnt; k++)
-                {
-                    TSSSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:k];
-                    BOOL ret = [self createTrafficPolylineInfo:pSegTrf withRttgRoadInfo:road];
-                    if (ret)
-                    {
-                        [self DrawTrafficPolyline:NO];
-                    }
-                }
-            }
+            [self addTSSTraffic2RunningDataset:pRdTrc.road segment:pSegTrf];
         }
     }
     
+    for (RTTFormatedTrafficFromTSS *tssTrf in runningDataset.allRouteTrafficFromTSS)
+    {
+        for (RttGRoadInfo *road in runningDataset.formatedRouteInfo.roadlist)
+        {
+            if ([road.roadname isEqualToString:tssTrf.roadName])
+            {
+                //LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:k];
+                BOOL ret = [self createTrafficInfo2Dataset:tssTrf withRttgRoadInfo:road];
+                if (ret)
+                {
+                    //[self DrawTrafficPolyline:NO];
+                }
+            }
+
+        }
+    }
+
     [self DrawTrafficPolyline:NO];
+}
+
+
+//增加拥堵路径到runningDataset.allRouteTrafficFromTSS，不做过滤，只做覆盖
+- (void) addTSSTraffic2RunningDataset:(NSString *)roadName segment:(LYSegmentTraffic*) trfSegment
+{
+    
+    //先检查重复的
+    BOOL hasExistRecord = NO;
+    for (RTTFormatedTrafficFromTSS *trfSegInfo in runningDataset.allRouteTrafficFromTSS)
+    {
+        if ([trfSegInfo.details isEqualToString:trfSegment.details])
+        {
+            trfSegInfo.timestamp = trfSegment.timestamp; //更新时间戳即可
+            hasExistRecord = YES;
+            break;
+        }
+    }
+    
+    if (!hasExistRecord)
+    {
+        
+        RTTFormatedTrafficFromTSS *trfSegInfo = [[RTTFormatedTrafficFromTSS alloc] init];
+        trfSegInfo.roadName = roadName;
+        trfSegInfo.details = trfSegment.details;
+        trfSegInfo.speedKMPH = trfSegment.speed;
+        trfSegInfo.timestamp = trfSegment.timestamp;
+        
+        CLLocationCoordinate2D tmpStCoord;
+        tmpStCoord.latitude = trfSegment.segment.start.lat;
+        tmpStCoord.longitude = trfSegment.segment.start.lng;
+        [trfSegInfo setStartCoord:tmpStCoord];
+        
+        CLLocationCoordinate2D tmpEdCoord;
+        tmpEdCoord.latitude = trfSegment.segment.end.lat;
+        tmpEdCoord.longitude = trfSegment.segment.end.lng;
+        [trfSegInfo setEndCoord:tmpEdCoord];
+        
+        [runningDataset.allRouteTrafficFromTSS addObject:trfSegInfo];
+    }
+}
+
+- (void) clearOutofDateTrafficData
+{
+    int segCnt = runningDataset.allRouteTrafficFromTSS.count;
+    for (int i=(segCnt-1); i >= 0; i--)// * trfseg in runningDataset.allRouteTrafficFromTSS)
+    {
+        RTTFormatedTrafficFromTSS *trfseg = [runningDataset.allRouteTrafficFromTSS objectAtIndex:i];
+        
+        NSDate *segDate = [NSDate dateWithTimeIntervalSince1970:trfseg.timestamp];
+        NSTimeInterval secondsBetweenNow =  [segDate timeIntervalSinceNow];
+        if (secondsBetweenNow <= -900.0) //间隔超过15分钟就丢弃
+        {
+            [runningDataset.allRouteTrafficFromTSS removeObjectAtIndex:i];
+        }
+    }
 }
 
 - (void) DrawTrafficPolyline:(BOOL) isRemove
@@ -2222,17 +2456,19 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         [mMapView removeOverlay:[trafficPolylineList objectAtIndex:i]];
     }
     
+    [trafficPolylineList removeAllObjects];
+
     if (isRemove)
     {
         return;
     }
     
-    int trafficSegCnt = runningDataset.trafficInfoList.count;
+    int trafficSegCnt = runningDataset.filteredRouteTrafficList.count;
     
     for (int i=0; i<trafficSegCnt; i++)
     {
         
-        RttGTrafficInfo *trfInfo = [runningDataset.trafficInfoList objectAtIndex:i];
+        RttGTrafficInfo *trfInfo = [runningDataset.filteredRouteTrafficList objectAtIndex:i];
         int pointCnt = trfInfo.pointlist.count;
         
         CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[pointCnt];
@@ -2290,7 +2526,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     [mMapView addOverlay:polyLine];
     
     pCurrentlyPolyLine = polyLine; 
-    [mMapView setCenterCoordinate:(BMKCoordinateForMapPoint(points[0]))];
+    //[mMapView setCenterCoordinate:(BMKCoordinateForMapPoint(points[0]))];
+    [self setCenterOfMapView:(BMKCoordinateForMapPoint(points[0]))];
     
     delete []points;
 }
@@ -2734,6 +2971,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 {
     NSLog(@"RoutPlaning.....");
     
+    //情况前方拥堵的语音播放记录
+    [runningDataset.trffTTSPlayRec clear];
+    
 	if (!mBMKSearch)
     {
         mBMKSearch = [[BMKSearch alloc]init];
@@ -2841,7 +3081,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     [self CheckPointsSettingCompleted:NO];
 }
 
-- (BOOL) createTrafficPolylineInfo:(TSSSegmentTraffic*) segTraffic withRttgRoadInfo:(RttGRoadInfo*) roadInfo
+//过滤路径，进行拟合判断后写入runningDataset.filteredRouteTrafficList
+- (BOOL) createTrafficInfo2Dataset:(RTTFormatedTrafficFromTSS*) segTraffic withRttgRoadInfo:(RttGRoadInfo*) roadInfo
 {
     int roadPoincnt = [roadInfo.pointlist count];
     
@@ -2883,10 +3124,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     BMKMapRect roadRect = [self mapRectMakeFromPoint:&roadPoint1 withPoint:&roadPoint2];
     
     CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[2];
-    pPoints[0].latitude = segTraffic.segment.start.lat;
-    pPoints[0].longitude = segTraffic.segment.start.lng;
-    pPoints[1].latitude = segTraffic.segment.end.lat;
-    pPoints[1].longitude = segTraffic.segment.end.lng;
+    pPoints[0] = segTraffic.startCoord;
+    pPoints[1] = segTraffic.endCoord;
+//    pPoints[0].latitude = segTraffic.segment.start.lat;
+//    pPoints[0].longitude = segTraffic.segment.start.lng;
+//    pPoints[1].latitude = segTraffic.segment.end.lat;
+//    pPoints[1].longitude = segTraffic.segment.end.lng;
     
     
 //#warning FOR TEST        //TEST--YESONGHAI
@@ -3011,6 +3254,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         RttGTrafficInfo *pTrafficPath = [[RttGTrafficInfo alloc] init];
         pTrafficPath.roadname = roadInfo.roadname;
         pTrafficPath.detail = segTraffic.details;
+        pTrafficPath.timeStamp = segTraffic.timestamp;
+
         
         BMKMapPoint *roadPointList = new BMKMapPoint[roadPoincnt];
         for (int icp = 0; icp < roadPoincnt; icp++)
@@ -3063,12 +3308,261 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
                 //终点
                 RttGMapPoint *mapPointE = [[RttGMapPoint alloc]init];
                 mapPointE.mappoint = stPLDinfoC2.projection;
-                [pTrafficPath.pointlist addObject:mapPointE];                
+                [pTrafficPath.pointlist addObject:mapPointE];
             }
         }
         if (pTrafficPath.pointlist.count > 0)
         {
-            [runningDataset.trafficInfoList addObject: pTrafficPath];//增加到数据集中
+            [runningDataset.filteredRouteTrafficList addObject: pTrafficPath];//增加到数据集中
+            //6.0对讯飞支持不好
+            float verValue = deviceVersion.floatValue;
+            if (verValue < 6.0)
+            {
+                NSString *strInfo = [[NSString alloc] initWithFormat:@"最新路况:%@ %@", pTrafficPath.roadname, pTrafficPath.detail];
+                [mSynTTS addTrafficStr:strInfo];
+            }
+        }
+        return TRUE;
+    }
+    
+}
+
+
+- (BOOL) createTrafficPolylineInfo:(LYSegmentTraffic*) segTraffic withRttgRoadInfo:(RttGRoadInfo*) roadInfo
+{
+    int roadPoincnt = [roadInfo.pointlist count];
+    
+    CLLocationCoordinate2D minRectPoint;
+    CLLocationCoordinate2D maxRectPoint;
+    
+    minRectPoint.longitude = 5000.0;
+    minRectPoint.latitude = 50000.0;
+    maxRectPoint.longitude = 0.0;
+    maxRectPoint.latitude = 0.0;
+    
+    for (int i=0; i < roadInfo.pointlist.count; i++)
+    {
+        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude < minRectPoint.latitude)
+        {
+            minRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
+        }
+        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude < minRectPoint.longitude)
+        {
+            minRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
+        }
+        
+        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude > maxRectPoint.latitude)
+        {
+            maxRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
+        }
+        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude > maxRectPoint.longitude)
+        {
+            maxRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
+        }
+    }
+    
+    //    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:0] coordinate]);
+    //    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(roadPoincnt-1)] coordinate]);
+    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate(minRectPoint);
+    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate(maxRectPoint);
+    
+    
+    BMKMapRect roadRect = [self mapRectMakeFromPoint:&roadPoint1 withPoint:&roadPoint2];
+    
+    CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[2];
+    pPoints[0].latitude = segTraffic.segment.start.lat;
+    pPoints[0].longitude = segTraffic.segment.start.lng;
+    pPoints[1].latitude = segTraffic.segment.end.lat;
+    pPoints[1].longitude = segTraffic.segment.end.lng;
+    
+    
+    //#warning FOR TEST        //TEST--YESONGHAI
+    //    BMKPointAnnotation *pointAnnotation_11 = [[BMKPointAnnotation alloc] init];
+    //    pointAnnotation_11.coordinate = pPoints[0];
+    //    NSString *roadst11 =  @"点-1";
+    //    pointAnnotation_11.title = roadst11;
+    //    [mMapView addAnnotation:pointAnnotation_11];
+    //    NSLog(@"拥堵路段: Start=%f, %f", pointAnnotation_11.coordinate.latitude, pointAnnotation_11.coordinate.longitude);
+    //
+    //    BMKPointAnnotation *pointAnnotation_12 = [[BMKPointAnnotation alloc] init];
+    //    pointAnnotation_12.coordinate = pPoints[1];
+    //    NSString *roadst12 =  @"点-2";
+    //    pointAnnotation_12.title = roadst12;
+    //    [mMapView addAnnotation:pointAnnotation_12];
+    //    NSLog(@"拥堵路段: End=%f, %f", pointAnnotation_12.coordinate.latitude, pointAnnotation_12.coordinate.longitude);
+    //
+    //    BMKPointAnnotation *pointAnnotation_13 = [[BMKPointAnnotation alloc] init];
+    //    pointAnnotation_13.coordinate = ([[roadInfo.pointlist objectAtIndex:0] coordinate]);
+    //    NSString *roadst13 =  @"点-R-1";
+    //    pointAnnotation_13.title = roadst13;
+    //    [mMapView addAnnotation:pointAnnotation_13];
+    //    NSLog(@"Road Point: Start=%f, %f", pointAnnotation_13.coordinate.latitude, pointAnnotation_13.coordinate.longitude);
+    //
+    //    BMKPointAnnotation *pointAnnotation_14 = [[BMKPointAnnotation alloc] init];
+    //    pointAnnotation_14.coordinate = ([[roadInfo.pointlist objectAtIndex:(roadInfo.pointlist.count-1)] coordinate]);
+    //    NSString *roadst14 =  @"点-R-2";
+    //    pointAnnotation_14.title = roadst14;
+    //    [mMapView addAnnotation:pointAnnotation_14];
+    //    NSLog(@"Road Point: End=%f, %f", pointAnnotation_14.coordinate.latitude, pointAnnotation_14.coordinate.longitude);
+    
+    //ENDTEST
+    
+    BMKMapPoint SegPoint1 = BMKMapPointForCoordinate(pPoints[0]);
+    BMKMapPoint SegPoint2 = BMKMapPointForCoordinate(pPoints[1]);
+    BMKMapRect segRect = [self mapRectMakeFromPoint:&SegPoint1 withPoint:&SegPoint2];
+    
+    BMKMapRect comRect = BMKMapRectIntersection(roadRect, segRect);
+    if (BMKMapRectIsNull(comRect) || BMKMapRectIsEmpty(comRect)) //没有交集
+    {
+        //NSLog(@"没有拟合的矩形");
+        return false;
+    }
+    else
+    {
+        //NSLog(@"拟合矩形");
+        BMKMapPoint comPoint1;
+        BMKMapPoint comPoint2;
+        
+        double slope = (pPoints[1].latitude - pPoints[0].latitude)/(pPoints[1].longitude - pPoints[0].longitude);
+        
+        if (slope < 0.0) //正的斜率，取交集矩形最靠近坐标(0,0)的点和对角点; 地图坐标轴是以左上角为原点; 注意经纬度和直角坐标的区别;
+        {
+            if (pPoints[1].latitude < pPoints[0].latitude)
+            {
+                comPoint1 = comRect.origin;
+                comPoint2.x = comRect.origin.x + comRect.size.width;
+                comPoint2.y = comRect.origin.y + comRect.size.height;
+            }
+            else
+            {
+                comPoint2 = comRect.origin;
+                comPoint1.x = comRect.origin.x + comRect.size.width;
+                comPoint1.y = comRect.origin.y + comRect.size.height;
+            }
+            
+        }
+        else
+        {
+            if (pPoints[1].latitude > pPoints[0].latitude)
+            {
+                comPoint1.x = comRect.origin.x;
+                comPoint1.y = comRect.origin.y+comRect.size.height;
+                comPoint2.x = comRect.origin.x + comRect.size.width;
+                comPoint2.y = comRect.origin.y;
+            }
+            else
+            {
+                comPoint2.x = comRect.origin.x;
+                comPoint2.y = comRect.origin.y+comRect.size.height;
+                comPoint1.x = comRect.origin.x + comRect.size.width;
+                comPoint1.y = comRect.origin.y;
+            }
+        }
+        
+        CLLocationDistance cmbRange = BMKMetersBetweenMapPoints(comPoint1, comPoint2);
+        if (cmbRange < 50.0) //避免转弯时路口坐标偏差导致的小段拥堵误报
+        {
+            return false;
+        }
+        
+        //#warning FOR TEST        //TEST--YESONGHAI
+        //        BMKPointAnnotation *pointAnnotation_1 = [[BMKPointAnnotation alloc] init];
+        //        pointAnnotation_1.coordinate = BMKCoordinateForMapPoint(comPoint1);
+        //        NSString *roadst1 =  @"C点-1";
+        //        pointAnnotation_1.title = roadst1;
+        //        [mMapView addAnnotation:pointAnnotation_1];
+        //
+        //        BMKPointAnnotation *pointAnnotation_2 = [[BMKPointAnnotation alloc] init];
+        //        pointAnnotation_2.coordinate = BMKCoordinateForMapPoint(comPoint2);
+        //        NSString *roadst2 =  @"C点-2";
+        //        pointAnnotation_2.title = roadst2;
+        //        [mMapView addAnnotation:pointAnnotation_2];
+        //
+        //        CLLocationCoordinate2D *testpoints = new CLLocationCoordinate2D[2];
+        //        testpoints[0].latitude = segTraffic.segment.start.lat;
+        //        testpoints[0].longitude = segTraffic.segment.start.lng;
+        //        testpoints[1].latitude = segTraffic.segment.end.lat;
+        //        testpoints[1].longitude = segTraffic.segment.end.lng;
+        //
+        //
+        //        BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:testpoints count:2];
+        //        polyLine.title = @"test";
+        //        [mMapView insertOverlay:polyLine atIndex:2];//放在导航线路下面效果会更好
+        //        delete []testpoints;
+        //        //ENDTEST
+        
+        
+        //逐段判断路径拟合点并保存
+        //        BOOL isStartSegPntMached = NO;
+        //        BOOL isEndSegPntMached = NO;
+        RttGTrafficInfo *pTrafficPath = [[RttGTrafficInfo alloc] init];
+        pTrafficPath.roadname = roadInfo.roadname;
+        pTrafficPath.detail = segTraffic.details;
+        
+        BMKMapPoint *roadPointList = new BMKMapPoint[roadPoincnt];
+        for (int icp = 0; icp < roadPoincnt; icp++)
+        {
+            roadPointList[icp] = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:icp] coordinate]);
+        }
+        STPointLineDistInfo stPLDinfoC1;
+        CLLocationDistance distCP1 = getNearestDistanceOfRoad(comPoint1, roadPointList, roadPoincnt, &stPLDinfoC1);
+        
+        STPointLineDistInfo stPLDinfoC2;
+        CLLocationDistance distCP2 = getNearestDistanceOfRoad(comPoint2, roadPointList, roadPoincnt, &stPLDinfoC2);
+        
+        NSLog(@"CP1, IDX=%d, Dist=%f; CP2, IDX=%d, Dist=%f", stPLDinfoC1.pointindex, distCP1, stPLDinfoC2.pointindex, distCP2);
+        
+        if ((distCP1 >= 0.0 && distCP1 <= 100.0) && (distCP2 >= 0.0 && distCP2 <= 100.0))
+        {
+            if (stPLDinfoC1.pointindex <= stPLDinfoC2.pointindex)
+            {
+                //如果拥堵路段比较短，在两个直线的端点之间；则需要判断两个投影点和起始端点的距离，通过这个距离来判断先后顺序（方向）
+                if (stPLDinfoC1.pointindex == stPLDinfoC2.pointindex)
+                {
+                    BMKMapPoint rdPoint = roadPointList[stPLDinfoC1.pointindex];
+                    CLLocationDistance distancM1 = BMKMetersBetweenMapPoints(stPLDinfoC1.projection, rdPoint);
+                    CLLocationDistance distancM2 = BMKMetersBetweenMapPoints(stPLDinfoC2.projection, rdPoint);
+                    if (distancM1 >= distancM2)
+                    {
+                        return false;
+                    }
+                    
+                }
+                
+                RttGMapPoint *mapPoint = [[RttGMapPoint alloc]init];
+                mapPoint.mappoint = stPLDinfoC1.projection;
+                [pTrafficPath.pointlist addObject:mapPoint];
+                //保存拥堵路段起始点在规划路径中的位置，后续用于提示
+                pTrafficPath.stepIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] stepIndex];
+                pTrafficPath.nextPointIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] pointIndex];
+                
+                
+                //中间路径
+                int iRdPointCnt = (stPLDinfoC2.pointindex - stPLDinfoC1.pointindex);
+                for (int iSPI = 0; iSPI < iRdPointCnt; iSPI++)
+                {
+                    RttGMapPoint *mapPointRd = [[RttGMapPoint alloc]init];
+                    int pointIndexOfRoad = stPLDinfoC1.pointindex + iSPI + 1;
+                    mapPointRd.mappoint = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(pointIndexOfRoad)] coordinate]);
+                    [pTrafficPath.pointlist addObject:mapPointRd];
+                }
+                
+                //终点
+                RttGMapPoint *mapPointE = [[RttGMapPoint alloc]init];
+                mapPointE.mappoint = stPLDinfoC2.projection;
+                [pTrafficPath.pointlist addObject:mapPointE];
+            }
+        }
+        if (pTrafficPath.pointlist.count > 0)
+        {
+            [runningDataset.filteredRouteTrafficList addObject: pTrafficPath];//增加到数据集中
+            //6.0对讯飞支持不好
+            float verValue = deviceVersion.floatValue;
+            if (verValue < 6.0)
+            {
+                NSString *strInfo = [[NSString alloc] initWithFormat:@"最新路况:%@ %@", pTrafficPath.roadname, pTrafficPath.detail];
+                [mSynTTS addTrafficStr:strInfo];
+            }
         }
         return TRUE;
     }
@@ -3564,20 +4058,24 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     NSString *deviceName = dev.name;
     NSString *deviceModel = dev.model;
     NSString *deviceSystemVersion = dev.systemVersion;
+    
+    NSLog(@"UUID=%@, Name=%@, Model=%@, Version=%@", deviceUuid, deviceName, deviceModel, deviceSystemVersion);
 
-    TSSDeviceReport_Builder *devrptBuilder = [[TSSDeviceReport_Builder alloc] init];
+    LYDeviceReport_Builder *devrptBuilder = [[LYDeviceReport_Builder alloc] init];
     [devrptBuilder setDeviceId:deviceUuid];
     [devrptBuilder setDeviceToken:deviceToken];
     [devrptBuilder setDeviceName:deviceName];
     [devrptBuilder setDeviceModel:deviceModel];
     [devrptBuilder setDeviceOsVersion:deviceSystemVersion];
     
-    TSSDeviceReport * devrptMsg = [devrptBuilder build];
+    LYDeviceReport * devrptMsg = [devrptBuilder build];
     
-    TSSPackage_Builder *sendPackageBuilder = [[TSSPackage_Builder alloc] init];
+    LYMsgOnAir_Builder *sendPackageBuilder = [[LYMsgOnAir_Builder alloc] init];
     [sendPackageBuilder setVersion:1];
-    [sendPackageBuilder setMsgDir:TSSMsgDirClient2Tss];
-    [sendPackageBuilder setMsgType:TSSMsgTypeDeviceReport];
+    [sendPackageBuilder setFromParty:LYPartyLyClient];
+    [sendPackageBuilder setToParty:LYPartyLyTss];
+    //[sendPackageBuilder setMsgDir:TSSMsgDirClient2Tss];
+    [sendPackageBuilder setMsgType:LYMsgTypeLyDeviceReport];
     [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
     
     [sendPackageBuilder setDeviceReport:devrptMsg];
@@ -3586,7 +4084,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     NSTimeInterval timeStamp = now.timeIntervalSince1970;
     [sendPackageBuilder setTimestamp:timeStamp];
         
-    TSSPackage *sendPackage = [sendPackageBuilder build];
+    LYMsgOnAir *sendPackage = [sendPackageBuilder build];
     if (sendPackage == nil)
     {
         NSLog(@"*********Failed to build sendPackage");
@@ -3609,7 +4107,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //构建Protocolbuff结构数据并发送
     //TSS_Point_Builder *tssPointBuild = [[TSS_Point_Builder alloc]init];
     //TSSCoordinate_Builder *tssPointBuild = [[TSSCoordinate_Builder alloc]init];
-    TSSRoute_Builder *tssRouteBuild = [[TSSRoute_Builder alloc] init];
+    LYRoute_Builder *tssRouteBuild = [[LYRoute_Builder alloc] init];
     @autoreleasepool 
     {
         int iRoadCnt = pRouteData.roadlist.count;
@@ -3619,22 +4117,22 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             RttGRoadInfo *road = [pRouteData.roadlist objectAtIndex:i];
             int iPoincnt = [road.pointlist count];
            
-            TSSSegment_Builder *tssDrvSegmtBuild = [[TSSSegment_Builder alloc]init];
+            LYSegment_Builder *tssDrvSegmtBuild = [[LYSegment_Builder alloc]init];
             [tssDrvSegmtBuild setRoad:road.roadname];
             
-            TSSCoordinate_Builder *startPointBuild = [[TSSCoordinate_Builder alloc]init];
+            LYCoordinate_Builder *startPointBuild = [[LYCoordinate_Builder alloc]init];
             //取开始的点作为路径的起点
             [startPointBuild setLat: [[road.pointlist objectAtIndex:0] coordinate].latitude];
             [startPointBuild setLng: [[road.pointlist objectAtIndex:0] coordinate].longitude];
-            TSSCoordinate *startPoint = [startPointBuild build];
+            LYCoordinate *startPoint = [startPointBuild build];
             
-            TSSCoordinate_Builder *endPointBuild = [[TSSCoordinate_Builder alloc]init];
+            LYCoordinate_Builder *endPointBuild = [[LYCoordinate_Builder alloc]init];
             //取最后一点作为路径的终点
             Float64 latt = [[road.pointlist objectAtIndex:(iPoincnt-1)] coordinate].latitude;
             Float64 lott = [[road.pointlist objectAtIndex:(iPoincnt-1)] coordinate].longitude;
             [endPointBuild setLat: latt];
             [endPointBuild setLng: lott];
-            TSSCoordinate *endPoint = [endPointBuild build];
+            LYCoordinate *endPoint = [endPointBuild build];
             if (endPoint == nil)
             {
                 NSLog(@"*********Failed to build Point");
@@ -3643,7 +4141,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             
             [tssDrvSegmtBuild setStart:startPoint];
             [tssDrvSegmtBuild setEnd:endPoint];
-            TSSSegment *roadSegment = [tssDrvSegmtBuild build];
+            LYSegment *roadSegment = [tssDrvSegmtBuild build];
             if (roadSegment == nil)
             {
                 NSLog(@"*********Failed to build roadSegment");
@@ -3670,7 +4168,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
                 break;
         }
         
-        TSSRoute *pDrvRoute = [tssRouteBuild build];
+        LYRoute *pDrvRoute = [tssRouteBuild build];
         if (pDrvRoute == nil)
         {
             NSLog(@"*********Failed to build Route");
@@ -3678,22 +4176,22 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         }
         
         
-        TSSTrafficSub_Builder *subscMsgBuilder = [[TSSTrafficSub_Builder alloc] init];
+        LYTrafficSub_Builder *subscMsgBuilder = [[LYTrafficSub_Builder alloc] init];
         [subscMsgBuilder setCity:@"深圳"];
         [subscMsgBuilder setRoute:pDrvRoute];
-        [subscMsgBuilder setOprType:TSSOprTypeSubUpdate];
+        [subscMsgBuilder setOprType:LYTrafficSub_LYOprTypeLySubUpdate];
         
         if (routetype == RTTEN_ACTIVITYTYPE_GETTINGROUTE)
         {
-            [subscMsgBuilder setPubType:TSSPubTypePubEvent];
+            [subscMsgBuilder setPubType:LYTrafficSub_LYPubTypeLyPubEvent];
             [subscMsgBuilder setExpires:120];
         }
         else {
-            [subscMsgBuilder  setPubType:TSSPubTypePubTimer];
+            [subscMsgBuilder  setPubType:LYTrafficSub_LYPubTypeLyPubCron];
             [subscMsgBuilder setExpires:0];
         }
         
-        TSSTrafficSub *subscriberMsg = [subscMsgBuilder build];
+        LYTrafficSub *subscriberMsg = [subscMsgBuilder build];
         if (subscriberMsg == nil)
         {
             NSLog(@"*********Failed to build subscriberMsg");
@@ -3701,10 +4199,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         }
         
         
-        TSSPackage_Builder *sendPackageBuilder = [[TSSPackage_Builder alloc] init];
+        LYMsgOnAir_Builder *sendPackageBuilder = [[LYMsgOnAir_Builder alloc] init];
         [sendPackageBuilder setVersion:1];
-        [sendPackageBuilder setMsgDir:TSSMsgDirClient2Tss];
-        [sendPackageBuilder setMsgType:TSSMsgTypeTrafficSub];
+        [sendPackageBuilder setFromParty:LYPartyLyClient];
+        [sendPackageBuilder setToParty:LYPartyLyTss];
+
+        [sendPackageBuilder setMsgType:LYMsgTypeLyTrafficSub];
         [sendPackageBuilder setTrafficSub:subscriberMsg];
         [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
 
@@ -3714,7 +4214,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
         //[sendPackageBuilder setRoute:pDrvRoute];
         
-        TSSPackage *sendPackage = [sendPackageBuilder build];
+        LYMsgOnAir *sendPackage = [sendPackageBuilder build];
         if (sendPackage == nil)
         {
             NSLog(@"*********Failed to build sendPackage");
@@ -3739,7 +4239,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         return;
     }
     
-    TSSPackage *recvPackage = [TSSPackage parseFromData:rcvdata];
+    LYMsgOnAir *recvPackage = [LYMsgOnAir parseFromData:rcvdata];
     if (recvPackage == nil)
     {
         NSLog(@"Error when parse receive TSS package data");
@@ -3754,7 +4254,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     }
     
     
-    if (recvPackage.msgDir != TSSMsgDirTss2Client)
+    if (recvPackage.toParty != LYPartyLyClient)
     {
         NSLog(@"Error Direction in Package");
         return;
@@ -3776,12 +4276,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         
     
     switch (recvPackage.msgType) {
-        case TSSMsgTypeCityTrafficPub:
+        case LYMsgTypeLyTrafficPub:
         {
             
-            if (recvPackage.hasCityTraffic)
+            if (recvPackage.hasTrafficPub)
             {
-                [self didReceiveTrafficPackage:recvPackage.cityTraffic];
+                [self didReceiveTrafficPackage:recvPackage.trafficPub];
             }
             else 
             {
@@ -3797,9 +4297,10 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 }
 
 
-- (void) didReceiveTrafficPackage:(TSSCityTraffic*) cityTrafficPackage
+- (void) didReceiveTrafficPackage:(LYTrafficPub*) trafficPubPackage
 {
-    TSSCityTraffic *pTrafficInfo = cityTrafficPackage;
+    
+    LYCityTraffic *pTrafficInfo = trafficPubPackage.cityTraffic;
     
 #warning FOR TEST 在接受到的拥堵信息上增加测试数据TRAFFIC
     
@@ -3830,8 +4331,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     
     //citytraffic4me = pTrafficInfo;
-    [runningDataset setCityTraffic4Me:pTrafficInfo];
-    [self AddTrafficOverlay:pTrafficInfo];
+    //[runningDataset setCityTraffic4Me:pTrafficInfo];
+    
+#warning 编码调试中...............
+    //[self AddTrafficOverlay:pTrafficInfo];
+    [self formatAndSaveTrafficData:pTrafficInfo];
     
     [self CheckAndUpdateTrafficListView];
 
@@ -3847,7 +4351,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
     
     int iSegRdCnt = pTrafficInfo.roadTrafficsList.count;
-    TSSRoadTraffic *pRdTrc;
+    LYRoadTraffic *pRdTrc;
     for (int i=0; i<iSegRdCnt; i++)
     {
         pRdTrc = [pTrafficInfo.roadTrafficsList objectAtIndex:i];
@@ -3857,7 +4361,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         
         for (int j=0; j<iSegCnt; j++)
         {
-            TSSSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
+            LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
             NSLog(@"Direction: %d", pSegTrf.direction);
             NSLog(@"Speed: %d", pSegTrf.speed);
             NSLog(@"Details: %@", pSegTrf.details);
@@ -3940,176 +4444,176 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     } 
 }
 
-- (TSSCityTraffic*) ConstructTSSData//:(BMKRoute*) routeinfo
+- (LYCityTraffic*) ConstructTSSData//:(BMKRoute*) routeinfo
 {
     
     
     //深南大道/南山大道(路口)    坐标：113.929296,22.545851
-    TSSCoordinate_Builder *pPoint_shennan_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shennan_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shennan_1_p1 setLng:(113.929296)];
     [pPoint_shennan_1_p1 setLat:(22.545851)];
     //南新路/深南大道(路口)    坐标：113.926909,22.546228
-    TSSCoordinate_Builder *pPoint_shennan_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shennan_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shennan_1_p2 setLng:(113.926909)];
     [pPoint_shennan_1_p2 setLat:(22.546228)];
-    TSSSegment_Builder *pLineBuild_shennan_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_shennan_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_shennan_1 setStartBuilder:pPoint_shennan_1_p1];
     [pLineBuild_shennan_1 setEndBuilder:pPoint_shennan_1_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_shennan_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_shennan_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_shennan_1 setSpeed:10];
     [pSegBuild_shennan_1 setDetails:@"前方拥堵：南山大道路口到南新路路口 方向：西向"];
-    [pSegBuild_shennan_1 setDirection:TSSDirectionWest];
+    [pSegBuild_shennan_1 setDirection:LYDirectionLyWest];
     [pSegBuild_shennan_1 setSegmentBuilder:pLineBuild_shennan_1];
-    TSSSegmentTraffic *pSeg_shennan_1 = [pSegBuild_shennan_1 build];
+    LYSegmentTraffic *pSeg_shennan_1 = [pSegBuild_shennan_1 build];
     
     //深南大道/南海大道(路口)    坐标：113.938478,22.545289
-    TSSCoordinate_Builder *pPoint_shennan_2_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shennan_2_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shennan_2_p1 setLng:(113.938478)];
     [pPoint_shennan_2_p1 setLat:(22.545289)];
     //深南大道/南山大道(路口)    坐标：113.929296,22.545851
-    TSSCoordinate_Builder *pPoint_shennan_2_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shennan_2_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shennan_2_p2 setLng:(113.929296)];
     [pPoint_shennan_2_p2 setLat:(22.545851)];
-    TSSSegment_Builder *pLineBuild_shennan_2 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_shennan_2 = [[LYSegment_Builder alloc] init];
     [pLineBuild_shennan_2 setStartBuilder:pPoint_shennan_2_p1];
     [pLineBuild_shennan_2 setEndBuilder:pPoint_shennan_2_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_shennan_2 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_shennan_2 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_shennan_2 setSpeed:10];
     [pSegBuild_shennan_2 setDetails:@"前方拥堵：南海大道路口到南山大道路口 方向：西向"];
-    [pSegBuild_shennan_2 setDirection:TSSDirectionWest];
+    [pSegBuild_shennan_2 setDirection:LYDirectionLyWest];
     [pSegBuild_shennan_2 setSegmentBuilder:pLineBuild_shennan_2];
-    TSSSegmentTraffic *pSeg_shennan_2 = [pSegBuild_shennan_2 build];
+    LYSegmentTraffic *pSeg_shennan_2 = [pSegBuild_shennan_2 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_shennan = [[TSSRoadTraffic_Builder alloc] init];
-    [pRoadBuild_shennan setRoad:@"深南大道2"];
+    LYRoadTraffic_Builder *pRoadBuild_shennan = [[LYRoadTraffic_Builder alloc] init];
+    [pRoadBuild_shennan setRoad:@"深南大道"];
     [pRoadBuild_shennan addSegmentTraffics:pSeg_shennan_1];
     [pRoadBuild_shennan addSegmentTraffics:pSeg_shennan_2];
     [pRoadBuild_shennan setDesc:@"shenan"];
-    TSSRoadTraffic *pRoad_shennan = [pRoadBuild_shennan build];
+    LYRoadTraffic *pRoad_shennan = [pRoadBuild_shennan build];
     
     
     //北环大道/南海大道(路口)    坐标：113.940385,22.56035
-    TSSCoordinate_Builder *pPoint_nanhai_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_nanhai_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_nanhai_1_p1 setLng:(113.940385)];
     [pPoint_nanhai_1_p1 setLat:(22.56035)];
     //龙岗路/南海大道(路口)  坐标：113.935013,22.525017
-    TSSCoordinate_Builder *pPoint_nanhai_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_nanhai_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_nanhai_1_p2 setLng:(113.935013)];
     [pPoint_nanhai_1_p2 setLat:(22.525017)];
-    TSSSegment_Builder *pLineBuild_nanhai_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_nanhai_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_nanhai_1 setStartBuilder:pPoint_nanhai_1_p2];
     [pLineBuild_nanhai_1 setEndBuilder:pPoint_nanhai_1_p1];
-    TSSSegmentTraffic_Builder *pSegBuild_nanhai_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_nanhai_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_nanhai_1 setSpeed:10];
     [pSegBuild_nanhai_1 setDetails:@"前方拥堵：龙岗路路口到北环大道路口 方向：北向"];
-    [pSegBuild_nanhai_1 setDirection:TSSDirectionWest];
+    [pSegBuild_nanhai_1 setDirection:LYDirectionLyWest];
     [pSegBuild_nanhai_1 setSegmentBuilder:pLineBuild_nanhai_1];
-    TSSSegmentTraffic *pSeg_nanhai_1 = [pSegBuild_nanhai_1 build];
+    LYSegmentTraffic *pSeg_nanhai_1 = [pSegBuild_nanhai_1 build];
     
     //南海大道/创业路(路口)    坐标：113.933132,22.520743
-    TSSCoordinate_Builder *pPoint_nanhai_2_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_nanhai_2_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_nanhai_2_p1 setLng:(113.933132)];
     [pPoint_nanhai_2_p1 setLat:(22.520743)];
     //南海大道/东滨路(路口)  坐标：113.930127,22.510216
-    TSSCoordinate_Builder *pPoint_nanhai_2_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_nanhai_2_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_nanhai_2_p2 setLng:(113.930127)];
     [pPoint_nanhai_2_p2 setLat:(22.510216)];
-    TSSSegment_Builder *pLineBuild_nanhai_2 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_nanhai_2 = [[LYSegment_Builder alloc] init];
     [pLineBuild_nanhai_2 setStartBuilder:pPoint_nanhai_2_p2];
     [pLineBuild_nanhai_2 setEndBuilder:pPoint_nanhai_2_p1];
-    TSSSegmentTraffic_Builder *pSegBuild_nanhai_2 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_nanhai_2 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_nanhai_2 setSpeed:10];
     [pSegBuild_nanhai_2 setDetails:@"前方拥堵：东滨路路口到创业路路口 方向：北向"];
-    [pSegBuild_nanhai_2 setDirection:TSSDirectionWest];
+    [pSegBuild_nanhai_2 setDirection:LYDirectionLyWest];
     [pSegBuild_nanhai_2 setSegmentBuilder:pLineBuild_nanhai_2];
-    TSSSegmentTraffic *pSeg_nanhai_2 = [pSegBuild_nanhai_2 build];
+    LYSegmentTraffic *pSeg_nanhai_2 = [pSegBuild_nanhai_2 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_nanhai = [[TSSRoadTraffic_Builder alloc] init];
-    [pRoadBuild_nanhai setRoad:@"南海大道2"];
+    LYRoadTraffic_Builder *pRoadBuild_nanhai = [[LYRoadTraffic_Builder alloc] init];
+    [pRoadBuild_nanhai setRoad:@"南海大道"];
     [pRoadBuild_nanhai addSegmentTraffics:pSeg_nanhai_1];
     [pRoadBuild_nanhai addSegmentTraffics:pSeg_nanhai_2];
     [pRoadBuild_nanhai setDesc:@"南海大道"];
-    TSSRoadTraffic *pRoad_nanhai = [pRoadBuild_nanhai build];
+    LYRoadTraffic *pRoad_nanhai = [pRoadBuild_nanhai build];
     
     //--红荔路
     //华强北路口    坐标：22.560482, 114.092727
-    TSSCoordinate_Builder *pPoint_hongli_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_hongli_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_hongli_1_p1 setLng:(114.092727)];
     [pPoint_hongli_1_p1 setLat:(22.560482)];
     //上步中路口    坐标：22.555224, 114.102595
-    TSSCoordinate_Builder *pPoint_hongli_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_hongli_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_hongli_1_p2 setLng:(114.102595)];
     [pPoint_hongli_1_p2 setLat:(22.555224)];
-    TSSSegment_Builder *pLineBuild_hongli_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_hongli_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_hongli_1 setStartBuilder:pPoint_hongli_1_p1];
     [pLineBuild_hongli_1 setEndBuilder:pPoint_hongli_1_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_hongli_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_hongli_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_hongli_1 setSpeed:10];
     [pSegBuild_hongli_1 setDetails:@"N1-Detail"];
-    [pSegBuild_hongli_1 setDirection:TSSDirectionWest];
+    [pSegBuild_hongli_1 setDirection:LYDirectionLyWest];
     [pSegBuild_hongli_1 setSegmentBuilder:pLineBuild_hongli_1];
-    TSSSegmentTraffic *pSeg_hongli_1 = [pSegBuild_hongli_1 build];
+    LYSegmentTraffic *pSeg_hongli_1 = [pSegBuild_hongli_1 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_hongli = [[TSSRoadTraffic_Builder alloc] init];
+    LYRoadTraffic_Builder *pRoadBuild_hongli = [[LYRoadTraffic_Builder alloc] init];
     [pRoadBuild_hongli setRoad:@"红荔路"];
     [pRoadBuild_hongli addSegmentTraffics:pSeg_hongli_1];
     //[pRoadBuild_hongli addSegmenttraffic:pSeg_hongli_2];
     [pRoadBuild_hongli setDesc:@"shenan"];
-    TSSRoadTraffic *pRoad_hongli = [pRoadBuild_hongli build];
+    LYRoadTraffic *pRoad_hongli = [pRoadBuild_hongli build];
     //--END-红荔路
     
     //--隆平路
     //五和大道路口    坐标：114.065571,22.651841
-    TSSCoordinate_Builder *pPoint_longping_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_longping_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_longping_1_p1 setLng:(114.065571)];
     [pPoint_longping_1_p1 setLat:(22.651841)];
     //坂雪岗大道路口    坐标：114.07265,22.651991
-    TSSCoordinate_Builder *pPoint_longping_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_longping_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_longping_1_p2 setLng:(114.07265)];
     [pPoint_longping_1_p2 setLat:(22.651991)];
-    TSSSegment_Builder *pLineBuild_longping_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_longping_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_longping_1 setStartBuilder:pPoint_longping_1_p1];
     [pLineBuild_longping_1 setEndBuilder:pPoint_longping_1_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_longping_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_longping_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_longping_1 setSpeed:10];
     [pSegBuild_longping_1 setDetails:@"东向 五和大道路口-坂雪岗大道路口"];
-    [pSegBuild_longping_1 setDirection:TSSDirectionWest];
+    [pSegBuild_longping_1 setDirection:LYDirectionLyWest];
     [pSegBuild_longping_1 setSegmentBuilder:pLineBuild_longping_1];
-    TSSSegmentTraffic *pSeg_longping_1 = [pSegBuild_longping_1 build];
+    LYSegmentTraffic *pSeg_longping_1 = [pSegBuild_longping_1 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_longping = [[TSSRoadTraffic_Builder alloc] init];
+    LYRoadTraffic_Builder *pRoadBuild_longping = [[LYRoadTraffic_Builder alloc] init];
     [pRoadBuild_longping setRoad:@"隆平路"];
     [pRoadBuild_longping addSegmentTraffics:pSeg_longping_1];
     //[pRoadBuild_longping addSegmenttraffic:pSeg_longping_2];
     [pRoadBuild_longping setDesc:@"shenan"];
-    TSSRoadTraffic *pRoad_longping = [pRoadBuild_longping build];
+    LYRoadTraffic *pRoad_longping = [pRoadBuild_longping build];
     //--END-隆平路
     
     //--冲之大道
     //稼先路口    坐标：114.067817,22.656944
-    TSSCoordinate_Builder *pPoint_chongzhi_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_chongzhi_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_chongzhi_1_p1 setLng:(114.067817)];
     [pPoint_chongzhi_1_p1 setLat:(22.656944)];
     //隆平路口    坐标：114.068053,22.654608
-    TSSCoordinate_Builder *pPoint_chongzhi_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_chongzhi_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_chongzhi_1_p2 setLng:(114.068053)];
     [pPoint_chongzhi_1_p2 setLat:(22.654608)];
-    TSSSegment_Builder *pLineBuild_chongzhi_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_chongzhi_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_chongzhi_1 setStartBuilder:pPoint_chongzhi_1_p1];
     [pLineBuild_chongzhi_1 setEndBuilder:pPoint_chongzhi_1_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_chongzhi_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_chongzhi_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_chongzhi_1 setSpeed:10];
     [pSegBuild_chongzhi_1 setDetails:@"南向 稼先路路口-隆平路之间TEST"];
-    [pSegBuild_chongzhi_1 setDirection:TSSDirectionWest];
+    [pSegBuild_chongzhi_1 setDirection:LYDirectionLyWest];
     [pSegBuild_chongzhi_1 setSegmentBuilder:pLineBuild_chongzhi_1];
-    TSSSegmentTraffic *pSeg_chongzhi_1 = [pSegBuild_chongzhi_1 build];
+    LYSegmentTraffic *pSeg_chongzhi_1 = [pSegBuild_chongzhi_1 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_chongzhi = [[TSSRoadTraffic_Builder alloc] init];
+    LYRoadTraffic_Builder *pRoadBuild_chongzhi = [[LYRoadTraffic_Builder alloc] init];
     [pRoadBuild_chongzhi setRoad:@"冲之大道"];
     [pRoadBuild_chongzhi addSegmentTraffics:pSeg_chongzhi_1];
     //[pRoadBuild_chongzhi addSegmenttraffic:pSeg_chongzhi_2];
     [pRoadBuild_chongzhi setDesc:@"shenan"];
-    TSSRoadTraffic *pRoad_chongzhi = [pRoadBuild_chongzhi build];
+    LYRoadTraffic *pRoad_chongzhi = [pRoadBuild_chongzhi build];
     //--END-冲之大道
     
     
@@ -4169,32 +4673,32 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     //--南山大道
     //桃园路    坐标：113.931375, 22.538141
-    TSSCoordinate_Builder *pPoint_shahexi_1_p1 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shahexi_1_p1 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shahexi_1_p1 setLng:(113.931375)];
     [pPoint_shahexi_1_p1 setLat:(22.538141)];
     //桂庙路    坐标：113.930125, 22.529976
-    TSSCoordinate_Builder *pPoint_shahexi_1_p2 = [[TSSCoordinate_Builder alloc]init];
+    LYCoordinate_Builder *pPoint_shahexi_1_p2 = [[LYCoordinate_Builder alloc]init];
     [pPoint_shahexi_1_p2 setLng:(113.930125)];
     [pPoint_shahexi_1_p2 setLat:(22.529976)];
-    TSSSegment_Builder *pLineBuild_shahexi_1 = [[TSSSegment_Builder alloc] init];
+    LYSegment_Builder *pLineBuild_shahexi_1 = [[LYSegment_Builder alloc] init];
     [pLineBuild_shahexi_1 setStartBuilder:pPoint_shahexi_1_p1];
     [pLineBuild_shahexi_1 setEndBuilder:pPoint_shahexi_1_p2];
-    TSSSegmentTraffic_Builder *pSegBuild_shahexi_1 = [[TSSSegmentTraffic_Builder alloc] init];
+    LYSegmentTraffic_Builder *pSegBuild_shahexi_1 = [[LYSegmentTraffic_Builder alloc] init];
     [pSegBuild_shahexi_1 setSpeed:10];
     [pSegBuild_shahexi_1 setDetails:@"前方拥堵：从桃园路到桂庙路，蛇口方向"];
-    [pSegBuild_shahexi_1 setDirection:TSSDirectionWest];
+    [pSegBuild_shahexi_1 setDirection:LYDirectionLyWest];
     [pSegBuild_shahexi_1 setSegmentBuilder:pLineBuild_shahexi_1];
-    TSSSegmentTraffic *pSeg_shahexi_1 = [pSegBuild_shahexi_1 build];
+    LYSegmentTraffic *pSeg_shahexi_1 = [pSegBuild_shahexi_1 build];
     
-    TSSRoadTraffic_Builder *pRoadBuild_shahexi = [[TSSRoadTraffic_Builder alloc] init];
+    LYRoadTraffic_Builder *pRoadBuild_shahexi = [[LYRoadTraffic_Builder alloc] init];
     [pRoadBuild_shahexi setRoad:@"南山大道"];
     [pRoadBuild_shahexi addSegmentTraffics:pSeg_shahexi_1];
     //[pRoadBuild_shahexi addSegmenttraffic:pSeg_shahexi_2];
     [pRoadBuild_shahexi setDesc:@"南山大道"];
-    TSSRoadTraffic *pRoad_shahexi = [pRoadBuild_shahexi build];
+    LYRoadTraffic *pRoad_shahexi = [pRoadBuild_shahexi build];
     //--END-南山大道
     
-    TSSCityTraffic_Builder *pCityTrafficBuild = [[TSSCityTraffic_Builder alloc] init];
+    LYCityTraffic_Builder *pCityTrafficBuild = [[LYCityTraffic_Builder alloc] init];
     [pCityTrafficBuild setCity:@"深圳"];
     [pCityTrafficBuild setTimestamp:0];
     [pCityTrafficBuild addRoadTraffics:pRoad_shennan];
@@ -4205,7 +4709,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     [pCityTrafficBuild addRoadTraffics:pRoad_shahexi];
     
     
-    __autoreleasing TSSCityTraffic *pTrafficInfo = [pCityTrafficBuild build];
+    __autoreleasing LYCityTraffic *pTrafficInfo = [pCityTrafficBuild build];
     
     
     return pTrafficInfo;

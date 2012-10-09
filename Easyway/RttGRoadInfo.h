@@ -16,7 +16,7 @@
 }
 
 @property NSString *roadname;
-@property NSMutableArray *pointlist;
+@property NSMutableArray *pointlist; //RttGPoint
 
 @end
 
@@ -42,6 +42,7 @@
 
 @property NSString *roadname;
 @property NSString *detail;
+@property TimeValue64 timeStamp;
 @property NSMutableArray *pointlist; //RttGMapPoint
 @property int stepIndex;             //在路径Step中的位置;
 @property int nextPointIndex;        //在路径点中的位置;
@@ -53,4 +54,21 @@
 @property BMKMapPoint mappoint;
 
 @end
+
+
+
+@interface RTTFormatedTrafficFromTSS : NSObject
+{
+    
+}
+
+@property CLLocationCoordinate2D startCoord;
+@property CLLocationCoordinate2D endCoord;
+@property TimeValue64 timestamp;
+@property int speedKMPH;
+@property NSString *roadName;
+@property NSString *details;
+
+@end
+
 
