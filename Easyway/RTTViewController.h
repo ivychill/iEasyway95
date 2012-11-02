@@ -14,11 +14,12 @@
 @class RTTRunningDataSet;
 @class RTTGuideBoardView;
 @class RTTSuggestionListViewController;
-@class RTTTopBarView;
+//@class RTTTopBarView;
 @class RTTTrafficBoardView;
 @class RTTModeActivityIndicatorView;
 @class RTTComm4TSS;
 @class RTTSynthesizeTTS;
+@class RTTSearchBarView;
 
 #import <UIKit/UIKit.h>
 #import "BMapKit.h"
@@ -53,11 +54,11 @@ enum RTTEN_ACTIVITYTYPE {
 
     IBOutlet UIView *mCenterView;
     
-    IBOutlet UISearchBar *mAddrSearchBar;
-    IBOutlet UIButton *mRoutePreviewBTN;
-    IBOutlet UIView *mInfoboadView;
-    IBOutlet UIButton *mOnGoBTN;
-    IBOutlet UIButton *mRoutePreviewInInfoBoadBTN;
+    //非路径提示版本这些都不用了
+//    IBOutlet UIButton *mRoutePreviewBTN;
+//    IBOutlet UIView *mInfoboadView;
+//    IBOutlet UIButton *mOnGoBTN;
+//    IBOutlet UIButton *mRoutePreviewInInfoBoadBTN;
     
     
     RTTMapView *mMapView;
@@ -65,6 +66,7 @@ enum RTTEN_ACTIVITYTYPE {
     BMKSearch  *mBMKSearch;
     RTTGuideBoardView *mGuideBoard;
     RTTTrafficBoardView *mTrafficInfoBoard;
+    RTTSearchBarView *mTopSearchBar;
 
     
     RTTSuggestionListViewController *mSuggestionListVC;
@@ -74,23 +76,26 @@ enum RTTEN_ACTIVITYTYPE {
     RTTModeActivityIndicatorView *mModeIndicatorView;
 
     
-    BOOL mIsHomeAddrSetting;
+//    BOOL mIsHomeAddrSetting;
 //    BMKPoiInfo *mHomeAddrInfo;
 //    BMKPoiInfo *mOfficeAddrInfo;
 //    NSInteger *mCurrentRoute;
     
-    BMKPolyline     *pCurrentlyPolyLine;
-    NSMutableArray *trafficPolylineList;
-    
-    RTTMapPointAnnotation *pStartPointAnnotation;
-    RTTMapPointAnnotation *pEndPointAnnotation;
-    RTTMapPointAnnotation *pHomePointAnnotation;
-    RTTMapPointAnnotation *pUndefAnnotation;
-
-    RTTMapPointAnnotation *pCurrentlySelectedAnnotation;  //当前选择的点
-    RTTMapPointAnnotation *pWaitPOIResultAnnotation;  //当前选择的点
-
-    
+//    BMKPolyline     *pCurrentlyPolyLine;
+//    NSMutableArray *trafficPolylineList;
+//    
+//    RTTMapPointAnnotation *pStartPointAnnotation;
+//    RTTMapPointAnnotation *pEndPointAnnotation;
+//    RTTMapPointAnnotation *pHomePointAnnotation;
+//    RTTMapPointAnnotation *pUndefAnnotation;
+//
+//    RTTMapPointAnnotation *pCurrentlySelectedAnnotation;  //当前选择的点
+//    RTTMapPointAnnotation *pWaitPOIResultAnnotation;  //当前等待返回POI结果的点
+//    
+//    NSMutableArray *mAnnotationArray;  //当前未定义的点
+//
+//
+//    
     RTTRunningDataSet *runningDataset;
     
     CLLocationCoordinate2D mLastOnPlanLocation;
@@ -102,22 +107,22 @@ enum RTTEN_ACTIVITYTYPE {
 //    NSOperationQueue *rttThreadQue; 
     RTTComm4TSS *mComm4TSS;
     
-    NSTimer *locUpdateTimer;
-    NSTimer *btnDismissTimer;
+//    NSTimer *locUpdateTimer;
+//    NSTimer *btnDismissTimer;
     NSTimer *mModeIndicatorTimer;
     
     enum RTTEN_ACTIVITYTYPE mRunningActivity;
     NSTimer *mActivityTimer;
 
     
-    bool isBTNDismissTimeOut;
-    int iTestLocIndex;
+//    bool isBTNDismissTimeOut;
+//    int iTestLocIndex;
     
-    BMKPointAnnotation *pTestCareAnnotation;
-    NSMutableArray *testLocationList;
-
-    NSTimer *mStart2GoTimer;
-    int     mTicks4StartGo;
+//    BMKPointAnnotation *pTestCareAnnotation;
+//    NSMutableArray *testLocationList;
+//
+//    NSTimer *mStart2GoTimer;
+//    int     mTicks4StartGo;
     
     int mTSSMessageSerialNum;
     
@@ -128,29 +133,41 @@ enum RTTEN_ACTIVITYTYPE {
     
     BOOL mIsOutofRange;
     
-    UIDevice *dev; //= [UIDevice currentDevice];
-    NSString *deviceVersion; //= dev.systemVersion;
-    NSString *deviceUuid; //= dev.uniqueIdentifier;
+    //UIDevice *dev; //= [UIDevice currentDevice];
+    //NSString *deviceVersion; //= dev.systemVersion;
+    //NSString *deviceUuid; //= dev.uniqueIdentifier;
 }
 
 //@property (nonatomic) CLLocationCoordinate2D lastOnPlanLocation;
+@property CLLocationCoordinate2D currentlyRouteEndPoint;
+@property NSString *currentlyRouteEndAddr;
+@property BOOL isViewMap;
+
+@property BOOL TTSSwitchOnOff;
+@property BOOL autoScaleOnOff;
+@property BOOL autoDetectOnOff;
 
 @property (strong, nonatomic) IBOutlet UIButton *back2locBTN;
 @property (strong, nonatomic) IBOutlet UIButton *showTrafficViewBTN;
+@property (strong, nonatomic) IBOutlet UIButton *showSearchBarBTN;
+@property (strong, nonatomic) IBOutlet UILabel *uiDestinationLBL;
 
 - (IBAction)didSaveSpeedSegs:(id)sender;
 
 - (IBAction)didShowTraffic:(id)sender;
+- (IBAction)didPanOnMap:(id)sender;
 - (IBAction)didLongPress:(UILongPressGestureRecognizer *)sender;
-- (IBAction)didShowRoutePreview:(id)sender;
-- (IBAction)didStart2Go:(id)sender;
-- (IBAction)didShowRoutePreviewAfterPlan:(id)sender;
+//- (IBAction)didShowRoutePreview:(id)sender;
+//- (IBAction)didStart2Go:(id)sender;
+//- (IBAction)didShowRoutePreviewAfterPlan:(id)sender;
 - (IBAction)didBack2UserLocation:(id)sender;
+- (IBAction)didShowSearchbar:(id)sender;
 
 
 - (NSInteger) detectPath;
 
 - (bool) sendDeviceInfo2TSS:(NSData *)deviceToken;
+
 
 
 @end

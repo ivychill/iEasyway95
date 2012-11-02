@@ -31,6 +31,8 @@
 @property BOOL isShowAllTraffic;
 @property (strong, nonatomic) IBOutlet UISegmentedControl *setmentCTRL;
 
+- (void) getDatasourceFromRunningDataSet;
+
 - (IBAction)didSegmentChange:(id)sender;
 
 @end

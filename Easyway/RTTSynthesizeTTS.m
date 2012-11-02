@@ -62,6 +62,7 @@
     {
         [loTTSArray removeObjectAtIndex:0];
     }
-    [loTTSArray addObject:strInfo];}
+    [loTTSArray addObject:strInfo];
+}
 
 @end

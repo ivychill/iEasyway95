@@ -47,6 +47,7 @@
     [self.window addSubview:navigationController.view];
     self.navigationController.delegate = self;
     
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlack];//UIBarStyleBlackTranslucent];
     self.viewController = rootView;
     //self.window.rootViewController = self.viewController;
     
@@ -149,8 +150,9 @@
     NSLog(@"deviceToken: %@", deviceToken);
     NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
     [saveDefaults setObject:@"YES" forKey:@"IsSuccessRegAPS"];
-    [saveDefaults setObject:deviceToken forKey:@"DeviceToken"];        
-
+    [saveDefaults setObject:deviceToken forKey:@"DeviceToken"];
+    [saveDefaults synchronize];
+    
     if ([self.viewController sendDeviceInfo2TSS:deviceToken])
     {
         NSLog(@"Success call send device token to TSS");

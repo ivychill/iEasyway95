@@ -29,12 +29,12 @@
 //#import "RttGOprRcvTSS.h"
 
 #import "RTTMapPointSettingViewController.h"
-#import "RTTRoutePreviewViewController.h"
-#import "RTTRouteBookmarkViewController.h"
+//#import "RTTRoutePreviewViewController.h"
+//#import "RTTRouteBookmarkViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import "RTTGuideBoardView.h"
 #import "RTTSuggestionListViewController.h"
-#import "RTTTopBarView.h"
+//#import "RTTTopBarView.h"
 #import "RTTHomeAddrViewController.h"
 #import "RTTTrafficListViewController.h"
 #import "RTTIntroPageViewController.h"
@@ -44,163 +44,8 @@
 #import "RTTComm4TSS.h"
 #import "RTTSynthesizeTTS.h"
 
-
-#pragma mark -
-#pragma mark Some Gloable Process
-@interface RouteAnnotation : BMKPointAnnotation
-{
-	int _type; ///<0:起点 1：终点 2：公交 3：地铁 4:驾乘
-	int _degree;
-}
-
-@property (nonatomic) int type;
-@property (nonatomic) int degree;
-@end
-
-@implementation RouteAnnotation
-
-@synthesize type = _type;
-@synthesize degree = _degree;
-@end
-
-
-@interface CandidateSteps:NSObject
-{
-	int _index;
-	CLLocationCoordinate2D _StPoint;
-    CLLocationCoordinate2D _EdPoint;
-}
-@property (nonatomic) int index;
-@property (nonatomic) CLLocationCoordinate2D StPoint;
-@property (nonatomic) CLLocationCoordinate2D EdPoint;
-@end
-
-@implementation CandidateSteps
-@synthesize index = _index;
-@synthesize StPoint = _StPoint;
-@synthesize EdPoint = _EdPoint;
-@end
-
-//判断pnt是否在由（p1, p2）两点组成的线段范围内
-//方法：计算投影点，然后判断投影点是否在线段内；如果是，则返回距离，否则返回－1.0；
-//Note: 允许投影点在线段两端的误差，目前本函数还没加入这个误差；
-CLLocationDistance GetNearLineDistance(BMKMapPoint pnt,  BMKMapPoint p1, BMKMapPoint p2, BMKMapPoint *retproj)
-{
-    double a;    
-    double b;    
-    double c;    
-    
-    if(p2.x >= p1.y)   
-    {   
-        a=p2.y-p1.y;
-        b=p1.x-p2.x;
-        c=p1.y*p2.x-p1.x*p2.y;    
-    }
-    else   
-    {   
-        a=p1.y-p2.y;    
-        b=p2.x-p1.x;    
-        c=p2.y*p1.x-p2.x*p1.y;    
-    }
-    
-    double dSPtX = (b*b*pnt.x - a*(b*pnt.y + c))/(a*a + b*b);
-    double dSPtY = (a*a*pnt.y - b*(a*pnt.x + c))/(a*a + b*b);
-    
-    if (retproj)
-    {
-        retproj->x = dSPtX;
-        retproj->y = dSPtY;
-    }
-    
-    //投影点是否在线段内；之所以这么写是为了避免复杂浮点运算；
-    if (p1.x < p2.x)//横坐标判断
-    {
-        if ((dSPtX < p1.x) || (dSPtX > p2.x)) //不在线段内，还没加入误差
-        {
-            return -1.0;
-        }
-    }
-    else 
-    {
-        if ((dSPtX > p1.x) || (dSPtX < p2.x)) //不在线段内，还没加入误差
-        {
-            return -1.0;
-        }
-    }
-    
-    if (p1.y < p2.y) //纵坐标判断
-    {
-        if ((dSPtY < p1.y) || (dSPtY > p2.y)) //不在线段内，还没加入误差
-        {
-            return -1.0;
-        }
-    }
-    else 
-    {
-        if ((dSPtY > p1.y) || (dSPtY < p2.y)) //不在线段内，还没加入误差
-        {
-            return -1.0;
-        }
-    }
-    
-    //double s = fabs(a*pnt.x+b*pnt.y+c)/sqrt(a*a+b*b);
-    //return s;
-    
-    BMKMapPoint projectionPoint;
-    projectionPoint.x = dSPtX;
-    projectionPoint.y = dSPtY;
-    CLLocationDistance distance = BMKMetersBetweenMapPoints(pnt, projectionPoint);
-    return distance;
-    
-};
-
-struct STPointLineDistInfo
-{
-    CLLocationDistance distance;
-    BMKMapPoint projection;
-    int pointindex;
-};
-
-CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoint *roadPoints, int pointCount, STPointLineDistInfo *retPLDInfo=nil)
-{
-    if (pointCount < 2)
-        return -1.0;
-    
-    CLLocationDistance nearestDistance = BMKMetersBetweenMapPoints(LoctionPoint, roadPoints[0]);
-    if (retPLDInfo!=nil){
-        retPLDInfo->projection = roadPoints[0];
-        retPLDInfo->pointindex = 0;
-    }
-    
-    BMKMapPoint projPoint;
-    for (int i=0; i<(pointCount-1); i++)
-    {
-        CLLocationDistance dist = GetNearLineDistance(LoctionPoint, roadPoints[i], roadPoints[i+1], &projPoint);
-        if ((dist>=0.0) && (dist <= nearestDistance))
-        {
-            nearestDistance = dist;
-            if (retPLDInfo!=nil){
-                retPLDInfo->pointindex = i;
-                retPLDInfo->projection = projPoint;
-            }
-        }
-        dist = BMKMetersBetweenMapPoints(LoctionPoint, roadPoints[i+1]); //避免落在投影外的情况，譬如凸折现连接外的点
-        if ((dist>=0.0) && (dist <= nearestDistance))
-        {
-            nearestDistance = dist;
-            if (retPLDInfo!=nil){
-                retPLDInfo->pointindex = i;
-                retPLDInfo->projection = roadPoints[i+1];
-            }
-        }
-    }
-    
-    if (retPLDInfo!=nil){
-        retPLDInfo->distance = nearestDistance;
-    }
-    
-    return nearestDistance;
-};
+#import "RTTSearchBarView.h"
+#import "RTTPrefSettingViewController.h"
 
 
 
@@ -236,6 +81,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //初始化和启动通信模块
     [self initCommUnit];
     
+    //初始化合成语音模块
+    [self initTTS];
+    
     //增加测试数据
     [self addTestData];
     
@@ -250,17 +98,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (void)viewDidUnload
 {
-    //mMapView = nil;
-    mAddrSearchBar = nil;
     mCenterView = nil;
-    mRoutePreviewBTN = nil;
-    mInfoboadView = nil;
-    mOnGoBTN = nil;
-    mRoutePreviewBTN = nil;
     [self setBack2locBTN:nil];
     [self setShowTrafficViewBTN:nil];
+    [self setShowSearchBarBTN:nil];
+    [self setUiDestinationLBL:nil];
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -271,7 +114,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (void) initTimer
 {
-    
+    mModeIndicatorTimer = nil;
+    mActivityTimer = nil;
 }
 
 - (void) initBaiduMap
@@ -288,8 +132,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     mMapView.delegate = self;
     CLLocationCoordinate2D centerlocation = CLLocationCoordinate2DMake(22.546154, 114.06859);
-    //[mMapView setCenterCoordinate:(centerlocation)];
-    [self setCenterOfMapView:centerlocation];
+    [mMapView setCenterOfMapView:centerlocation];
     
     //百度地图API，允许获取和显示用户当前位置
     [mMapView setShowsUserLocation:YES];
@@ -303,8 +146,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //    overlayCover.backgroundColor = [[[UIColor brownColor] colorWithAlphaComponent:0.8] CGColor];
 //    [mMapView.layer addSublayer:overlayCover];
     
-    //[mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
-    [self setCenterOfMapView:(mMapView.userLocation.coordinate)];
+    //[mMapView setCenterCoordinate:([self getCurLocation])];
+    [mMapView setCenterOfMapView:([mMapView getCurLocation])];
     
     if (!mBMKSearch)
     {
@@ -316,12 +159,6 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 - (void) initMainViewUnit
 {
     //初始化各种窗口部件
-    [mRoutePreviewBTN setHidden:NO];
-    
-    //设置infoboard
-    [self initInfoBoard];
-    [self hideInfoBoardforStart2Go];
-    
     
     //设置guide board
     [self initGuideBoard];
@@ -334,12 +171,15 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     [self initModeIndicator];
     [self closeModeIndicator];
     
+    //设置顶部的自定义搜索条
+    [self initTopSearchBar];
+    
     //设置搜索建议结果列表框
     [self initSuggestionListView];
     [self.view addSubview:mSuggestionListVC.view];
     
     [self initButtomBar];
-    [self initTopBar];
+    //[self initTopBar];
     
     //地图上的小按钮
     //设置阴影
@@ -347,29 +187,14 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     back2locBTN.layer.shadowOffset = CGSizeMake(3.0f, 3.0f); // [水平偏移，垂直偏移]
     back2locBTN.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
     back2locBTN.layer.shadowRadius = 10.0f; // 阴影发散的程度
-
     
-    
-#if defined (HUAWEIVER)
-    [mAddrSearchBar removeFromSuperview];    
-#endif
-
+    [self initDestinationLBL];
 }
 
 - (void) initRunningParam
 {
-    pCurrentlySelectedAnnotation = nil;
-    pWaitPOIResultAnnotation = nil;
-    
-    pStartPointAnnotation = nil;
-    pEndPointAnnotation = nil;
-    pHomePointAnnotation = nil;
-    pUndefAnnotation = nil;
-    trafficPolylineList = [[NSMutableArray alloc] init];
-    
+
     runningDataset = [[RTTRunningDataSet alloc] init];//运行时所有的数据集都在这个大类里头, datamodel
-    
-    mIsHomeAddrSetting = NO;
     
     mRunningActivity = RTTEN_ACTIVITYTYPE_IDLE;
     mActivityTimer = nil;
@@ -380,9 +205,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     mIsOutofRange = NO;
     
     
-    dev = [UIDevice currentDevice];
-    deviceVersion = dev.systemVersion;
-    deviceUuid = dev.uniqueIdentifier;
+    runningDataset.thisDev = [UIDevice currentDevice];
+    runningDataset.deviceVersion = runningDataset.thisDev.systemVersion;
+    runningDataset.deviceUuid = runningDataset.thisDev.uniqueIdentifier;
 }
 
 - (void) initCommUnit
@@ -390,10 +215,16 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //初始化和启动通信模块
     mTSSMessageSerialNum = 0; //消息序列号
     
-    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:7001" delegate:self];
-    
-    
-    mSynTTS = [[RTTSynthesizeTTS alloc] init:10];
+    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:7001" uuID:runningDataset.deviceUuid delegate:self];
+}
+
+- (void) initTTS
+{
+    float verValue = runningDataset.deviceVersion.floatValue;
+    if (verValue < 6.0)
+    {
+        mSynTTS = [[RTTSynthesizeTTS alloc] init:10];
+    }
 }
 
 - (void) initLoadData
@@ -410,32 +241,110 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     //Load Home Address Info
     NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray *loadArray = [saveDefaults objectForKey:@"HomeOfficeSaveKey"];
-    if (loadArray.count < 3)
+    NSArray *loadHomeInfoArray = [saveDefaults objectForKey:@"HomeAddrSaveKey"];
+    if (loadHomeInfoArray.count < 3)
     {
-        return;
+        //return;
     }
-    NSString *loadHomeAddr = [loadArray objectAtIndex:0];
-    NSString *loadHomeLat = [loadArray objectAtIndex:1];
-    NSString *loadHomeLon = [loadArray objectAtIndex:2];
-    if (!loadHomeAddr || !loadHomeLat || !loadHomeLon)
+    else
     {
-        return;
+        NSString *loadHomeAddr = [loadHomeInfoArray objectAtIndex:0];
+        NSString *loadHomeLat = [loadHomeInfoArray objectAtIndex:1];
+        NSString *loadHomeLon = [loadHomeInfoArray objectAtIndex:2];
+        if (!loadHomeAddr || !loadHomeLat || !loadHomeLon)
+        {
+            NSLog(@"无法加载家庭地址");
+            NSLog(@"str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
+
+        }
+        else
+        {
+            NSLog(@"加载家庭地址str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
+            
+            __autoreleasing BMKPoiInfo *homePoi = [[BMKPoiInfo alloc] init];
+            homePoi.address = loadHomeAddr;
+            CLLocationCoordinate2D loadHomeLoc;
+            loadHomeLoc.latitude = [loadHomeLat floatValue];
+            loadHomeLoc.longitude = [loadHomeLon floatValue];
+            homePoi.pt = loadHomeLoc;
+            runningDataset.homeAddrInfo = homePoi;
+        }
     }
-    NSLog(@"str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
     
-    __autoreleasing BMKPoiInfo *homePoi = [[BMKPoiInfo alloc] init];
-    homePoi.address = loadHomeAddr;
-    CLLocationCoordinate2D loadHomeLoc;
-    loadHomeLoc.latitude = [loadHomeLat floatValue];
-    loadHomeLoc.longitude = [loadHomeLon floatValue];
-    homePoi.pt = loadHomeLoc;
-    runningDataset.homeAddrInfo = homePoi;
+    NSArray *loadOfficeInfoArray = [saveDefaults objectForKey:@"OfficeAddrSaveKey"];
+    if (loadOfficeInfoArray.count < 3)
+    {
+        //return;
+    }
+    else
+    {
+        NSString *loadOfficeAddr = [loadOfficeInfoArray objectAtIndex:0];
+        NSString *loadOfficeLat = [loadOfficeInfoArray objectAtIndex:1];
+        NSString *loadOfficeLon = [loadOfficeInfoArray objectAtIndex:2];
+        if (!loadOfficeAddr || !loadOfficeLat || !loadOfficeLon)
+        {
+            //return;
+        }
+        else
+        {
+            NSLog(@"str:%@, %@, %@",loadOfficeAddr, loadOfficeLat, loadOfficeLon);
+            
+            __autoreleasing BMKPoiInfo *officePoi = [[BMKPoiInfo alloc] init];
+            officePoi.address = loadOfficeAddr;
+            CLLocationCoordinate2D loadOfficeLoc;
+            loadOfficeLoc.latitude = [loadOfficeLat floatValue];
+            loadOfficeLoc.longitude = [loadOfficeLon floatValue];
+            officePoi.pt = loadOfficeLoc;
+            runningDataset.officeAddrInfo = officePoi;
+        }
+    }
+    
+    
+    NSString *isIntroReaded = [saveDefaults objectForKey:@"isReadedIntroPage"];
+    if ([isIntroReaded isEqualToString: @"YES"])
+    {
+        runningDataset.isReadedIntroPage = YES;
+    }
+    
+    
+    NSString *switchStat = [saveDefaults objectForKey:@"TSSSwitchOnOffSaveKey"];
+    if (switchStat && [switchStat isEqualToString: @"NO"])
+    {
+        self.TTSSwitchOnOff = NO;
+    }
+    else
+    {
+        self.TTSSwitchOnOff = YES;  //缺省是ON
+    }
+
+    
+    switchStat = [saveDefaults objectForKey:@"AutoDetectOnOffSaveKey"];
+    if (switchStat && [switchStat isEqualToString: @"NO"])
+    {
+        self.autoDetectOnOff = NO;
+    }
+    else
+    {
+        self.autoDetectOnOff = YES; //缺省是ON
+    }
+
+    
+    switchStat = [saveDefaults objectForKey:@"AutoScaleOnOffSaveKey"];
+    if (switchStat && [switchStat isEqualToString: @"YES"])
+    {
+        self.autoScaleOnOff = YES;
+    }
+    else
+    {
+        self.autoScaleOnOff = NO;  //缺省不缩放
+    }
+
 }
 
 - (void) processIntroPage
 {
-    if (runningDataset.homeAddrInfo)
+    //if (runningDataset.homeAddrInfo)
+    if (runningDataset.isReadedIntroPage)
     {
         return;
     }
@@ -449,39 +358,6 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 #pragma mark -
 #pragma mark Timer process
-- (void) setStart2GoTimer:(int) seconds
-{
-    if (mStart2GoTimer)
-    {
-        [mStart2GoTimer invalidate];
-        mStart2GoTimer = nil;
-    }
-    mStart2GoTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(time2TickStartGo) userInfo:nil repeats:YES]; 
-    mTicks4StartGo = 9;
-}
-
-- (void) stopStart2GoTimer
-{
-    if (mStart2GoTimer)
-    {
-        [mStart2GoTimer invalidate];
-        mStart2GoTimer = nil;
-    }
-}
-
-- (void) time2TickStartGo
-{
-    if (mTicks4StartGo <= 0)
-    {
-        [self start2Go];
-    }
-    else
-    {
-    NSString *strTitile = [[NSString alloc] initWithFormat:@"随路播报%1d", mTicks4StartGo]; 
-    mOnGoBTN.titleLabel.text = strTitile;
-    mTicks4StartGo--;
-    }
-}
 
 - (void) setModeIndicatorTimer:(int) seconds
 {
@@ -575,35 +451,61 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 #pragma mark -
 #pragma mark UI event process
-//- (IBAction)didShowLeftView:(id)sender 
-//{
-////    if (!PointSettingView)
-////    {
-////        NSArray *nibObjs = [[NSBundle mainBundle] loadNibNamed:@"RoutPointSetting" owner:self options:nil];
-////        PointSettingView = [nibObjs objectAtIndex:0];
-////    }
-////    
-////    PointInfoLabel.text = pCurrentlyAnnotation.AddrString;
-////    [self.view sendSubviewToBack:_mapView];
-////    [self.view insertSubview:PointSettingView aboveSubview:_mapView];
-//
-//    [mNaviBar setHidden:YES];
-//    [mLeftView setHidden:NO];
-//}
 
-- (void) gotUserLoginToken:(NSString*) token
+- (void)didTTSSwitchOnOff:(BOOL)isOn
 {
-    [runningDataset setUserToken:token];
-    //[self sendUserProfile2Server:token];
-    NSLog(@"Will Send Profile to Server");
+    self.TTSSwitchOnOff = isOn;
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    if (isOn)
+    {
+        [saveDefaults setObject:@"YES" forKey:@"TSSSwitchOnOffSaveKey"];
+    }
+    else
+    {
+        [saveDefaults setObject:@"NO" forKey:@"TSSSwitchOnOffSaveKey"];
+    }
+    [saveDefaults synchronize];
+
 }
 
+- (void)didAutoDetectSwitchOnOff:(BOOL)isOn
+{
+    self.autoDetectOnOff = isOn;
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    if (isOn)
+    {
+        [saveDefaults setObject:@"YES" forKey:@"AutoDetectOnOffSaveKey"];
+    }
+    else
+    {
+        [saveDefaults setObject:@"NO" forKey:@"AutoDetectOnOffSaveKey"];
+    }
+    [saveDefaults synchronize];
+
+    
+}
+
+- (void)didAutoScaleMapSwitchOnOff:(BOOL)isOn
+{
+    self.autoScaleOnOff = isOn;
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    if (isOn)
+    {
+        [saveDefaults setObject:@"YES" forKey:@"AutoScaleOnOffSaveKey"];
+    }
+    else
+    {
+        [saveDefaults setObject:@"NO" forKey:@"AutoScaleOnOffSaveKey"];
+    }
+    [saveDefaults synchronize];
+
+}
 
 - (IBAction)didSaveSpeedSegs:(id)sender
 {
     //路况1
     //6.0对讯飞支持不好
-    float verValue = deviceVersion.floatValue;
+    float verValue = runningDataset.deviceVersion.floatValue;
     if (verValue < 6.0)
     {
         [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
@@ -620,6 +522,49 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
 }
 
+- (IBAction)didShowPrefSettingView:(id)sender
+{
+    RTTPrefSettingViewController *prefSettingVC = [[RTTPrefSettingViewController alloc] init];
+    NSString *addrHome = @"未设置";
+    NSString *addrOffice = @"未设置";
+
+    if (runningDataset.homeAddrInfo && runningDataset.homeAddrInfo.address)
+    {
+        addrHome = runningDataset.homeAddrInfo.address;
+    }
+    if (runningDataset.officeAddrInfo && runningDataset.officeAddrInfo.address)
+    {
+        addrOffice = runningDataset.officeAddrInfo.address;
+    }
+    
+    NSString *strAddrInfo = [[NSString alloc] initWithFormat:@"家庭地址:\n%@\n\n公司地址:\n%@", addrHome, addrOffice];
+    [prefSettingVC setAddrInfoTxt:strAddrInfo];
+    
+    [prefSettingVC setTTSSwitchStat:self.TTSSwitchOnOff];
+    [prefSettingVC setAutoDetectSwitchStat:self.autoDetectOnOff];
+    [prefSettingVC setAutoScaleSwitchStat:self.autoScaleOnOff];
+    
+    [prefSettingVC setDelegate:self];
+    
+    //prefSettingVC.view.layer.backgroundColor = [[UIColor clearColor] CGColor];;
+    //prefSettingVC.view.layer. = 0.5f;
+    //self.modalPresentationStyle = UIModalPresentationCurrentContext;
+
+//    prefSettingVC.view.backgroundColor = [UIColor blackColor];
+//    prefSettingVC.view.alpha = 0.5f;
+//    self.modalPresentationStyle = UIModalPresentationCurrentContext;
+
+    //[self presentModalViewController:prefSettingVC animated:YES];
+//    self.navigationController.view.backgroundColor = [UIColor clearColor];
+//    self.navigationController.view.alpha = 0.1f;
+    //self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+
+
+    [self.navigationController pushViewController:prefSettingVC animated:NO];
+    
+}
+
+
 - (IBAction)didShowTraffic:(id)sender 
 {
     RTTTrafficListViewController *trafficVC = [[RTTTrafficListViewController alloc] init];
@@ -628,183 +573,59 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {
         [trafficVC setIsShowAllTraffic:YES];
     }
+
     [self.navigationController pushViewController:trafficVC animated:YES];
     
 }
 
 
-- (void)didBookmarkPathSelected:(RttGHistoryPathInfo*) pathInfo;       //处理选中路径书签中的某条路径
+- (IBAction)didPanOnMap:(id)sender
 {
-    if (pathInfo) 
-    {
-        [mMapView removeAnnotation:pStartPointAnnotation];
-        [mMapView removeAnnotation:pEndPointAnnotation];
-        //pCurrentlyAnnotation = nil;
-        
-        
-        CLLocationCoordinate2D point1 = pathInfo.startPointInfo.geoPt;
-        [self addAnnotation2Map:point1 withType:MAPPOINTTYPE_START];
-        CLLocationCoordinate2D point2 = pathInfo.endPointInfo.geoPt;
-        [self addAnnotation2Map:point2 withType:MAPPOINTTYPE_END];
-        
-        pStartPointAnnotation.addrInfo = pathInfo.startPointInfo;
-        pEndPointAnnotation.addrInfo = pathInfo.endPointInfo;
-        
-        NSString *StrProv = pathInfo.startPointInfo.addressComponent.province;
-        NSString *StrCity = pathInfo.startPointInfo.addressComponent.city;
-        NSString *StrDist = pathInfo.startPointInfo.addressComponent.district;
-        NSString *StrRoad = pathInfo.startPointInfo.addressComponent.streetName;
-        if (StrRoad == nil) {
-            StrRoad = @"未知道路";
-        }
-        NSString *StrFormatedInfo = [[NSString alloc] initWithFormat:@"省份:%@\n城市:%@\n地区%@\n街道:%@", StrProv, StrCity,StrDist,StrRoad];
-        
-        pStartPointAnnotation.AddrString = StrFormatedInfo;
-        NSString *StrProv2 = pathInfo.endPointInfo.addressComponent.province;
-        NSString *StrCity2 = pathInfo.endPointInfo.addressComponent.city;
-        NSString *StrDist2 = pathInfo.endPointInfo.addressComponent.district;
-        NSString *StrRoad2 = pathInfo.endPointInfo.addressComponent.streetName;
-        if (StrRoad2 == nil) {
-            StrRoad2 = @"未知道路";
-        }
-        NSString *StrFormatedInfo2 = [[NSString alloc] initWithFormat:@"省份:%@\n城市:%@\n地区%@\n街道:%@", StrProv2, StrCity2,StrDist2,StrRoad2];
-        pEndPointAnnotation.AddrString = StrFormatedInfo2;
-        
-        bool ret = [self RoutePlanning:point1 end:point2];
-        if (!ret)
-        {
-            NSLog(@"History Route Planing Fail!");
-        }
-        else {
-            [self showModeIndicator:@"路况获取中" seconds:10];
-            [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-        }
-        
-        runningDataset.startPointInfo = pathInfo.startPointInfo;
-        runningDataset.endPointInfo = pathInfo.endPointInfo;
-    }
+    //NSLog(@"Pan=============================");
 
 }
 
-- (void) didHomeAddrReset:(id)sender
-{
-    [self toHomeSettingView];
-}
+
+//- (void) didHomeAddrReset:(id)sender
+//{
+//    [self toHomeSettingView];
+//}
 
 - (void) didToolbarHomeSettingBTN:(id)sender
 {
-    
-    if (runningDataset.homeAddrInfo)
-    {
-        [self toHomeAddrReview];
-    }
-    else 
-    {
-        [self toHomeSettingView];
-    }
+    [mSwipeBar toggle:NO];
+
+    [self didShowPrefSettingView:sender];
 }
 
-- (void) toHomeAddrReview
-{
-    RTTHomeAddrViewController *homeAddrPreviewVC = [[RTTHomeAddrViewController alloc] init];
-    //homeAddrPreviewVC.mHomeAddrLBL.text = mHomeAddrInfo.address;
-    NSString *addrStr;
-    if (runningDataset.homeAddrInfo.name != nil)
-    {
-        addrStr = [[NSString alloc] initWithFormat:@"%@\n%@", runningDataset.homeAddrInfo.name, runningDataset.homeAddrInfo.address];
-    }
-    else {
-        addrStr =  runningDataset.homeAddrInfo.address;
-    }
-    
-    homeAddrPreviewVC.addrTxt = addrStr;
-    homeAddrPreviewVC.addrLocation = runningDataset.homeAddrInfo.pt;
-    
-    [homeAddrPreviewVC setDelegate:self];  
-    
-    [mSwipeBar toggle:NO];
-    [self.navigationController pushViewController:homeAddrPreviewVC animated:YES];
-    
-}
-- (void) toHomeSettingView
-{
-    [mAddrSearchBar removeFromSuperview];
-    
-    UISearchBar *topSeachBar=[[UISearchBar alloc] init];
-    [topSeachBar setFrame:CGRectMake(0, 0, 200, 20)];
-    topSeachBar.backgroundColor=[UIColor clearColor];  
-    for (UIView *subview in topSeachBar.subviews)   
-    {    
-        if ([subview isKindOfClass:NSClassFromString(@"UISearchBarBackground")])  
-        {    
-            [subview removeFromSuperview];    
-            break;  
-        }   
-    } 
-    
-    //[topSeachBar showsCancelButton];
-    topSeachBar.delegate = self;
-    mAddrSearchBar = topSeachBar;
-    self.navigationItem.titleView = topSeachBar;
-    //[topSeachBar showsCancelButton];
-    [self.navigationController setNavigationBarHidden:NO animated:NO];
-    
-//    UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithTitle:@"取消键盘" 
-//                                                                      style:UIBarButtonItemStylePlain target:self action:@selector(didSearchKeyboardDiss)];
-    
-    // UIBarButtonItemStylePlain
-//    UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc]initWithTitle:@"退出设置" 
-//                                                                     style:UIBarButtonItemStylePlain target:self action:@selector(didQuiteHomeSetting)];
-//    UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithImage:([UIImage imageNamed:@"keyboardv2.png"]) style:UIBarButtonItemStylePlain target:self action:@selector(didSearchKeyboardDiss)];
-    
-    UIBarButtonItem *rightBarButton = [[UIBarButtonItem alloc]initWithImage:([UIImage imageNamed:@"keyboardv2.png"]) style:UIBarButtonItemStylePlain target:self action:@selector(didSearchKeyboardDiss)];
-    
-    
-    UIBarButtonItem *leftBarButton = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(didQuiteHomeSetting)];
-    
-    
-    [self.navigationItem setLeftBarButtonItem:leftBarButton];
-    
-    [self.navigationItem setRightBarButtonItem:rightBarButton];
-    
-    [mSwipeBar toggle:NO];
-    [mSuggestionListVC.view setFrame:CGRectMake(20, 5, 0, 0)];
-    
-    mIsHomeAddrSetting = YES;
-    
-    [self hideButtonsOnMap];
-    
-    [self DrawTrafficPolyline:YES];
-    if (pCurrentlyPolyLine)
-    {
-        [mMapView removeOverlay:pCurrentlyPolyLine];
-        pCurrentlyPolyLine = nil;
-    }
-    if (pStartPointAnnotation != nil){
-        [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
-    if (pEndPointAnnotation != nil){
-        [mMapView removeAnnotation:pEndPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
-    
-    if (runningDataset)
-    {
-        runningDataset.currentlyRoute = ROUTEUNKNOW;
-    }
-    
-    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您可以通过搜索条或者在地图上长时间触摸相应位置以设置您的家庭地址\r\n注意：目前只限于在深圳市范围使用"
-                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
-    [alertView show];
-    
-    //[mMapView setCenterCoordinate:(mMapView.userLocation.coordinate)];
-    [self setCenterOfMapView:(mMapView.userLocation.coordinate)];
-
-}
+//- (void) toHomeAddrReview
+//{
+//    RTTHomeAddrViewController *homeAddrPreviewVC = [[RTTHomeAddrViewController alloc] init];
+//    //homeAddrPreviewVC.mHomeAddrLBL.text = mHomeAddrInfo.address;
+//    NSString *addrStr;
+//    if (runningDataset.homeAddrInfo.name != nil)
+//    {
+//        addrStr = [[NSString alloc] initWithFormat:@"%@\n%@", runningDataset.homeAddrInfo.name, runningDataset.homeAddrInfo.address];
+//    }
+//    else {
+//        addrStr =  runningDataset.homeAddrInfo.address;
+//    }
+//    
+//    homeAddrPreviewVC.addrTxt = addrStr;
+//    homeAddrPreviewVC.addrLocation = runningDataset.homeAddrInfo.pt;
+//    
+//    [homeAddrPreviewVC setDelegate:self];  
+//    
+//    [mSwipeBar toggle:NO];
+//    [self.navigationController pushViewController:homeAddrPreviewVC animated:YES];
+//    
+//}
 
 
 - (void) didToolbarAccountBTN:(id)sender
 {
-    
+    [mSwipeBar toggle:NO];
+
     RTTAccountViewController *accountVM = [[RTTAccountViewController alloc] init];
     //[accountVM setWebpageStr:@"http://www.baidu.com"];
     [self.navigationController pushViewController:accountVM animated:YES];
@@ -815,111 +636,57 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     if (runningDataset.homeAddrInfo == nil)
     {
         
-        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您的家庭地址未设置，请先进行设置"
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"家庭地址未设置\n请通过搜索或者长按地图上对应的地址进行设置"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
         return;
     }
-    [self routePlantoHome];
-
+    
+    [self routePlanCurLoctoHome];
 }
 
 - (void)didToolbarGoOfficeBTN:(id)sender
 {
-    if (runningDataset.homeAddrInfo == nil)
+    if (runningDataset.officeAddrInfo == nil)
     {
         
-        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"您的家庭地址未设置，请先进行设置"
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"公司地址未设置\n请通过搜索或者长按地图上对应的地址进行设置"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
         return;
     }
     
-    [self routePlantoOffice];
+    [self routePlanCurLoctoOffice];
 }
 
 
-- (void)didToolbarBookmarkBTN:(id)sender;
-{
-    NSLog(@"Prepare to BookMark");
-    [mSwipeBar toggle:NO];
-    RTTRouteBookmarkViewController *routeBookmarkVC = [[RTTRouteBookmarkViewController alloc] init];
-    [routeBookmarkVC setRuntimeDataset:runningDataset];  
-    [routeBookmarkVC setDelegate:self];
-    [self.navigationController pushViewController:routeBookmarkVC animated:YES];
-}
-
-- (void) didSearchKeyboardDiss
-{
-    [mAddrSearchBar resignFirstResponder];
-}
-
-- (void) didQuiteHomeSetting
-{
-    mIsHomeAddrSetting = NO;
-    [mAddrSearchBar resignFirstResponder];
-    [self.navigationItem setLeftBarButtonItem:nil];
-    [self.navigationItem  setRightBarButtonItem:nil];
-    [self.navigationItem  setTitleView:nil];
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
-    [mSwipeBar toggle:NO];
-    //mSwipeBar 
-    [mTopbar toggle];
-    
-    [self showButtonsOnMap];
-    
-    [self detectPath];
-}
-
-
-- (void)didRTTToolbarButtonWasPressed:(NSString*)buttonName
-{
-    [mSwipeBar toggle];
-
-    if (buttonName == @"RouteBookmarkBTN")
-    {
-        NSLog(@"Prepare to BookMark");
-        RTTRouteBookmarkViewController *routeBookmarkVC = [[RTTRouteBookmarkViewController alloc] init];
-        [routeBookmarkVC setRuntimeDataset:runningDataset];  
-        [routeBookmarkVC setDelegate:self];
-        [self.navigationController pushViewController:routeBookmarkVC animated:YES];
-    }
-    
-}
-
-
-- (IBAction)didShowRoutePreview:(id)sender {
-    RTTRoutePreviewViewController *routePreviewVC = [[RTTRoutePreviewViewController alloc] init];
-    [routePreviewVC setRuntimeDataset:runningDataset];  
-    [self.navigationController pushViewController:routePreviewVC animated:YES];
-   
-}
-
-- (IBAction)didStart2Go:(id)sender 
-{
-    [self start2Go];
-}
-
-- (IBAction)didShowRoutePreviewAfterPlan:(id)sender 
-{
-    [self stopStart2GoTimer];
-    [self didShowRoutePreview:sender];
-}
 
 - (IBAction)didBack2UserLocation:(id)sender 
 {
     //[mMapView setCenterCoordinate:[mMapView userLocation].coordinate animated:0];
-    [self setCenterOfMapView:([mMapView userLocation].coordinate)];
+    [mMapView setCenterOfMapView:([mMapView getCurLocation])];
 
 }
 
+- (IBAction)didShowSearchbar:(id)sender
+{
+    [self showTopSearchBar];
+    //[mTopSearchBar setHidden:NO];
+    [self hideDestinationLBL];
+}
+
+- (void)didHideAddrSearchBar:(id)sender
+{
+    [self hideTopSearchBar];
+    [self showDestinationLBL];
+}
 
 -(void) showSettingRoutPointView:(int) pointtype
 {
 
     RTTMapPointSettingViewController *mapPointVC = [[RTTMapPointSettingViewController alloc] init];
     mapPointVC.delegate = self;
-    mapPointVC.addrTxt = pCurrentlySelectedAnnotation.addrString;
+    mapPointVC.addrTxt =  mMapView.currentlySelectedAnnotation.addrString;
     
     [self.navigationController pushViewController:mapPointVC animated:YES];    
 }
@@ -954,233 +721,206 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //设置导航点视图通过消息回调这个delegate的方法，对所选的点进行处理
 - (void) SetRoutePointType:(RttGRoutePointType*) pointtype
 {
-    switch (pointtype.pointtype) 
+    switch (pointtype.pointtype)
     {
         case RTTSETMAPPOIN_START:
         {
-            if (pStartPointAnnotation != nil){
-                [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
-            }
-            
-            runningDataset.startPointInfo = pCurrentlySelectedAnnotation.addrInfo;
-            CLLocationCoordinate2D annLoc = pCurrentlySelectedAnnotation.coordinate;
-            //通过删除和增加的方式，改变大头针的视图
-            [mMapView removeAnnotation:pCurrentlySelectedAnnotation]; 
-            pStartPointAnnotation = [self addAnnotation2Map:annLoc withType:MAPPOINTTYPE_START];
-            pCurrentlySelectedAnnotation = nil;
         }
             break;
             
         case RTTSETMAPPOIN_END:
         {
-            if (pEndPointAnnotation != nil){
-                [mMapView removeAnnotation:pEndPointAnnotation]; //地图上只保留一个起始点或者终点
-            }
-            
-            runningDataset.endPointInfo = pCurrentlySelectedAnnotation.addrInfo;
-            CLLocationCoordinate2D annLoc = pCurrentlySelectedAnnotation.coordinate;
-            //通过删除和增加的方式，改变大头针的视图
-            [mMapView removeAnnotation:pCurrentlySelectedAnnotation]; 
-            pEndPointAnnotation = [self addAnnotation2Map:annLoc withType:MAPPOINTTYPE_END];
-            pCurrentlySelectedAnnotation = nil;
         }
             break;
             
         case RTTSETMAPPOIN_ROUTETO:
         {
-            if (pStartPointAnnotation != nil){
-                [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
-            }
-            if (pEndPointAnnotation != nil){
-                [mMapView removeAnnotation:pEndPointAnnotation]; //地图上只保留一个起始点或者终点
-            }
+            CLLocationCoordinate2D endLoc = mMapView.currentlySelectedAnnotation.coordinate;
+            runningDataset.currentlyRoute = ROUTECODETEMPROUTE;
             
-            pStartPointAnnotation = [self addAnnotation2Map:mMapView.userLocation.coordinate withType:MAPPOINTTYPE_START];
-                        
-            CLLocationCoordinate2D endLoc = pCurrentlySelectedAnnotation.coordinate;
-            //通过删除和增加的方式，改变大头针的视图
-            [mMapView removeAnnotation:pCurrentlySelectedAnnotation]; //地图上只保留一个起始点或者终点
-            pEndPointAnnotation = [self addAnnotation2Map:endLoc withType:MAPPOINTTYPE_END];
-            pCurrentlySelectedAnnotation = nil;
+            
+            //获取路名
+            NSString *pKeyPtString =  [[NSString alloc] initWithString:mMapView.currentlySelectedAnnotation.addrString];
+            NSArray *strArray = [pKeyPtString componentsSeparatedByString:@"\n"];
+            NSInteger strCnt = strArray.count;
+            NSString *strRdName = @"未知道路";
+            if (strCnt > 1)
+            {
+                if ([[strArray objectAtIndex:(strCnt-1)] length] != 0)
+                {
+                    strRdName = [strArray objectAtIndex:(strCnt-1)];
+                }
+            }
+            self.currentlyRouteEndAddr = [[NSString  alloc] initWithFormat:@"到%@路况", strRdName];
+            
+            [self routePlanCurLoctoTemp:endLoc];
+
         }
             break;
             
         case RTTSETMAPPOIN_DELETE:
         {
-            [mMapView removeAnnotation:pCurrentlySelectedAnnotation];
+            [mMapView removeAnnotation:mMapView.currentlySelectedAnnotation];
         }
             break;
+            
+            
+        case RTTSETMAPPOIN_OFFICE:
+        {
+            
+            BMKPoiInfo *officePoi = [[BMKPoiInfo alloc] init];
+            if (mMapView.currentlySelectedAnnotation.addrString != nil)
+            {
+                officePoi.address = mMapView.currentlySelectedAnnotation.addrString;
+            }
+            else
+            {
+                officePoi.address = @"未知道路";
+            }
+
+            officePoi.pt = mMapView.currentlySelectedAnnotation.coordinate;
+            runningDataset.officeAddrInfo = officePoi;
+            [self saveOfficeData];
+            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"公司地址设置成功！\r\n您下次可以直接使用上班按钮获取上班路况"
+                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+            [alertView show];
+            
+            
+            runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;//
+            [self routePlanCurLoctoOffice];
+        }
+            break;
+            
+        case RTTSETMAPPOIN_HOME:
+        {
+            BMKPoiInfo *homePoi = [[BMKPoiInfo alloc] init];
+            if (mMapView.currentlySelectedAnnotation.addrString != nil)
+            {
+                homePoi.address = mMapView.currentlySelectedAnnotation.addrString;
+            }
+            else
+            {
+                homePoi.address = @"未知道路";
+            }
+
+            homePoi.pt = mMapView.currentlySelectedAnnotation.coordinate;
+            runningDataset.homeAddrInfo = homePoi;
+            [self saveHomeData];
+            
+            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"家庭地址设置成功！\r\n您下次可以直接使用回家按钮获取回家路况"
+                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+            [alertView show];
+            
+            
+            
+            runningDataset.currentlyRoute = ROUTECODEGOHOME;//
+            [self routePlanCurLoctoHome];
+        }
+            break;
+            
+            
+            
             
         default:
             break;
     }
     
     //因为只能有一个Undefine的点，所以设置了具体类型后，这个点就不是Undef了。
-    pUndefAnnotation = nil;
+    //mMapView.pUndefAnnotation = nil;
     
-    [self CheckPointsSettingCompleted:0];
+    //[self CheckPointsSettingCompleted:0];
+    
     
 }
-
-#pragma mark -
-#pragma mark History Route Data Source and delegate
-
-//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-//{
-//    // Return the number of sections.
-//    return 2;
-//}
-//
-//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-//{
-//    // Return the number of rows in the section.
-//    //int iTrfSegCnt = runtimeDataset.filteredRouteTrafficList.count;
-//    //NSLog(@"SegCnt=%d", iTrfSegCnt);
-//    if (section == 1)
-//    {
-//    return 8;
-//    }
-//    else {
-//        return 2;
-//    }
-//}
-//
-//- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    static NSString *CellIdentifier = @"TrafficRoadSeg";
-//    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-//    
-//    // Configure the cell...
-//    if (!cell)
-//    {
-//        //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];//
-//        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-//    }
-//    
-//    [[cell textLabel] setText:@"Routes"];
-//    
-////    int iSegCnt = runtimeDataset.filteredRouteTrafficList.count;
-////    
-////    if (indexPath.row < iSegCnt)
-////    {
-////        RttGTrafficInfo *ptrfInfo = [runtimeDataset.filteredRouteTrafficList objectAtIndex:indexPath.row];
-////        if (ptrfInfo)
-////        {
-////            NSString *cellString = ptrfInfo.roadname;
-////            [[cell textLabel] setText:cellString];
-////            [[cell detailTextLabel] setText:ptrfInfo.detail];
-////        }
-////    }
-//    
-//    return cell;
-//}
-//
-//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    // Navigation logic may go here. Create and push another view controller.
-//    /*
-//     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-//     // ...
-//     // Pass the selected object to the new view controller.
-//     [self.navigationController pushViewController:detailViewController animated:YES];
-//     */
-//}
-//
-//
 
 
 #pragma mark -
 #pragma mark Searchbar delegate
 
-
-
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText 
+- (void)didAddrSearchWasPressed:(NSString*)inputStr
 {
-    if ( [searchBar isEqual:mAddrSearchBar])
+    NSString *strPOIName = inputStr;
+    //[mBMKSearch poiSearchInCity:@"深圳" withKey:strPOIName pageIndex:0];
+    BOOL result = [self getPoiLocationInCityfromMAPSVR:@"深圳" poiName:strPOIName];
+    if (!result)
     {
-        if ([searchText length] != 0) 
+        
+        NSLog(@"Failure when get poi location from map server");
+        //百度已经有提示了，所以不用重复提示
+        //            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:errorMsg
+        //                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+        //            [alertView show];
+        return;
+    }
+    else
+    {
+        [self hideTopSearchBar];
+
+        [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGGEO];
+        [self showModeIndicator:@"获取地理坐标信息" seconds:10];
+    }
+    
+}
+- (void)didAddrSearchInputWasChanged:(NSString*)inputStr
+{
+    if ([inputStr length] != 0)
+    {
+        BOOL callresult = [self getPoinameSuggestionfromMAPSVR:inputStr];
+        if (!callresult)
         {
-            //BOOL callresult = [mBMKSearch suggestionSearch:searchText];
-            BOOL callresult = [self getPoinameSuggestionfromMAPSVR:searchText];
-            if (!callresult)
-            {
-                NSLog(@"######Call sugession Error");
-            }
-            
-            mSuggestionListVC.searchText = searchText;
-            [mSuggestionListVC updateData];
-            [self setSearchListHidden:NO];
-        }
-        else
-        {
-            [self setSearchListHidden:YES];
+            NSLog(@"######Call sugession Error");
         }
         
-        //isSearchBarInuse = YES;
+        mSuggestionListVC.searchText = inputStr;
+        [mSuggestionListVC updateData];
+        [self setSearchListHidden:NO];
+    }
+    else
+    {
+        [self setSearchListHidden:YES];
+    }
+
+}
+- (void)didAddrSearchBegin:(id)sender
+{
+    [mSuggestionListVC clearData];
+    
+    if (runningDataset.searchHistoryArray.count > 0)
+    {
+        for (NSString *searchHisTxt in runningDataset.searchHistoryArray)
+        {
+            NSLog(@"**********Input TXT=%@************", searchHisTxt);
+            [mSuggestionListVC.resultList addObject:searchHisTxt];
+        }
+        [mSuggestionListVC updateData];
+        [self setSearchListHidden:NO];
     }
     
 }
 
-- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar 
+
+#pragma mark -
+#pragma mark UserLogin and Token and Profile
+
+- (void) gotUserLoginToken:(NSString*) token
 {
-    if ( [searchBar isEqual:mAddrSearchBar])
-    {
-        //isSearchBarInuse = YES;
-    }
-	return YES;
+    [runningDataset setUserToken:token];
+    //[self sendUserProfile2Server:token];
+    NSLog(@"Will Send Profile to Server");
 }
 
-- (void) searchBarSearchButtonClicked:(UISearchBar*)activeSearchbar
-{
-    if ( [activeSearchbar isEqual:mAddrSearchBar])
-    {
-        NSString *strPOIName = activeSearchbar.text;
-        //[mBMKSearch poiSearchInCity:@"深圳" withKey:strPOIName pageIndex:0];
-        BOOL result = [self getPoiLocationInCityfromMAPSVR:@"深圳" poiName:strPOIName];
-        if (!result)
-        {
-            
-            NSLog(@"Failure when get poi location from map server");
-            //百度已经有提示了，所以不用重复提示
-//            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:errorMsg 
-//                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
-//            [alertView show];
-            return;
-        }
-        else 
-        {
-            [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGGEO];
-            [self showModeIndicator:@"获取地理坐标信息" seconds:10];
-        }
-        
-        //uiAddrSearchBar.text = @"";
-        [activeSearchbar resignFirstResponder];
-        [self setSearchListHidden:YES];
-        //isSearchBarInuse = NO;
-    }
-}
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
-{
-    if ( [searchBar isEqual:mAddrSearchBar])
-    {
-        [mAddrSearchBar resignFirstResponder];
-    }
-    //
-}
 
 - (void)didResultlistSelected:(NSString *)poiName
 {
 	if (poiName) 
     {
-		mAddrSearchBar.text = poiName;
-		[self searchBarSearchButtonClicked:mAddrSearchBar];
+        [self didAddrSearchWasPressed:poiName];
+        [runningDataset saveSearchHistory:poiName];
 	}
     [self setSearchListHidden:YES];
-    [mAddrSearchBar resignFirstResponder];
     
-    //isSearchBarInuse = NO;
-
+    [self hideTopSearchBar];
 }
 
 
@@ -1196,44 +936,14 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (IBAction)didLongPress:(UILongPressGestureRecognizer *)sender 
 {
-#if defined (HUAWEIVER)
-    if (!mIsHomeAddrSetting)
-    {
-        return;
-    }
-#endif
     
     if (sender.state == UIGestureRecognizerStateBegan)
     {
         //坐标转换
         CGPoint touchPoint = [sender locationInView:mMapView];
-        //得到经纬度，指触摸区域
-        CLLocationCoordinate2D touchMapCoordinate = [mMapView convertPoint:touchPoint toCoordinateFromView:mMapView];
+        CLLocationCoordinate2D touchMapCoordinate = [mMapView addUndefAnnotationWithTouchPoint:touchPoint];
         
-        if (!mIsHomeAddrSetting)
-        {
-            pWaitPOIResultAnnotation = [self addAnnotation2Map:touchMapCoordinate withType:MAPPOINTTYPE_UNDEF];
-            if (pHomePointAnnotation != nil)
-            {
-                [mMapView removeAnnotation:pHomePointAnnotation];
-            }
-            pUndefAnnotation = pWaitPOIResultAnnotation;
-        }
-        else 
-        {
-            pWaitPOIResultAnnotation = [self addAnnotation2Map:touchMapCoordinate withType:MAPPOINTTYPE_HOME];
-
-            if (pHomePointAnnotation != nil)
-            {
-                [mMapView removeAnnotation:pHomePointAnnotation];
-            }
-            pHomePointAnnotation = pWaitPOIResultAnnotation;
-            
-            __autoreleasing BMKPoiInfo *addInfo = [[BMKPoiInfo alloc] init];
-            runningDataset.homeAddrInfo = addInfo;
-            runningDataset.homeAddrInfo.pt = touchMapCoordinate;
-        }
-        
+        //CLLocationCoordinate2D touchMapCoordinate = [mMapView convertPoint:touchPoint toCoordinateFromView:mMapView];
         BOOL result = [self getGeoInfofromMAPSVR:touchMapCoordinate];
         if (result)
         {
@@ -1267,9 +977,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         NSLog(@"POISuggestion: %@", strPoiName);
         
         [mSuggestionListVC.resultList addObject:strPoiName];
-        [mSuggestionListVC updateData];
+        //[mSuggestionListVC updateData];
     }
-    
+    [mSuggestionListVC updateData];
 }
 
 
@@ -1282,7 +992,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         [self stopRunningActivityTimer];
     }
     
-	if (error == BMKErrorOk) 
+	if (error == BMKErrorOk)
     {
 		BMKPoiResult* result = (BMKPoiResult*) [poiResultList objectAtIndex:0];
         
@@ -1290,38 +1000,24 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         {
             BMKPoiInfo* poi = [result.poiInfoList objectAtIndex:0];
             
-            if (!mIsHomeAddrSetting)
-            {
-                [self addAnnotation2Map:poi.pt withType:MAPPOINTTYPE_UNDEF];
-            }
-            else 
-            {
-                if (pHomePointAnnotation != nil)
-                {
-                    [mMapView removeAnnotation:pHomePointAnnotation];
-                }
-                
-                pHomePointAnnotation = [self addAnnotation2Map:poi.pt withType:MAPPOINTTYPE_HOME];
-                runningDataset.homeAddrInfo = [result.poiInfoList objectAtIndex:0];
-                
-                [self HomeSettingSuccuess];
-            }
+            BMKPoiInfo *firstPoi = [result.poiInfoList objectAtIndex:0];
+            NSString *pointAddr = firstPoi.address;
+            NSString *pointName = firstPoi.name;
+            NSString *addrTxt = [[NSString alloc] initWithFormat:@"%@\r\n%@", pointAddr, pointName ];
             
+            [mMapView removeAllUndefAnnotation];
+            [mMapView addAnnotation2Map:poi.pt withType:MAPPOINTTYPE_UNDEF addr:addrTxt];
             
-            //[mMapView setCenterCoordinate:poi.pt];
-            [self setCenterOfMapView:poi.pt];
+            [mMapView setCenterOfMapView:poi.pt];
         }
 	}
-    else 
+    else
     {
         NSLog(@"POI Search Fail, Error Code=%d", error);
-        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取检索结果" 
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取检索结果"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
-
     }
-    
-
 }
 
 
@@ -1337,35 +1033,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 	if (error != BMKErrorOk) 
     {
     	NSLog(@"onGetDrivingRouteResult:error:%d", error);
-        //self->uilRoadName.text = @"获取地理信息错误";
         return;
     }
     
-    if (result.addressComponent.streetName != nil)
-    {
-        //self->uilRoadName.text = result.addressComponent.streetName;
-    }
-    else {
-        //self->uilRoadName.text = @"未知路名";
-    }
+    [mMapView setWaitingPOIAnnotationAddress:result];
     
-    [self setRoutPlaningViewAddress:result];
-    
-    if (mIsHomeAddrSetting)
-    {
-        NSString *StrProv = result.addressComponent.province;
-        NSString *StrCity = result.addressComponent.city;
-        NSString *StrDist = result.addressComponent.district;
-        NSString *StrRoad = result.addressComponent.streetName;
-        if (StrRoad == nil) {
-            StrRoad = @"未知道路";
-        }
-        NSString *StrFormatedInfo = [[NSString alloc] initWithFormat:@"省份:%@\n城市:%@\n地区%@\n街道:%@", StrProv, StrCity,StrDist,StrRoad];
-
-        
-        runningDataset.homeAddrInfo.address = StrFormatedInfo;
-        [self HomeSettingSuccuess];
-    }
 }
 
 - (void)onGetDrivingRouteResult:(BMKPlanResult*)result errorCode:(int)error
@@ -1434,7 +1106,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         [self sendRouteInfo2TSS:runningDataset.formatedH2ORouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE];
     }
     
-    if (runningDataset.currentlyRoute == GOTOOFFICE)
+    if (runningDataset.currentlyRoute == ROUTECODEGOTOOFFICE)
     {
         [self processGetedDrivingRoute:result errorCode:error];
     }
@@ -1475,7 +1147,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         [self formateHomeOfficeRouteInfoandSave:runningDataset.drivingRoute direction:1];
         [self sendRouteInfo2TSS:runningDataset.formatedO2HRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE];
     }
-    if (runningDataset.currentlyRoute == GOHOME)
+    if (runningDataset.currentlyRoute == ROUTECODEGOHOME)
     {
         [self processGetedDrivingRoute:result errorCode:error];
     }
@@ -1507,45 +1179,41 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {
         return;
     }
+    else
+    {
+        iRouteCnt = 1; //目前百度只提供一个route，为了防止后续多个，这里暂时固定为1
+    }
     
     for (int i = 0; i < iRouteCnt; i++)
     {
         [runningDataset setDrivingRoute:[plan.routes objectAtIndex:i]];
-        [self AddDrivingRouteOverlay:runningDataset.drivingRoute];
-        //[self GetDataandSendtoTSS:runningDataset.drivingRoute];
+        runningDataset.drivingRoute.startPt = result.startNode.pt;
+        runningDataset.drivingRoute.endPt = result.endNode.pt;
+
+        [mMapView AddDrivingRouteOverlay:runningDataset.drivingRoute];
         [self formateRouteInfoandSave:runningDataset.drivingRoute];
         [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-        
-#warning FOR TEST 增加提示点
-        //[self addRouteGuidePoints];
     }
     
-    [self changeMapVisibleRect:runningDataset.drivingRoute withIndex:-1];
+    if (self.autoScaleOnOff)
+    {
+        [mMapView changeMapVisibleRect:runningDataset.drivingRoute withIndex:-1];
+    }
     
     [runningDataset setIsPlaned:YES];
     
     //清理地图和路况数据
-    [self DrawTrafficPolyline:YES];
-    [trafficPolylineList removeAllObjects];
-    [runningDataset.filteredRouteTrafficList removeAllObjects];
-    [runningDataset.allRouteTrafficFromTSS removeAllObjects];
+    [mMapView removeAllTrafficPolylines];
+
+    [runningDataset.trafficContainer removeAllRouteTraffic];
+    [runningDataset.trafficContainer clearOutofDateTrafficData4Hot];
+    [runningDataset.trafficContainer removeAllFilteredTraffic];
+    
+    [runningDataset.trafficContainer reFilteTrafficWithRoadList:runningDataset.formatedRouteInfo.roadlist];
 
     
-    [mAddrSearchBar setHidden:YES];
     [mSwipeBar toggle:NO];
-#if !defined (HUAWEIVER)
-    [self setStart2GoTimer:1];
-    [self showInfoBoardforStart2Go];
-#else
-    [self start2Go];
-#endif
-    
-#warning FOR TEST 增加测试用拥堵路段//
-#if defined (DEBUG)
-//    TSSCityTraffic* pTSSTraffic = [self ConstructTSSData];//:(BMKRoute*) routeinfo
-//    [runningDataset setCityTraffic4Me:pTSSTraffic];
-//    [self AddTrafficOverlay:pTSSTraffic];
-#endif
+    [self start2Go];    
 }
 
 
@@ -1634,7 +1302,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     if (runningDataset.isDriving)
     {
         //[pmapview setCenterCoordinate:temp_userLocation animated:0];
-        [self setCenterOfMapView:temp_userLocation];
+        [mMapView setCenterOfMapView:temp_userLocation];
     }
         
     BMKMapPoint LocationPoint = BMKMapPointForCoordinate(temp_userLocation);
@@ -1643,7 +1311,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //NSLog(@"stepIndex.count= %d", StepIndexs.count);
     bool isOnPlan = false; //是否在路径上
     
-    isOnPlan = [self getPositionFromRoute:runningDataset.drivingRoute withLocation:temp_userLocation 
+    isOnPlan = [RTTMapKit getPositionFromRoute:runningDataset.drivingRoute withLocation:temp_userLocation
                           andRetStepIndex:&stepIndex andretPointsIndex:&pointIndex];
     
     
@@ -1655,15 +1323,18 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         [self hideTrafficBoard];
         
 
-#if !defined (HUAWEIVER)
-        //切换视图
-        if (runningDataset.currentRoadStep !=  stepIndex)
+//#if !defined (HUAWEIVER)
+        //if (runningDataset.isRouteGuideON)
+        if (self.autoScaleOnOff == YES)
         {
-            [self changeMapVisibleRect:runningDataset.drivingRoute withIndex:stepIndex+1];
-            //[pmapview setCenterCoordinate:temp_userLocation animated:0];
-            [self setCenterOfMapView:temp_userLocation];
+            //切换视图
+            if (runningDataset.currentRoadStep !=  stepIndex)
+            {
+                [mMapView changeMapVisibleRect:runningDataset.drivingRoute withIndex:stepIndex+1];
+                [mMapView setCenterOfMapView:temp_userLocation];
+            }
         }
-#endif
+//#endif
         //保存当前在Step的哪一步了
         runningDataset.currentRoadStep = stepIndex;
         runningDataset.nextRoadPointIndex = pointIndex;
@@ -1671,104 +1342,155 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         
         
         //路名和提示
-        if (stepIndex < ([runningDataset.drivingRoute.steps count]-1)) //如果是最后一段了，不提示？
+        if (runningDataset.isRouteGuideON)
         {
-            BMKStep* step = [runningDataset.drivingRoute.steps objectAtIndex:stepIndex];
-            BMKStep* pNextStep = [runningDataset.drivingRoute.steps objectAtIndex:stepIndex+1];
-            
-            CLLocationDistance nextPointDistance = BMKMetersBetweenMapPoints(LocationPoint,
-                                                                             BMKMapPointForCoordinate(pNextStep.pt));    
-            
-            if (nextPointDistance < 300.0) //和下一点距离小于300米就提示关键信息
+            if (stepIndex < ([runningDataset.drivingRoute.steps count]-1)) //如果是最后一段了，不提示？
             {
-                //self->uilRoadName.text = pNextStep.content; //下一个Step的提示信息
-#if !defined (HUAWEIVER)
-                [self setGuideBoardContent:pNextStep.content];
-#endif
-            }
-            else //否则提示路名
-            {
-                //NSString *stepInfo = [[NSString alloc] initWithString:step.content];
-                //抽取路名，目前是根据“进入.....——xxKM“的规则来抽取
-                NSString *roadName = [self getRoadNameFromStepContent:step.content];
+                BMKStep* step = [runningDataset.drivingRoute.steps objectAtIndex:stepIndex];
+                BMKStep* pNextStep = [runningDataset.drivingRoute.steps objectAtIndex:stepIndex+1];
                 
-                if (roadName.length > 0)
+                CLLocationDistance nextPointDistance = BMKMetersBetweenMapPoints(LocationPoint,
+                                                                                 BMKMapPointForCoordinate(pNextStep.pt));
+                
+                if (nextPointDistance < 300.0) //和下一点距离小于300米就提示关键信息
                 {
-                    //self->uilRoadName.text = roadName;
-                    [self hideGuideBoard];
+                    if (runningDataset.isRouteGuideON)
+                    {
+                        [self setGuideBoardContent:pNextStep.content];
+                    }
                 }
-                else 
+                else //否则提示路名
                 {
-                    //如果导航信息没有包含路名，这里只是简单地把导航信息显示出来；
-                    //但是实际上Baidu地图有个缺点是起点没有标注路名，如果起点就是再大路上并且直行很长一段的话就没有路名；这种情况需要考虑通过其他手段获得路名；
-                    //self->uilRoadName.text = @"未知道路";
-                    NSString *roadName = [self getRoadNameFromStepContent:step.content];
+                    //NSString *stepInfo = [[NSString alloc] initWithString:step.content];
+                    //抽取路名，目前是根据“进入.....——xxKM“的规则来抽取
+                    NSString *roadName = [RTTMapKit getRoadNameFromStepContent:step.content];
+                    
+                    if (roadName.length > 0)
+                    {
+                        [self hideGuideBoard];
+                    }
                 }
             }
         }
         
         //判断拥堵提示
-        int trafficSegCnt = runningDataset.filteredRouteTrafficList.count;
-        for (int trfindex = 0; trfindex < trafficSegCnt; trfindex++)
+        RttGMatchedTrafficInfo *nearestTrffSeg =
+            [runningDataset.trafficContainer getNearestTrafficSeg:runningDataset.currentRoadStep pointIndex:runningDataset.nextRoadPointIndex];
+        
+        if (nearestTrffSeg != nil)
         {
-            RttGTrafficInfo *trfinfo = [runningDataset.filteredRouteTrafficList objectAtIndex:trfindex];
+            RttGMapPoint *trafficpoint = [nearestTrffSeg.pointlist objectAtIndex:0];
+
+            CLLocationDistance nextTrafficDistance = BMKMetersBetweenMapPoints(LocationPoint,
+                                                                               trafficpoint.mappoint);
             
-            //如果当前点的Step位置和拥堵点相同，并且路径点中下一点小于拥堵点在路径点中相关位置（意味着还没到）
-            //或者当前点的Step位置比拥堵点小
-            if ((runningDataset.currentRoadStep == trfinfo.stepIndex && runningDataset.nextRoadPointIndex <= trfinfo.nextPointIndex)
-                || (runningDataset.currentRoadStep < trfinfo.stepIndex))
+            if (nextTrafficDistance < 2000.0) //和下一个拥堵点距离小于2000米就提示关键信息
             {
-                RttGMapPoint *trafficpoint = [trfinfo.pointlist objectAtIndex:0];
-                CLLocationDistance nextTrafficDistance = BMKMetersBetweenMapPoints(LocationPoint,
-                                                                                   trafficpoint.mappoint);    
+                NSString *trafficInfoText = [[NSString alloc] initWithFormat:@"%@", nearestTrffSeg.roadname];
                 
-                if (nextTrafficDistance < 2000.0) //和下一个拥堵点距离小于2000米就提示关键信息
+                [self setTrafficBoardContent:nearestTrffSeg.roadname distance:nextTrafficDistance detail:nearestTrffSeg.detail];
+                [self showTrafficBoard];
+                
+                NSLog(@"%@", trafficInfoText);
+                
+                //播放语音，每隔500M
+                if (![runningDataset.trffTTSPlayRec ifRecorded:nextTrafficDistance stepIndex:nearestTrffSeg.stepIndex pointIndex:nearestTrffSeg.nextPointIndex])
                 {
-                    NSString *trafficInfoText = [[NSString alloc] initWithFormat:@"%@",   trfinfo.roadname];                            
-
-                    [self setTrafficBoardContent:trfinfo.roadname distance:nextTrafficDistance detail:trfinfo.detail];
-                    [self showTrafficBoard];
-
-                    NSLog(@"%@", trafficInfoText);
-                    
-                    //播放语音，每隔500M
-                    if (![runningDataset.trffTTSPlayRec ifRecorded:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex])
+                    [runningDataset.trffTTSPlayRec record:nextTrafficDistance stepIndex:nearestTrffSeg.stepIndex pointIndex:nearestTrffSeg.nextPointIndex];
+                    NSString *distanceStr;
+                    if (nextTrafficDistance > 1000.0)
                     {
-                        [runningDataset.trffTTSPlayRec record:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex];
-                        NSString *distanceStr;
-                        if (nextTrafficDistance > 1000.0)
-                        {
-                            distanceStr = [[NSString alloc] initWithFormat:@"%.1f公里", nextTrafficDistance/1000.0];
-                        }
-                        else
-                        {
-                            distanceStr  = [[NSString alloc] initWithFormat:@"%d米", (int)nextTrafficDistance];
-                        }
-                        
-                        //6.0对讯飞支持不好
-                        float verValue = deviceVersion.floatValue;
-                        if (verValue < 6.0)
-                        {
-                            NSString *strInfo = [[NSString alloc] initWithFormat:@"路况提示：前方约%@，%@，%@", distanceStr, trfinfo.roadname, trfinfo.detail];
-                            [mSynTTS addGuideStr:strInfo];
-                        }
+                        distanceStr = [[NSString alloc] initWithFormat:@"%.1f公里", nextTrafficDistance/1000.0];
+                    }
+                    else
+                    {
+                        distanceStr  = [[NSString alloc] initWithFormat:@"%d米", (int)nextTrafficDistance];
                     }
                     
-                    //if (nextTrafficDistance)
+                    //6.0对讯飞支持不好
+                    //float verValue = runningDataset.deviceVersion.floatValue;
+                    //if (verValue < 6.0)
+                    if (self.TTSSwitchOnOff == YES)
+                    {
+                        NSString *strInfo = [[NSString alloc] initWithFormat:@"路况提示：前方约%@，%@，%@", distanceStr, nearestTrffSeg.roadname, nearestTrffSeg.detail];
+                        [mSynTTS addGuideStr:strInfo];
+                    }
                 }
-                else 
-                {
-                    [self hideTrafficBoard];
-                }
+                
             }
-            else 
+            else
             {
                 [self hideTrafficBoard];
             }
+
+        }
+        else
+        {
+            [self hideTrafficBoard];
         }
         
         //保存最后判断的在规划路径上的点坐标，用于判断偏离距离
         mLastOnPlanLocation = temp_userLocation;
+
+//        int trafficSegCnt = runningDataset.trafficContainer.filteredRouteTrafficList.count;
+//        for (int trfindex = 0; trfindex < trafficSegCnt; trfindex++)
+//        {
+//            RttGMatchedTrafficInfo *trfinfo = [runningDataset.trafficContainer.filteredRouteTrafficList objectAtIndex:trfindex];
+//            
+//            //如果当前点的Step位置和拥堵点相同，并且路径点中下一点小于拥堵点在路径点中相关位置（意味着还没到）
+//            //或者当前点的Step位置比拥堵点小
+//            if ((runningDataset.currentRoadStep == trfinfo.stepIndex && runningDataset.nextRoadPointIndex <= trfinfo.nextPointIndex)
+//                || (runningDataset.currentRoadStep < trfinfo.stepIndex))
+//            {
+//                RttGMapPoint *trafficpoint = [trfinfo.pointlist objectAtIndex:0];
+//                CLLocationDistance nextTrafficDistance = BMKMetersBetweenMapPoints(LocationPoint,
+//                                                                                   trafficpoint.mappoint);    
+//                
+//                if (nextTrafficDistance < 2000.0) //和下一个拥堵点距离小于2000米就提示关键信息
+//                {
+//                    NSString *trafficInfoText = [[NSString alloc] initWithFormat:@"%@",   trfinfo.roadname];                            
+//
+//                    [self setTrafficBoardContent:trfinfo.roadname distance:nextTrafficDistance detail:trfinfo.detail];
+//                    [self showTrafficBoard];
+//
+//                    NSLog(@"%@", trafficInfoText);
+//                    
+//                    //播放语音，每隔500M
+//                    if (![runningDataset.trffTTSPlayRec ifRecorded:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex])
+//                    {
+//                        [runningDataset.trffTTSPlayRec record:nextTrafficDistance stepIndex:trfinfo.stepIndex pointIndex:trfinfo.nextPointIndex];
+//                        NSString *distanceStr;
+//                        if (nextTrafficDistance > 1000.0)
+//                        {
+//                            distanceStr = [[NSString alloc] initWithFormat:@"%.1f公里", nextTrafficDistance/1000.0];
+//                        }
+//                        else
+//                        {
+//                            distanceStr  = [[NSString alloc] initWithFormat:@"%d米", (int)nextTrafficDistance];
+//                        }
+//                        
+//                        //6.0对讯飞支持不好
+//                        float verValue = runningDataset.deviceVersion.floatValue;
+//                        if (verValue < 6.0)
+//                        {
+//                            NSString *strInfo = [[NSString alloc] initWithFormat:@"路况提示：前方约%@，%@，%@", distanceStr, trfinfo.roadname, trfinfo.detail];
+//                            [mSynTTS addGuideStr:strInfo];
+//                        }
+//                    }
+//                    
+//                    //if (nextTrafficDistance)
+//                }
+//                else 
+//                {
+//                    [self hideTrafficBoard];
+//                }
+//            }
+//            else 
+//            {
+//                [self hideTrafficBoard];
+//            }
+//        }
+        
     }
     else 
     {
@@ -1787,13 +1509,14 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 #warning 调试屏蔽重规划
                 [self RePlanRouting:temp_userLocation];
                 
+                //后续把播放语音挪到RePlanRouting中，和提示框一起
                 //6.0对讯飞支持不好
-                float verValue = deviceVersion.floatValue;
-                if (verValue < 6.0)
+                //float verValue = runningDataset.deviceVersion.floatValue;
+                //if (verValue < 6.0)
+                if (self.TTSSwitchOnOff == YES)
                 {
                     [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
                 }
-//                //[self showModeIndicator:@"路径重算中..." seconds:0];
             }
 
         }
@@ -1805,23 +1528,42 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 -(void) mapView: (BMKMapView*)mapView didSelectAnnotationView:(BMKAnnotationView*) view
 {
-    pCurrentlySelectedAnnotation = view.annotation;
+    mMapView.currentlySelectedAnnotation = view.annotation;
 }
 
 -(void) mapView: (BMKMapView*) mapView didDeselectAnnotationView: (BMKAnnotationView*) view
 {
-    pCurrentlySelectedAnnotation = nil;
+    mMapView.currentlySelectedAnnotation = nil;
     //NSLog(@"UnTouched Annotation****************");
 }
 
 -(void) mapView: (BMKMapView*) mapView annotationViewForBubble: (BMKAnnotationView*) view
 {
     //NSLog(@"Bubble Selected");
-    pCurrentlySelectedAnnotation = view.annotation;
+    mMapView.currentlySelectedAnnotation = view.annotation;
 }
 
 #pragma mark -
 #pragma mark - process View for Window
+
+- (void) hideTopSearchBar
+{
+    [mTopSearchBar dismissKeyboard];
+    [mTopSearchBar setHidden:YES];
+    
+    [self setSearchListHidden:YES];
+
+    [self.showSearchBarBTN setHidden:NO];
+}
+
+- (void) showTopSearchBar
+{
+    [mTopSearchBar.uiInputTxtField setText:@""];
+    [mTopSearchBar setHidden:NO];
+    
+    [self.showSearchBarBTN setHidden:YES];
+}
+
 
 - (void) hideButtonsOnMap
 {
@@ -1835,102 +1577,61 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     [showTrafficViewBTN setHidden:NO];
 }
 
-- (void) HomeSettingSuccuess
-{
-    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"家庭地址设置成功！" 
-                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
-    [alertView show];
-    [self didQuiteHomeSetting];
-    [self toHomeAddrReview];
-    [mSwipeBar toggle:NO];
-    
-    [self saveHomeData];
-    [mMapView removeAnnotation:pHomePointAnnotation];
-    
-    [self showButtonsOnMap];
-    
-    //获取上班路线；这个将触发-获取上班路线-获取下班路线-判断当前合适的路径等一系列动作
-    [self getH2ORoute];
-    //[self detectPath];
-}
+//- (void) HomeSettingSuccuess
+//{
+//    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"家庭地址设置成功！" 
+//                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+//    [alertView show];
+//    [self didQuiteHomeSetting];
+//    [self toHomeAddrReview];
+//    [mSwipeBar toggle:NO];
+//    
+//    [self saveHomeData];
+//    [mMapView removeAnnotation:pHomePointAnnotation];
+//    
+//    [self showButtonsOnMap];
+//    
+//    //获取上班路线；这个将触发-获取上班路线-获取下班路线-判断当前合适的路径等一系列动作
+//    [self getH2ORoute];
+//    //[self detectPath];
+//}
 
 
 - (void) saveSpeed:(CLLocationSpeed)speed startPoint:(CLLocationCoordinate2D) startpoint endPoint:(CLLocationCoordinate2D) endpoint
 {
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    NSString *docPath = [paths objectAtIndex:0];
-//    NSString *myFile = [docPath stringByAppendingPathComponent:@"SpeedInfo.data"];
-//    
-
     NSString *strSpeed = [[NSString alloc] initWithFormat:@"%.2f", speed];
     NSString *stpt = [[NSString alloc] initWithFormat:@"%f, %f", startpoint.longitude, startpoint.latitude];
     NSString *edpt = [[NSString alloc] initWithFormat:@"%f, %f", endpoint.longitude, endpoint.latitude];
 
     NSArray *writearray = [NSArray arrayWithObjects: strSpeed, stpt, edpt, nil];
 
-    //NSDictionary *myDictionary = [NSDictionary dictionaryWithObjectsAndKeys:writearray,strIndex,nil];//注意用nil结束
-
     [mSpeedSedList addObject:writearray];
-    
-    //[myDictionary writeToFile:myFile atomically:NO];
 }
 
 - (void) saveHomeData
 {
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);  
-//    NSString *docPath = [paths objectAtIndex:0];  
-//    NSString *myFile = [docPath stringByAppendingPathComponent:@"HomeInfo.data"];  
-//    
-//    NSMutableData *data1 = [[NSMutableData alloc] init];  
-//    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data1];  
-//    [archiver encodeObject:(runningDataset.homeAddrInfo) forKey:@"data"];  
-//    [archiver finishEncoding];
-//    [data1 writeToFile:myFile atomically:YES];
-//    
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    NSString *documentsDirectory = [paths objectAtIndex:0];
-//    if (!documentsDirectory) {
-//        NSLog(@"Documents directory not found!");
-//    }
-//    NSString *appFile = [documentsDirectory stringByAppendingPathComponent:@"Savedatas.plist"];
-//     NSArray *array = [NSArray arrayWithObjects:runningDataset.homeAddrInfo, runningDataset.officeAddrInfo, nil];
-//    [[NSArray arrayWithObjects:array,nil] writeToFile:appFile atomically:NO];    
-//    
-//    NSLog(@"PATH: %@", appFile);
-//    
-//    //load
-//    NSMutableArray *SaveDataArray;
-//    if([[NSFileManager defaultManager] fileExistsAtPath:appFile])
-//    {
-//         SaveDataArray = [NSMutableArray arrayWithContentsOfFile:appFile];     
-//    }
-//    else
-//    {
-//        SaveDataArray = [NSMutableArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Savedatas" ofType:@"plist"]];
-//    }
-//    NSArray *strArray = [SaveDataArray objectAtIndex:0];
-//    
-//    BMKPoiInfo *savePoi1 = [strArray objectAtIndex:0];
-//    BMKPoiInfo *savePoi2 = [strArray objectAtIndex:1];
-//    
-////  
     NSString *strAddr = runningDataset.homeAddrInfo.address;
     NSString *HomeLat = [[NSString alloc] initWithFormat:@"%f",runningDataset.homeAddrInfo.pt.latitude];
     NSString *HomeLon = [[NSString alloc] initWithFormat:@"%f",runningDataset.homeAddrInfo.pt.longitude];
-
+    
     NSArray *array = [NSArray arrayWithObjects:strAddr, HomeLat, HomeLon, nil];
     //Save
     NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
-    [saveDefaults setObject:array forKey:@"HomeOfficeSaveKey"];
+    [saveDefaults setObject:array forKey:@"HomeAddrSaveKey"];
+    [saveDefaults synchronize];
+}
+
+- (void) saveOfficeData
+{
+    NSString *strAddr = runningDataset.officeAddrInfo.address;
+    NSString *addrLat = [[NSString alloc] initWithFormat:@"%f",runningDataset.officeAddrInfo.pt.latitude];
+    NSString *addrLon = [[NSString alloc] initWithFormat:@"%f",runningDataset.officeAddrInfo.pt.longitude];
     
-    
-//    NSArray *loadArray = [saveDefaults objectForKey:@"HomeOfficeSaveKey"];
-//    NSString *loadHomeAddr = [loadArray objectAtIndex:0];
-//    NSString *loadHomeLat = [loadArray objectAtIndex:1];
-//    NSString *loadHomeLon = [loadArray objectAtIndex:2];
-//
-//    NSLog(@"str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
-    
+    NSArray *array = [NSArray arrayWithObjects:strAddr, addrLat, addrLon, nil];
+    //Save
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    [saveDefaults setObject:array forKey:@"OfficeAddrSaveKey"];
+    [saveDefaults synchronize];
 }
 
 - (void) initButtomBar
@@ -1958,11 +1659,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {
         [mSuggestionListVC.view setHidden:NO];
     }
-	NSInteger height = hidden ? 0 : 180;
+	NSInteger height = hidden ? 0 : 125; //180
 	[UIView beginAnimations:nil context:nil];
 	[UIView setAnimationDuration:.2];
 	//[mSuggestionListVC.view setFrame:CGRectMake(mSuggestionListVC.view.frame.origin.x, mSuggestionListVC.view.frame.origin.y, 210, height)];
-    [mSuggestionListVC.view setFrame:CGRectMake(mSuggestionListVC.view.frame.origin.x, mSuggestionListVC.view.frame.origin.y, 210, height)];
+    [mSuggestionListVC.view setFrame:CGRectMake(mSuggestionListVC.view.frame.origin.x, mSuggestionListVC.view.frame.origin.y, 310, height)];
 	[UIView commitAnimations];
     
     
@@ -1976,56 +1677,24 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (void) initSuggestionListView
 {
-    //poiResultList = [[RttGDLTViewControler alloc] initWithStyle:UITableViewStylePlain];
-
-    mSuggestionListVC = [[RTTSuggestionListViewController alloc] initWithStyle:UITableViewStylePlain];    
+    mSuggestionListVC = [[RTTSuggestionListViewController alloc] initWithStyle:UITableViewStylePlain];
     mSuggestionListVC.delegate = self;
-    [mSuggestionListVC.view setFrame:CGRectMake(20, 46, 0, 0)];
-
-    //[self.view addSubview:mSuggestionListVC.view];
+    [mSuggestionListVC.view setFrame:CGRectMake(5, 42, 0, 0)];
 }
+
+
 
 - (void) start2Go
 {
-    if (mStart2GoTimer)
-    {
-        [mStart2GoTimer invalidate];
-    }
-    
     if(runningDataset && runningDataset.isPlaned)
     {
         runningDataset.isDriving = YES;
     }
-    [self stopStart2GoTimer];
-    [self hideInfoBoardforStart2Go];
-#if !defined (HUAWEIVER)
-    [self showGuideBoard];
-#endif
-    RTTTopBarView *topbarView = [[[NSBundle mainBundle] loadNibNamed:@"RTTTopBarView" owner:self options:nil] lastObject];
-    [topbarView setDelegate:self];
-    [mTopbar setBarView:topbarView];
-    [mTopbar show:NO];
-}
 
-- (void) initTopBar
-{    
-    mTopbar = [[RNSwipeBar alloc] initWithMainView:[self view] withType:1];
-    [mTopbar setPadding:10.0f];
-    [mTopbar setDelegate:self];
-    [[self view] addSubview:mTopbar];
-    //    
-    RTTTopBarView *topbarView = [[[NSBundle mainBundle] loadNibNamed:@"RTTTopBarView" owner:self options:nil] lastObject];
-    [topbarView setDelegate:self];
-    //[mTopbar setBarView:topbarView];
-    //[mTopbar setBarView:mAddrSearchBar];
-#if defined (HUAWEIVER)
-    [mTopbar setPadding:0.0f];
-    [mTopbar show:NO];
-    [mTopbar setHidden:YES];
-#else
-    [mTopbar show:YES];
-#endif
-    
+    if (runningDataset.isRouteGuideON)
+    {
+        [self showGuideBoard];
+    }
 }
 
 
@@ -2058,7 +1727,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
 - (void) setGuideBoardContent:(NSString *)content
 {
-    RTTStepInfo *stepInfo = [self getStepInfoFromStepContent:content];
+    RTTStepInfo *stepInfo = [RTTMapKit getStepInfoFromStepContent:content];
     mGuideBoard.rangeLABEL.text = stepInfo.distanceStr;
     mGuideBoard.descLABEL.text = stepInfo.discriptionStr;
 
@@ -2101,41 +1770,6 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 {
     
 }
-
-
-- (void) showInfoBoardforStart2Go
-{
-    [mInfoboadView setHidden:NO];
-}
-
-- (void) hideInfoBoardforStart2Go
-{
-    [mInfoboadView setHidden:YES];
-}
-
-- (void) initInfoBoard
-{
-    //设置圆角
-    [mInfoboadView.layer setCornerRadius:12.0f];
-    
-    //设置阴影
-    mInfoboadView.layer.shadowColor = [[UIColor blackColor] CGColor];
-    mInfoboadView.layer.shadowOffset = CGSizeMake(3.0f, 3.0f); // [水平偏移，垂直偏移]
-    mInfoboadView.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
-    mInfoboadView.layer.shadowRadius = 10.0f; // 阴影发散的程度
-    
-    //    CAGradientLayer *gradient = [CAGradientLayer layer];
-    //    gradient.frame = mInfoboadView.bounds;
-    //
-    //    UIColor *color1 = [[UIColor alloc] initWithRed:0.1 green:0.8 blue:0.1 alpha:1];
-    //    UIColor *color2 = [[UIColor alloc] initWithRed:0.1 green:0.5 blue:0.1 alpha:1];
-    //
-    //    gradient.colors = [NSArray arrayWithObjects:(id)
-    //                       [color1 CGColor], (id)[color2 CGColor], nil]; // 由上到下的漸層顏色
-    //    [mInfoboadView.layer insertSublayer:gradient atIndex:0];
-    
-}
-
 
 
 -(void) initTrafficBoard
@@ -2210,17 +1844,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     mModeIndicatorView = [[[NSBundle mainBundle] loadNibNamed:@"RTTModeActivityIndicator" owner:self options:nil] lastObject];
     [[self view] addSubview:mModeIndicatorView];
-//    [mModeIndicatorView setCenter:CGPointMake(160.0, 80.0)];
-//    
-//    //设置圆角
-//    [mModeIndicatorView.layer setCornerRadius:12.0f];
-//    
-//    //设置阴影
-//    mModeIndicatorView.layer.shadowColor = [[UIColor blackColor] CGColor];
-//    mModeIndicatorView.layer.shadowOffset = CGSizeMake(3.0f, 3.0f); // [水平偏移，垂直偏移]
-//    mModeIndicatorView.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
-//    mModeIndicatorView.layer.shadowRadius = 10.0f; // 阴影发散的程度
-    
+
     [mModeIndicatorView.backgroundBoardVW setCenter:CGPointMake(160.0, 80.0)];
     
     //设置圆角
@@ -2232,19 +1856,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     mModeIndicatorView.backgroundBoardVW.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
     mModeIndicatorView.backgroundBoardVW.layer.shadowRadius = 10.0f; // 阴影发散的程度
     
-    //mActivityIndicatorView = [[UIActivityIndicatorView alloc] initWithFrame : CGRectMake(0.0f, 0.0f, 32.0f, 32.0f)] ;
     mActivityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [mModeIndicatorView addSubview: mActivityIndicatorView];
 
-//    CGFloat cX = mModeIndicatorView.frame.size.width/2.0;
-//    CGFloat cY = mModeIndicatorView.frame.size.height/2.0+12.0;
-//    CGFloat cX = (mModeIndicatorView.backgroundBoardVW).frame.size.width/2.0;
-//    CGFloat cY = (mModeIndicatorView.backgroundBoardVW).frame.size.height/2.0+12.0;
     [mActivityIndicatorView setCenter: CGPointMake(160, 92)] ;
-    //[mActivityIndicatorView setActivityIndicatorViewStyle: UIActivityIndicatorViewStyleWhite] ; 
     [mActivityIndicatorView setHidesWhenStopped:YES];
-    
-    
 }
 
 
@@ -2273,303 +1889,146 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 }
 
 
-
-
-#pragma mark -
-#pragma mark Process View for Map
-
-- (void) setCenterOfMapView:(CLLocationCoordinate2D)coordinate
+-(void) initTopSearchBar
 {
-    //Lon: 73-135, Lat:18-54
-    if ((coordinate.latitude >= 18.0 && coordinate.latitude <= 54.0)
-        && (coordinate.longitude >= 73.0 && coordinate.longitude <= 135.0) )
+    
+    mTopSearchBar = [[[NSBundle mainBundle] loadNibNamed:@"RTTSearchBar" owner:self options:nil] lastObject];
+    [mTopSearchBar setCenter:CGPointMake(160.0, 20.0)];
+    [mTopSearchBar setInputDelegate];
+    [mTopSearchBar setDelegate:self];
+    
+    [[self view] addSubview:mTopSearchBar];
+    
+    //设置圆角
+    //[mTrafficInfoBoard.layer setCornerRadius:12.0f];
+    
+    //设置阴影
+    mTopSearchBar.layer.shadowColor = [[UIColor blackColor] CGColor];
+    mTopSearchBar.layer.shadowOffset = CGSizeMake(3.0f, 3.0f); // [水平偏移，垂直偏移]
+    mTopSearchBar.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
+    mTopSearchBar.layer.shadowRadius = 10.0f; // 阴影发散的程度
+    
+    [mTopSearchBar setHidden:YES];
+}
+
+
+- (void) initDestinationLBL
+{
+    UIColor *bgColor = [[UIColor alloc] initWithRed:0.4 green:0.4 blue:0.4 alpha:0.4];
+    self.uiDestinationLBL.layer.backgroundColor = [bgColor CGColor];
+    
+    [self.uiDestinationLBL.layer setCornerRadius:4.0f];
+
+    self.uiDestinationLBL.layer.shadowColor = [[UIColor blackColor] CGColor];
+    self.uiDestinationLBL.layer.shadowOffset = CGSizeMake(3.0f, 3.0f); // [水平偏移，垂直偏移]
+    self.uiDestinationLBL.layer.shadowOpacity = 0.5f; // 0.0 ~ 1.0的值
+    self.uiDestinationLBL.layer.shadowRadius = 5.0f; // 阴影发散的程度
+    
+}
+
+- (void) hideDestinationLBL
+{
+    [self.uiDestinationLBL setHidden:YES];
+    
+}
+
+- (void) showDestinationLBL
+{
+    [self.uiDestinationLBL setHidden:NO];
+    
+}
+
+
+- (void) setDestinationTrafficSegCnt:(int) segCount
+{
+    if (runningDataset.isPlaned == NO)
     {
-        [mMapView setCenterCoordinate:coordinate animated:0];
+        [self.uiDestinationLBL setText:@"无路线/路线的路况信息"];
+        return;
+    }
+    
+    if (segCount > 0)
+    {
+    NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 拥堵路段: %d",  self.currentlyRouteEndAddr , segCount ];
+    [self.uiDestinationLBL setText:strLable];
+    }
+    else
+    {
+        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 全线无拥堵",  self.currentlyRouteEndAddr];
+        [self.uiDestinationLBL setText:strLable];
     }
 }
 
-//修改协议后废弃
-//- (void) AddTrafficOverlay:(LYCityTraffic*) trafficinfo
-//{
-//    [runningDataset.filteredRouteTrafficList removeAllObjects];
-//    
-//    //int iSegRdCnt = trafficinfo.roadtrafficList.count;
-//    int iSegRdCnt = trafficinfo.roadTrafficsList.count;
-//
-//    
-//    LYRoadTraffic *pRdTrc;
-//    
-//    for (int i=0; i<iSegRdCnt; i++)
-//    {
-//        pRdTrc = [trafficinfo.roadTrafficsList objectAtIndex:i];
-//        int iSegCnt = pRdTrc.segmentTrafficsList.count;
-//        
-//        int iRoadCnt = runningDataset.formatedRouteInfo.roadlist.count;
-//        for (int j = 0; j < iRoadCnt; j++)
-//        {
-//            RttGRoadInfo *road = [runningDataset.formatedRouteInfo.roadlist objectAtIndex:j];
-//            
-//            //int iPoincnt = [road.pointlist count];
-//            //NSLog(@"===RoadName:%@, SegName:%@", road.roadname, pRdTrc.road);
-//            
-//            //判断路名是否相同，这里用相同路名的拥堵路段和路径中的相同路名的路段进行比较得到拟合线段
-//            if ([road.roadname isEqualToString:pRdTrc.road])
-//            {
-//                //NSLog(road.roadname);
-//                for (int k=0; k<iSegCnt; k++)
-//                {
-//                    LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:k];
-//                    BOOL ret = [self createTrafficPolylineInfo:pSegTrf withRttgRoadInfo:road];
-//                    if (ret)
-//                    {
-//                        [self DrawTrafficPolyline:NO];
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    
-//    [self DrawTrafficPolyline:NO];
-//}
+#pragma mark -
+#pragma mark Process Receive Traffic
 
-
-- (void) formatAndSaveTrafficData:(LYCityTraffic*) trafficinfo
+- (void) formatAndSaveTrafficData4Route:(LYCityTraffic*) trafficinfo
 {
-    [runningDataset.filteredRouteTrafficList removeAllObjects];
-    
-    int iRdCnt = trafficinfo.roadTrafficsList.count;
-    
-    
-    LYRoadTraffic *pRdTrc;
-    
-    [self clearOutofDateTrafficData];//先清理超时的路况信息
+    [runningDataset.trafficContainer clearOutofDateTrafficData4Route];//先清理超时的路况信息
     
     for (LYRoadTraffic *pRdTrc in trafficinfo.roadTrafficsList)
     {
         for (LYSegmentTraffic *pSegTrf in pRdTrc.segmentTrafficsList)
         {
+                        
+            //[self addTSSTraffic2RunningDataset4Route:pRdTrc.road segment:pSegTrf];
+          NSMutableArray *retMatchedTrfList =
+            [runningDataset.trafficContainer addTSSTraffic2RunningDataset4Route:pRdTrc.road segment:pSegTrf roadList:runningDataset.formatedRouteInfo.roadlist];
             
-            //把所有的拥堵路段都加入队列中
-//            RTTFormatedTrafficFromTSS *trfSegInfo = [[RTTFormatedTrafficFromTSS alloc] init];
-//            trfSegInfo.roadName = pRdTrc.road;
-//            trfSegInfo.details = pSegTrf.details;
-//            trfSegInfo.speedKMPH = pSegTrf.speed;
-//            trfSegInfo.timestamp = pSegTrf.timestamp;
-//            
-//            CLLocationCoordinate2D tmpStCoord;
-//            tmpStCoord.latitude = pSegTrf.segment.start.lat;
-//            tmpStCoord.longitude = pSegTrf.segment.start.lng;
-//            [trfSegInfo setStartCoord:tmpStCoord];
-//            
-//            CLLocationCoordinate2D tmpEdCoord;
-//            tmpEdCoord.latitude = pSegTrf.segment.end.lat;
-//            tmpEdCoord.longitude = pSegTrf.segment.end.lng;
-//            [trfSegInfo setEndCoord:tmpEdCoord];
-//            
-//            [runningDataset.allRouteTrafficFromTSS addObject:trfSegInfo];
-            
-            [self addTSSTraffic2RunningDataset:pRdTrc.road segment:pSegTrf];
-        }
-    }
-    
-    for (RTTFormatedTrafficFromTSS *tssTrf in runningDataset.allRouteTrafficFromTSS)
-    {
-        for (RttGRoadInfo *road in runningDataset.formatedRouteInfo.roadlist)
-        {
-            if ([road.roadname isEqualToString:tssTrf.roadName])
+            if (self.TTSSwitchOnOff == YES)
             {
-                //LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:k];
-                BOOL ret = [self createTrafficInfo2Dataset:tssTrf withRttgRoadInfo:road];
-                if (ret)
+                for (RttGMatchedTrafficInfo *trfSeg in retMatchedTrfList)
                 {
-                    //[self DrawTrafficPolyline:NO];
+                    NSString *strSpeed;
+                    if (trfSeg.speedKMPH < 5)
+                    {
+                        strSpeed = @"严重拥堵";
+                    }
+                    else
+                    {
+                        if (trfSeg.speedKMPH < 15)
+                        {
+                            strSpeed = @"中度拥堵";
+                        }
+                        else
+                        {
+                            strSpeed = @"轻度拥堵";
+                        }
+                    }
+                    
+                    NSString *strInfo = [[NSString alloc] initWithFormat:@"最新路况：%@，%@，%@", trfSeg.roadname, trfSeg.detail, strSpeed];
+                    [mSynTTS addTrafficStr:strInfo];
                 }
             }
 
         }
     }
-
-    [self DrawTrafficPolyline:NO];
+    
+    [mMapView DrawTrafficPolyline:runningDataset.trafficContainer.filteredRouteTrafficList];
 }
 
 
-//增加拥堵路径到runningDataset.allRouteTrafficFromTSS，不做过滤，只做覆盖
-- (void) addTSSTraffic2RunningDataset:(NSString *)roadName segment:(LYSegmentTraffic*) trfSegment
+- (void) formatAndSaveTrafficData4Hot:(LYCityTraffic*) trafficinfo
 {
+    [runningDataset.trafficContainer clearOutofDateTrafficData4Hot];//先清理超时的路况信息
     
-    //先检查重复的
-    BOOL hasExistRecord = NO;
-    for (RTTFormatedTrafficFromTSS *trfSegInfo in runningDataset.allRouteTrafficFromTSS)
+    for (LYRoadTraffic *pRdTrc in trafficinfo.roadTrafficsList)
     {
-        if ([trfSegInfo.details isEqualToString:trfSegment.details])
+        for (LYSegmentTraffic *pSegTrf in pRdTrc.segmentTrafficsList)
         {
-            trfSegInfo.timestamp = trfSegment.timestamp; //更新时间戳即可
-            hasExistRecord = YES;
-            break;
+            [runningDataset.trafficContainer addTSSTraffic2RunningDataset4Hot:pRdTrc.road segment:pSegTrf];
         }
     }
     
-    if (!hasExistRecord)
-    {
-        
-        RTTFormatedTrafficFromTSS *trfSegInfo = [[RTTFormatedTrafficFromTSS alloc] init];
-        trfSegInfo.roadName = roadName;
-        trfSegInfo.details = trfSegment.details;
-        trfSegInfo.speedKMPH = trfSegment.speed;
-        trfSegInfo.timestamp = trfSegment.timestamp;
-        
-        CLLocationCoordinate2D tmpStCoord;
-        tmpStCoord.latitude = trfSegment.segment.start.lat;
-        tmpStCoord.longitude = trfSegment.segment.start.lng;
-        [trfSegInfo setStartCoord:tmpStCoord];
-        
-        CLLocationCoordinate2D tmpEdCoord;
-        tmpEdCoord.latitude = trfSegment.segment.end.lat;
-        tmpEdCoord.longitude = trfSegment.segment.end.lng;
-        [trfSegInfo setEndCoord:tmpEdCoord];
-        
-        [runningDataset.allRouteTrafficFromTSS addObject:trfSegInfo];
-    }
-}
-
-- (void) clearOutofDateTrafficData
-{
-    int segCnt = runningDataset.allRouteTrafficFromTSS.count;
-    for (int i=(segCnt-1); i >= 0; i--)// * trfseg in runningDataset.allRouteTrafficFromTSS)
-    {
-        RTTFormatedTrafficFromTSS *trfseg = [runningDataset.allRouteTrafficFromTSS objectAtIndex:i];
-        
-        NSDate *segDate = [NSDate dateWithTimeIntervalSince1970:trfseg.timestamp];
-        NSTimeInterval secondsBetweenNow =  [segDate timeIntervalSinceNow];
-        if (secondsBetweenNow <= -900.0) //间隔超过15分钟就丢弃
-        {
-            [runningDataset.allRouteTrafficFromTSS removeObjectAtIndex:i];
-        }
-    }
-}
-
-- (void) DrawTrafficPolyline:(BOOL) isRemove
-{
-    int polyCnt = trafficPolylineList.count;
-    for (int i=0; i<polyCnt; i++)
-    {
-        [mMapView removeOverlay:[trafficPolylineList objectAtIndex:i]];
-    }
-    
-    [trafficPolylineList removeAllObjects];
-
-    if (isRemove)
-    {
-        return;
-    }
-    
-    int trafficSegCnt = runningDataset.filteredRouteTrafficList.count;
-    
-    for (int i=0; i<trafficSegCnt; i++)
-    {
-        
-        RttGTrafficInfo *trfInfo = [runningDataset.filteredRouteTrafficList objectAtIndex:i];
-        int pointCnt = trfInfo.pointlist.count;
-        
-        CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[pointCnt];
-        
-        for (int j = 0; j < pointCnt; j++)
-        {
-            BMKMapPoint linePoint = [[trfInfo.pointlist objectAtIndex:j] mappoint];
-            pPoints[j] = BMKCoordinateForMapPoint(linePoint);
-        }
-        
-        BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:pPoints count:pointCnt];
-        polyLine.title = @"traffic";
-        
-        //NSLog(@"Draw Traffic polyline.........");
-        [mMapView insertOverlay:polyLine atIndex:0];//放在导航线路下面效果会更好
-        [trafficPolylineList addObject:polyLine];
-        
-        delete []pPoints;
-    }
+    //[mMapView DrawTrafficPolyline:runningDataset.trafficContainer.filteredRouteTrafficList];
 }
 
 
-- (void) AddDrivingRouteOverlay:(BMKRoute*) route
-{
-    int iRoutePointCnt = 0; //路径上所有坐标点的个数
-    for (int j = 0; j < route.pointsCount; j++) 
-    {
-        int len = [route getPointsNum:j];
-        iRoutePointCnt += len;
-    }
-    NSLog(@"Points Cnt in Steps: %d", iRoutePointCnt);
-    
-    
-    //DrivingRoute = route;//[plan.routes objectAtIndex:i];
-    BMKMapPoint* points = new BMKMapPoint[iRoutePointCnt];
-    
-    
-    int index = 0; //YSH_DEBUGING...............................................
-    for (int j = 0; j < route.pointsCount; j++) 
-    {
-        int len = [route getPointsNum:j];
-        BMKMapPoint* pointArray = (BMKMapPoint*)[route getPoints:j];
-        memcpy(points + index, pointArray, len * sizeof(BMKMapPoint));
-        index += len;
-    }
-    
-    if (pCurrentlyPolyLine)
-    {
-        [mMapView removeOverlay:pCurrentlyPolyLine];
-        pCurrentlyPolyLine = nil;
-    }
-    //在地图上画出规划的路线
-    BMKPolyline* polyLine = [BMKPolyline polylineWithPoints:points count:iRoutePointCnt];
-    polyLine.title = @"Route";
-    [mMapView addOverlay:polyLine];
-    
-    pCurrentlyPolyLine = polyLine; 
-    //[mMapView setCenterCoordinate:(BMKCoordinateForMapPoint(points[0]))];
-    [self setCenterOfMapView:(BMKCoordinateForMapPoint(points[0]))];
-    
-    delete []points;
-}
 
 
-- (void) DrawSpeedPolyline: (double) speed startPoint:(CLLocationCoordinate2D)startPoint endPoint:(CLLocationCoordinate2D)endPoint
-{
-    int pointCnt = 2;
-    
-    CLLocationCoordinate2D pPoints[2];// = new CLLocationCoordinate2D[pointCnt];
-    
-    pPoints[0] = startPoint;
-    pPoints[1] = endPoint;
-    
-    
-    BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:pPoints count:pointCnt];
-    polyLine.title = [[NSString alloc] initWithFormat:@"Seg4Speed--%f", speed];
-    [mMapView addOverlay:polyLine];
-    
-    //        [mMapView insertOverlay:polyLine atIndex:0];//放在导航线路下面效果会更好
-    //        [trafficPolylineList addObject:polyLine];
-    
-    //delete []pPoints;
-}
 
-
-//For Test
-- (void) addRouteGuidePoints
-{
-    int iStepCnt = runningDataset.drivingRoute.steps.count;
-    
-    for (int i = 0; i < iStepCnt; i++) 
-    {
-        BMKStep* step_a = [runningDataset.drivingRoute.steps objectAtIndex:i];
-        RTTMapPointAnnotation *stepAnnot = [[RTTMapPointAnnotation alloc] init];
-        stepAnnot.coordinate = step_a.pt;
-        stepAnnot.title = step_a.content;
-        [mMapView addAnnotation:stepAnnot];
-    }
-    
-}
-
+#pragma mark -
+#pragma mark Process View Delegate for Map
 
 - (BMKAnnotationView *)mapView:(BMKMapView *)bmkmapview viewForAnnotation:(id <BMKAnnotation>)annotation
 {    
@@ -2583,58 +2042,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {   
         RTTMapPointAnnotation *pointAnnotation = (RTTMapPointAnnotation*) annotation;
         static NSString* RoutePlanAnnotationIdentifier = @"RoutePlanAnnotationIdentifier";  
-        __autoreleasing BMKPinAnnotationView* pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:RoutePlanAnnotationIdentifier];  
+        __autoreleasing BMKPinAnnotationView* pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:RoutePlanAnnotationIdentifier];
         if (!pinView)  
         {
             // if an existing pin view was not available, create one  
             BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:RoutePlanAnnotationIdentifier];
-            
-//            customPinView.animatesDrop = NO;  //如果需要从天而降的动画效果，设置为YES即可。
-//            customPinView.opaque = YES;
-//            
-//            switch (pointAnnotation.pointType) {
-//                case MAPPOINTTYPE_START:
-//                {customPinView.pinColor = BMKPinAnnotationColorGreen;}
-//                    break;
-//                    
-//                case MAPPOINTTYPE_END:
-//                {customPinView.pinColor = BMKPinAnnotationColorPurple;}
-//                    break;
-//                    
-//                case MAPPOINTTYPE_HOME:
-//                {customPinView.pinColor = BMKPinAnnotationColorRed;}
-//                    break;
-//                    
-//                default:
-//                {
-//                    customPinView.pinColor = BMKPinAnnotationColorRed;
-//                    customPinView.canShowCallout = YES;  //运行点击弹出标签 
-//                    if ((pointAnnotation.pointType != MAPPOINTTYPE_START) && (pointAnnotation.pointType != MAPPOINTTYPE_END))
-//                    {
-//                        UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];  
-//                        [rightButton addTarget:self  
-//                                        action:@selector(showSettingRoutPointView:)  //点击右边的按钮之后，显示设置导航点的页面
-//                              forControlEvents:UIControlEventTouchUpInside];
-//                        customPinView.rightCalloutAccessoryView = rightButton; 
-//                    }
-//                }
-//                    break;
-//            }
-
-            
-//            customPinView.canShowCallout = YES;  //运行点击弹出标签 
-//            if ((pointAnnotation.pointType != MAPPOINTTYPE_START) && (pointAnnotation.pointType != MAPPOINTTYPE_END))
-//            {
-//                UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];  
-//                [rightButton addTarget:self  
-//                                action:@selector(showSettingRoutPointView:)  //点击右边的按钮之后，显示设置导航点的页面
-//                      forControlEvents:UIControlEventTouchUpInside];
-//                customPinView.rightCalloutAccessoryView = rightButton; 
-//            }
-            //RTTMapPointAnnotation *rpAnnotation = (RTTMapPointAnnotation *)annotation;
-            
-            //rpAnnotation.pointType=MAPPOINTTYPE_UNDEF;
-            
             pinView = customPinView;
         }  
         else  
@@ -2668,7 +2080,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
                     [rightButton addTarget:self  
                                     action:@selector(showSettingRoutPointView:)  //点击右边的按钮之后，显示设置导航点的页面
                           forControlEvents:UIControlEventTouchUpInside];
-                    pinView.rightCalloutAccessoryView = rightButton; 
+                    pinView.rightCalloutAccessoryView = rightButton;
+                    [pinView setSelected:YES];
+                    mMapView.currentlySelectedAnnotation = pointAnnotation;
                 }
             }
                 break;
@@ -2758,177 +2172,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 }
 
 
-//stepIndex 小于0 则取全路径的范围
-- (void) changeMapVisibleRect:(BMKRoute*) route withIndex:(int) stepIndex
-{
-    int iRoutePointCnt = 0;
-    if (stepIndex < 0)
-    {
-        //int stepCnt = route.pointsCount;
-        
-        for (int i = 0; i < route.pointsCount; i++) 
-        {
-            int len = [route getPointsNum:i];
-            iRoutePointCnt += len;
-        }
-        
-        if (iRoutePointCnt > 0)
-        {
-            BMKMapPoint* points = new BMKMapPoint[iRoutePointCnt];
-            
-            int index = 0; 
-            for (int j = 0; j < route.pointsCount; j++) 
-            {
-                int len = [route getPointsNum:j];
-                BMKMapPoint* pointArray = (BMKMapPoint*)[route getPoints:j];
-                memcpy(points + index, pointArray, len * sizeof(BMKMapPoint));
-                index += len;
-            }
-            
-            BMKMapRect segRect = [self mapRectMakeFromPoint:&points[0] withPoint:(&points[iRoutePointCnt-1])];    
-            UIEdgeInsets edgeFrame={10,10,10,10};
-            BMKMapRect fitRect = [mMapView mapRectThatFits:segRect edgePadding:edgeFrame];
-            [mMapView setVisibleMapRect:fitRect animated:NO];
-            
-            delete[] points;
-        }
-        
-    }
-    else 
-    {
-        iRoutePointCnt = [route getPointsNum:stepIndex];
-        if (iRoutePointCnt > 0)
-        {
-            
-            BMKMapPoint* points = (BMKMapPoint*)[route getPoints:stepIndex];
-            
-            BMKMapRect segRect = [self mapRectMakeFromPoint:&points[0] withPoint:(&points[iRoutePointCnt-1])];    
-            UIEdgeInsets edgeFrame={10,10,10,10};
-            BMKMapRect fitRect = [mMapView mapRectThatFits:segRect edgePadding:edgeFrame];
-            [mMapView setVisibleMapRect:fitRect animated:NO];
-        }
-    }
-    
-    
-}
 
 
-- (RTTMapPointAnnotation*) addAnnotation2Map:(CLLocationCoordinate2D)coordinate withType:(RTTEN_MAPPOINTTYPE) type
-{
-    __autoreleasing RTTMapPointAnnotation *pointAnnotation = [[RTTMapPointAnnotation alloc] init];
-    pointAnnotation.coordinate = coordinate;
-    
-    switch (type) {
-        case MAPPOINTTYPE_START:
-        {
-            pointAnnotation.pointType = MAPPOINTTYPE_START;
-            pointAnnotation.title = @"起点";
-        }
-            break;
-        case MAPPOINTTYPE_END:
-        {
-            pointAnnotation.pointType = MAPPOINTTYPE_END;
-            pointAnnotation.title = @"终点";
-        }
-            break;
-        case MAPPOINTTYPE_HOME:
-        {
-            pointAnnotation.pointType = MAPPOINTTYPE_HOME;
-            pointAnnotation.title = @"家";
-        }
-            break;
-        default:
-        {
-            pointAnnotation.pointType = MAPPOINTTYPE_UNDEF;
-            pointAnnotation.title = @"点击设置为导航点";
-        }
-            break;
-    }
-    
-    [mMapView addAnnotation:pointAnnotation];
-    
-    
-//    switch (type) {
-//        case MAPPOINTTYPE_START:
-//        {
-//            pStartPointAnnotation = pointAnnotation;
-//        }
-//            break;
-//        case MAPPOINTTYPE_END:
-//        {
-//            pEndPointAnnotation = pointAnnotation;
-//        }
-//            break;
-//            
-//        default:
-//            break;
-//    }
-    
-    
-    //因为百度API是异步通过网络返回坐标POI信息，并且没有消息元素区分，所以多个点加入的时间比较短的话有可能会有错误（待处理）
-    //pCurrentlyAnnotation = pointAnnotation;
-//    
-//#warning "导航中路径重规划的时候应该取消查找"?
-//    [self getGeoInfofromMAPSVR:coordinate];
-//
-    return pointAnnotation;
-}
-
-
-//给返回的Annotation点设置地址信息，方便进入地图点类型选择视图的时候显示出来。
--(void) setRoutPlaningViewAddress:(BMKAddrInfo*)addrinfo
-{
-    //if (addrinfo.addressComponent 
-    
-    NSString *StrProv = addrinfo.addressComponent.province;
-    NSString *StrCity = addrinfo.addressComponent.city;
-    NSString *StrDist = addrinfo.addressComponent.district;
-    NSString *StrRoad = addrinfo.addressComponent.streetName;
-    if (StrRoad == nil) {
-        StrRoad = @"未知道路";
-    }
-    NSString *StrFormatedInfo = [[NSString alloc] initWithFormat:@"省份:%@\n城市:%@\n地区%@\n街道:%@", StrProv, StrCity,StrDist,StrRoad];
-
-    
-//    //FOR TEST，看是否有更加合理的POI地点可用；目前的结论是没有太多价值
-//    NSLog(@"------PoiList Cnt==%d", addrinfo.poiList.count);
-//    for (int i=0; i<addrinfo.poiList.count; i++)
-//    {
-//        BMKPoiInfo *poiinfo = [addrinfo.poiList objectAtIndex:i];
-//        //NSLog(@"###POIINFO Name=%@ Address=%@", poiinfo.name, poiinfo.address);
-//    }
-//    
-//    if (!pWaitPOIResultAnnotation) 
-//    {
-//        NSLog(@"Error======pWaitPOIResultAnnotation is NULL!!");
-//        return;
-//    }
-//    else {
-//        NSLog(@"pWaitPOIResultAnnotation string=%@", pWaitPOIResultAnnotation.title);
-//    }
-//    //END
-    
-    
-    //    注意：直接比较坐标的方式不可用，因为百度返回的坐标是存在变化的
-    //    这种直接比较的方式是错误的
-    //    if((pCurrentlyAnnotation.coordinate.latitude == addrinfo.geoPt.latitude) 
-    //        && (pCurrentlyAnnotation.coordinate.longitude == addrinfo.geoPt.longitude) )
-    //    {
-    //        NSLog(@"坐标匹配");
-    //    }
-    
-    //下面代码是为了避免异步的情况下，把地址信息错误地标识到其他的点
-    CLLocationDistance pointDistance = BMKMetersBetweenMapPoints(BMKMapPointForCoordinate(pWaitPOIResultAnnotation.coordinate),
-                                                                 BMKMapPointForCoordinate(addrinfo.geoPt));  
-    if (pointDistance < 30.0)
-    {
-        //NSLog(@"坐标匹配");
-        pWaitPOIResultAnnotation.addrInfo = addrinfo;
-        pWaitPOIResultAnnotation.AddrString = StrFormatedInfo;
-    }
-    
-    
-}
 
 #pragma mark -
 #pragma mark Process Request to MAP Service
@@ -2967,9 +2212,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 }
 
 
-- (bool) RoutePlanning:(CLLocationCoordinate2D)startpoint end:(CLLocationCoordinate2D)endpoint
+- (bool) RouteSearch:(CLLocationCoordinate2D)startpoint end:(CLLocationCoordinate2D)endpoint
 {
     NSLog(@"RoutPlaning.....");
+    
+    self.currentlyRouteEndPoint = endpoint;
     
     //情况前方拥堵的语音播放记录
     [runningDataset.trffTTSPlayRec clear];
@@ -2994,7 +2241,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     if (!isSuccPlanCall)
     {
 //#if defined (HUAWEIVER)
-//        runningDataset.currentlyRoute = ROUTEUNKNOW;
+//        runningDataset.currentlyRoute = ROUTECODEUNKNOW;
 //#endif
         NSLog(@"Call driving search failure");
         runningDataset.isPlaningFailed = YES;
@@ -3017,6 +2264,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 #pragma mark -
 #pragma mark Process Map Element Data
 
+
 - (void) getH2ORoute
 {
     if (runningDataset.homeAddrInfo == nil)
@@ -3027,7 +2275,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 
     CLLocationCoordinate2D point1 = runningDataset.homeAddrInfo.pt;
     CLLocationCoordinate2D point2 = runningDataset.officeAddrInfo.pt;
-    bool ret = [self RoutePlanning:point1 end:point2];
+    bool ret = [self RouteSearch:point1 end:point2];
     if (!ret)
     {
         NSLog(@"Route Planing Fail!");
@@ -3051,7 +2299,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     CLLocationCoordinate2D point1 = runningDataset.officeAddrInfo.pt;
     CLLocationCoordinate2D point2 = runningDataset.homeAddrInfo.pt;
-    bool ret = [self RoutePlanning:point1 end:point2];
+    bool ret = [self RouteSearch:point1 end:point2];
     if (!ret)
     {
         NSLog(@"Route Planing Fail!");
@@ -3067,632 +2315,16 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 //从location点作为起始点，重新路径规划
 - (void) RePlanRouting:(CLLocationCoordinate2D)location
 {
-    if (pStartPointAnnotation != nil){
-        [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
-    
-    //pStartPointAnnotation = [self addAnnotation2Map:[mMapView userLocation].coordinate withType:MAPPOINTTYPE_START];
-    pStartPointAnnotation = [self addAnnotation2Map:location withType:MAPPOINTTYPE_START];
-    
-    //获取起点描述信息，因为百度API如果起点在路上，Step信息可能是是没有这条路的路名的；
-    pWaitPOIResultAnnotation = pStartPointAnnotation;
-    [self getGeoInfofromMAPSVR:location];
+#warning 暂时去掉
+//    //获取起点描述信息，因为百度API如果起点在路上，Step信息可能是是没有这条路的路名的；
+//    mMapView.pWaitPOIResultAnnotation = mMapView.pStartPointAnnotation;
+//    [self getGeoInfofromMAPSVR:location];
 
-    [self CheckPointsSettingCompleted:NO];
-}
-
-//过滤路径，进行拟合判断后写入runningDataset.filteredRouteTrafficList
-- (BOOL) createTrafficInfo2Dataset:(RTTFormatedTrafficFromTSS*) segTraffic withRttgRoadInfo:(RttGRoadInfo*) roadInfo
-{
-    int roadPoincnt = [roadInfo.pointlist count];
-    
-    CLLocationCoordinate2D minRectPoint;
-    CLLocationCoordinate2D maxRectPoint;
-    
-    minRectPoint.longitude = 5000.0;
-    minRectPoint.latitude = 50000.0;
-    maxRectPoint.longitude = 0.0;
-    maxRectPoint.latitude = 0.0;
-
-    for (int i=0; i < roadInfo.pointlist.count; i++)
-    {
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude < minRectPoint.latitude)
-        {
-            minRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
-        }
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude < minRectPoint.longitude)
-        {
-            minRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
-        }
-        
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude > maxRectPoint.latitude)
-        {
-            maxRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
-        }
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude > maxRectPoint.longitude)
-        {
-            maxRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
-        }
-    }
-    
-//    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:0] coordinate]);
-//    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(roadPoincnt-1)] coordinate]);
-    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate(minRectPoint);
-    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate(maxRectPoint);
-
-    
-    BMKMapRect roadRect = [self mapRectMakeFromPoint:&roadPoint1 withPoint:&roadPoint2];
-    
-    CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[2];
-    pPoints[0] = segTraffic.startCoord;
-    pPoints[1] = segTraffic.endCoord;
-//    pPoints[0].latitude = segTraffic.segment.start.lat;
-//    pPoints[0].longitude = segTraffic.segment.start.lng;
-//    pPoints[1].latitude = segTraffic.segment.end.lat;
-//    pPoints[1].longitude = segTraffic.segment.end.lng;
-    
-    
-//#warning FOR TEST        //TEST--YESONGHAI
-//    BMKPointAnnotation *pointAnnotation_11 = [[BMKPointAnnotation alloc] init];
-//    pointAnnotation_11.coordinate = pPoints[0];
-//    NSString *roadst11 =  @"点-1";
-//    pointAnnotation_11.title = roadst11;
-//    [mMapView addAnnotation:pointAnnotation_11];
-//    NSLog(@"拥堵路段: Start=%f, %f", pointAnnotation_11.coordinate.latitude, pointAnnotation_11.coordinate.longitude);
-//    
-//    BMKPointAnnotation *pointAnnotation_12 = [[BMKPointAnnotation alloc] init];
-//    pointAnnotation_12.coordinate = pPoints[1];
-//    NSString *roadst12 =  @"点-2";
-//    pointAnnotation_12.title = roadst12;
-//    [mMapView addAnnotation:pointAnnotation_12];
-//    NSLog(@"拥堵路段: End=%f, %f", pointAnnotation_12.coordinate.latitude, pointAnnotation_12.coordinate.longitude);
-//    
-//    BMKPointAnnotation *pointAnnotation_13 = [[BMKPointAnnotation alloc] init];
-//    pointAnnotation_13.coordinate = ([[roadInfo.pointlist objectAtIndex:0] coordinate]);
-//    NSString *roadst13 =  @"点-R-1";
-//    pointAnnotation_13.title = roadst13;
-//    [mMapView addAnnotation:pointAnnotation_13];
-//    NSLog(@"Road Point: Start=%f, %f", pointAnnotation_13.coordinate.latitude, pointAnnotation_13.coordinate.longitude);
-//    
-//    BMKPointAnnotation *pointAnnotation_14 = [[BMKPointAnnotation alloc] init];
-//    pointAnnotation_14.coordinate = ([[roadInfo.pointlist objectAtIndex:(roadInfo.pointlist.count-1)] coordinate]);
-//    NSString *roadst14 =  @"点-R-2";
-//    pointAnnotation_14.title = roadst14;
-//    [mMapView addAnnotation:pointAnnotation_14];
-//    NSLog(@"Road Point: End=%f, %f", pointAnnotation_14.coordinate.latitude, pointAnnotation_14.coordinate.longitude);
-
-    //ENDTEST
-    
-    BMKMapPoint SegPoint1 = BMKMapPointForCoordinate(pPoints[0]);
-    BMKMapPoint SegPoint2 = BMKMapPointForCoordinate(pPoints[1]);
-    BMKMapRect segRect = [self mapRectMakeFromPoint:&SegPoint1 withPoint:&SegPoint2];
-    
-    BMKMapRect comRect = BMKMapRectIntersection(roadRect, segRect);
-    if (BMKMapRectIsNull(comRect) || BMKMapRectIsEmpty(comRect)) //没有交集
-    {
-        //NSLog(@"没有拟合的矩形");
-        return false; 
-    }
-    else 
-    {
-        //NSLog(@"拟合矩形");
-        BMKMapPoint comPoint1;
-        BMKMapPoint comPoint2;
-        
-        double slope = (pPoints[1].latitude - pPoints[0].latitude)/(pPoints[1].longitude - pPoints[0].longitude);
-        
-        if (slope < 0.0) //正的斜率，取交集矩形最靠近坐标(0,0)的点和对角点; 地图坐标轴是以左上角为原点; 注意经纬度和直角坐标的区别;
-        {
-            if (pPoints[1].latitude < pPoints[0].latitude)
-            {
-                comPoint1 = comRect.origin;
-                comPoint2.x = comRect.origin.x + comRect.size.width;
-                comPoint2.y = comRect.origin.y + comRect.size.height;
-            }
-            else 
-            {
-                comPoint2 = comRect.origin;
-                comPoint1.x = comRect.origin.x + comRect.size.width;
-                comPoint1.y = comRect.origin.y + comRect.size.height;
-            }
-            
-        }
-        else 
-        {
-            if (pPoints[1].latitude > pPoints[0].latitude)
-            {
-                comPoint1.x = comRect.origin.x;
-                comPoint1.y = comRect.origin.y+comRect.size.height;
-                comPoint2.x = comRect.origin.x + comRect.size.width;
-                comPoint2.y = comRect.origin.y;
-            }
-            else 
-            {
-                comPoint2.x = comRect.origin.x;
-                comPoint2.y = comRect.origin.y+comRect.size.height;
-                comPoint1.x = comRect.origin.x + comRect.size.width;
-                comPoint1.y = comRect.origin.y;
-            }
-        }
-        
-        CLLocationDistance cmbRange = BMKMetersBetweenMapPoints(comPoint1, comPoint2);
-        if (cmbRange < 50.0) //避免转弯时路口坐标偏差导致的小段拥堵误报
-        {
-            return false;
-        }
-        
-//#warning FOR TEST        //TEST--YESONGHAI
-//        BMKPointAnnotation *pointAnnotation_1 = [[BMKPointAnnotation alloc] init];
-//        pointAnnotation_1.coordinate = BMKCoordinateForMapPoint(comPoint1);
-//        NSString *roadst1 =  @"C点-1";
-//        pointAnnotation_1.title = roadst1;
-//        [mMapView addAnnotation:pointAnnotation_1];
-//
-//        BMKPointAnnotation *pointAnnotation_2 = [[BMKPointAnnotation alloc] init];
-//        pointAnnotation_2.coordinate = BMKCoordinateForMapPoint(comPoint2);
-//        NSString *roadst2 =  @"C点-2";
-//        pointAnnotation_2.title = roadst2;
-//        [mMapView addAnnotation:pointAnnotation_2];
-//        
-//        CLLocationCoordinate2D *testpoints = new CLLocationCoordinate2D[2];
-//        testpoints[0].latitude = segTraffic.segment.start.lat;
-//        testpoints[0].longitude = segTraffic.segment.start.lng;
-//        testpoints[1].latitude = segTraffic.segment.end.lat;
-//        testpoints[1].longitude = segTraffic.segment.end.lng;
-//        
-//        
-//        BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:testpoints count:2];
-//        polyLine.title = @"test";
-//        [mMapView insertOverlay:polyLine atIndex:2];//放在导航线路下面效果会更好
-//        delete []testpoints;
-//        //ENDTEST
-        
-        
-        //逐段判断路径拟合点并保存
-//        BOOL isStartSegPntMached = NO;
-//        BOOL isEndSegPntMached = NO;
-        RttGTrafficInfo *pTrafficPath = [[RttGTrafficInfo alloc] init];
-        pTrafficPath.roadname = roadInfo.roadname;
-        pTrafficPath.detail = segTraffic.details;
-        pTrafficPath.timeStamp = segTraffic.timestamp;
-
-        
-        BMKMapPoint *roadPointList = new BMKMapPoint[roadPoincnt];
-        for (int icp = 0; icp < roadPoincnt; icp++)
-        {
-            roadPointList[icp] = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:icp] coordinate]);
-        }
-        STPointLineDistInfo stPLDinfoC1;
-        CLLocationDistance distCP1 = getNearestDistanceOfRoad(comPoint1, roadPointList, roadPoincnt, &stPLDinfoC1);
-        
-        STPointLineDistInfo stPLDinfoC2;
-        CLLocationDistance distCP2 = getNearestDistanceOfRoad(comPoint2, roadPointList, roadPoincnt, &stPLDinfoC2);
-        
-        NSLog(@"CP1, IDX=%d, Dist=%f; CP2, IDX=%d, Dist=%f", stPLDinfoC1.pointindex, distCP1, stPLDinfoC2.pointindex, distCP2);
-        
-        if ((distCP1 >= 0.0 && distCP1 <= 100.0) && (distCP2 >= 0.0 && distCP2 <= 100.0))
-        {
-            if (stPLDinfoC1.pointindex <= stPLDinfoC2.pointindex)
-            {
-                //如果拥堵路段比较短，在两个直线的端点之间；则需要判断两个投影点和起始端点的距离，通过这个距离来判断先后顺序（方向）
-                if (stPLDinfoC1.pointindex == stPLDinfoC2.pointindex) 
-                {
-                    BMKMapPoint rdPoint = roadPointList[stPLDinfoC1.pointindex];
-                    CLLocationDistance distancM1 = BMKMetersBetweenMapPoints(stPLDinfoC1.projection, rdPoint);
-                    CLLocationDistance distancM2 = BMKMetersBetweenMapPoints(stPLDinfoC2.projection, rdPoint);
-                    if (distancM1 >= distancM2)
-                    {
-                        return false;
-                    }
-                    
-                }
-                
-                RttGMapPoint *mapPoint = [[RttGMapPoint alloc]init];
-                mapPoint.mappoint = stPLDinfoC1.projection;
-                [pTrafficPath.pointlist addObject:mapPoint];
-                //保存拥堵路段起始点在规划路径中的位置，后续用于提示
-                pTrafficPath.stepIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] stepIndex];
-                pTrafficPath.nextPointIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] pointIndex];
-                
-                
-                //中间路径
-                int iRdPointCnt = (stPLDinfoC2.pointindex - stPLDinfoC1.pointindex);
-                for (int iSPI = 0; iSPI < iRdPointCnt; iSPI++)
-                {
-                    RttGMapPoint *mapPointRd = [[RttGMapPoint alloc]init];
-                    int pointIndexOfRoad = stPLDinfoC1.pointindex + iSPI + 1;
-                    mapPointRd.mappoint = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(pointIndexOfRoad)] coordinate]);
-                    [pTrafficPath.pointlist addObject:mapPointRd];
-                }
-                
-                //终点
-                RttGMapPoint *mapPointE = [[RttGMapPoint alloc]init];
-                mapPointE.mappoint = stPLDinfoC2.projection;
-                [pTrafficPath.pointlist addObject:mapPointE];
-            }
-        }
-        if (pTrafficPath.pointlist.count > 0)
-        {
-            [runningDataset.filteredRouteTrafficList addObject: pTrafficPath];//增加到数据集中
-            //6.0对讯飞支持不好
-            float verValue = deviceVersion.floatValue;
-            if (verValue < 6.0)
-            {
-                NSString *strInfo = [[NSString alloc] initWithFormat:@"最新路况:%@ %@", pTrafficPath.roadname, pTrafficPath.detail];
-                [mSynTTS addTrafficStr:strInfo];
-            }
-        }
-        return TRUE;
-    }
-    
+    [self doRoutePlaning:location end:self.currentlyRouteEndPoint];
+    //[self CheckPointsSettingCompleted:NO];
 }
 
 
-- (BOOL) createTrafficPolylineInfo:(LYSegmentTraffic*) segTraffic withRttgRoadInfo:(RttGRoadInfo*) roadInfo
-{
-    int roadPoincnt = [roadInfo.pointlist count];
-    
-    CLLocationCoordinate2D minRectPoint;
-    CLLocationCoordinate2D maxRectPoint;
-    
-    minRectPoint.longitude = 5000.0;
-    minRectPoint.latitude = 50000.0;
-    maxRectPoint.longitude = 0.0;
-    maxRectPoint.latitude = 0.0;
-    
-    for (int i=0; i < roadInfo.pointlist.count; i++)
-    {
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude < minRectPoint.latitude)
-        {
-            minRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
-        }
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude < minRectPoint.longitude)
-        {
-            minRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
-        }
-        
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].latitude > maxRectPoint.latitude)
-        {
-            maxRectPoint.latitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].latitude;
-        }
-        if ([[roadInfo.pointlist objectAtIndex:i] coordinate].longitude > maxRectPoint.longitude)
-        {
-            maxRectPoint.longitude = [[roadInfo.pointlist objectAtIndex:i] coordinate].longitude;
-        }
-    }
-    
-    //    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:0] coordinate]);
-    //    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(roadPoincnt-1)] coordinate]);
-    BMKMapPoint roadPoint1 = BMKMapPointForCoordinate(minRectPoint);
-    BMKMapPoint roadPoint2 = BMKMapPointForCoordinate(maxRectPoint);
-    
-    
-    BMKMapRect roadRect = [self mapRectMakeFromPoint:&roadPoint1 withPoint:&roadPoint2];
-    
-    CLLocationCoordinate2D *pPoints = new CLLocationCoordinate2D[2];
-    pPoints[0].latitude = segTraffic.segment.start.lat;
-    pPoints[0].longitude = segTraffic.segment.start.lng;
-    pPoints[1].latitude = segTraffic.segment.end.lat;
-    pPoints[1].longitude = segTraffic.segment.end.lng;
-    
-    
-    //#warning FOR TEST        //TEST--YESONGHAI
-    //    BMKPointAnnotation *pointAnnotation_11 = [[BMKPointAnnotation alloc] init];
-    //    pointAnnotation_11.coordinate = pPoints[0];
-    //    NSString *roadst11 =  @"点-1";
-    //    pointAnnotation_11.title = roadst11;
-    //    [mMapView addAnnotation:pointAnnotation_11];
-    //    NSLog(@"拥堵路段: Start=%f, %f", pointAnnotation_11.coordinate.latitude, pointAnnotation_11.coordinate.longitude);
-    //
-    //    BMKPointAnnotation *pointAnnotation_12 = [[BMKPointAnnotation alloc] init];
-    //    pointAnnotation_12.coordinate = pPoints[1];
-    //    NSString *roadst12 =  @"点-2";
-    //    pointAnnotation_12.title = roadst12;
-    //    [mMapView addAnnotation:pointAnnotation_12];
-    //    NSLog(@"拥堵路段: End=%f, %f", pointAnnotation_12.coordinate.latitude, pointAnnotation_12.coordinate.longitude);
-    //
-    //    BMKPointAnnotation *pointAnnotation_13 = [[BMKPointAnnotation alloc] init];
-    //    pointAnnotation_13.coordinate = ([[roadInfo.pointlist objectAtIndex:0] coordinate]);
-    //    NSString *roadst13 =  @"点-R-1";
-    //    pointAnnotation_13.title = roadst13;
-    //    [mMapView addAnnotation:pointAnnotation_13];
-    //    NSLog(@"Road Point: Start=%f, %f", pointAnnotation_13.coordinate.latitude, pointAnnotation_13.coordinate.longitude);
-    //
-    //    BMKPointAnnotation *pointAnnotation_14 = [[BMKPointAnnotation alloc] init];
-    //    pointAnnotation_14.coordinate = ([[roadInfo.pointlist objectAtIndex:(roadInfo.pointlist.count-1)] coordinate]);
-    //    NSString *roadst14 =  @"点-R-2";
-    //    pointAnnotation_14.title = roadst14;
-    //    [mMapView addAnnotation:pointAnnotation_14];
-    //    NSLog(@"Road Point: End=%f, %f", pointAnnotation_14.coordinate.latitude, pointAnnotation_14.coordinate.longitude);
-    
-    //ENDTEST
-    
-    BMKMapPoint SegPoint1 = BMKMapPointForCoordinate(pPoints[0]);
-    BMKMapPoint SegPoint2 = BMKMapPointForCoordinate(pPoints[1]);
-    BMKMapRect segRect = [self mapRectMakeFromPoint:&SegPoint1 withPoint:&SegPoint2];
-    
-    BMKMapRect comRect = BMKMapRectIntersection(roadRect, segRect);
-    if (BMKMapRectIsNull(comRect) || BMKMapRectIsEmpty(comRect)) //没有交集
-    {
-        //NSLog(@"没有拟合的矩形");
-        return false;
-    }
-    else
-    {
-        //NSLog(@"拟合矩形");
-        BMKMapPoint comPoint1;
-        BMKMapPoint comPoint2;
-        
-        double slope = (pPoints[1].latitude - pPoints[0].latitude)/(pPoints[1].longitude - pPoints[0].longitude);
-        
-        if (slope < 0.0) //正的斜率，取交集矩形最靠近坐标(0,0)的点和对角点; 地图坐标轴是以左上角为原点; 注意经纬度和直角坐标的区别;
-        {
-            if (pPoints[1].latitude < pPoints[0].latitude)
-            {
-                comPoint1 = comRect.origin;
-                comPoint2.x = comRect.origin.x + comRect.size.width;
-                comPoint2.y = comRect.origin.y + comRect.size.height;
-            }
-            else
-            {
-                comPoint2 = comRect.origin;
-                comPoint1.x = comRect.origin.x + comRect.size.width;
-                comPoint1.y = comRect.origin.y + comRect.size.height;
-            }
-            
-        }
-        else
-        {
-            if (pPoints[1].latitude > pPoints[0].latitude)
-            {
-                comPoint1.x = comRect.origin.x;
-                comPoint1.y = comRect.origin.y+comRect.size.height;
-                comPoint2.x = comRect.origin.x + comRect.size.width;
-                comPoint2.y = comRect.origin.y;
-            }
-            else
-            {
-                comPoint2.x = comRect.origin.x;
-                comPoint2.y = comRect.origin.y+comRect.size.height;
-                comPoint1.x = comRect.origin.x + comRect.size.width;
-                comPoint1.y = comRect.origin.y;
-            }
-        }
-        
-        CLLocationDistance cmbRange = BMKMetersBetweenMapPoints(comPoint1, comPoint2);
-        if (cmbRange < 50.0) //避免转弯时路口坐标偏差导致的小段拥堵误报
-        {
-            return false;
-        }
-        
-        //#warning FOR TEST        //TEST--YESONGHAI
-        //        BMKPointAnnotation *pointAnnotation_1 = [[BMKPointAnnotation alloc] init];
-        //        pointAnnotation_1.coordinate = BMKCoordinateForMapPoint(comPoint1);
-        //        NSString *roadst1 =  @"C点-1";
-        //        pointAnnotation_1.title = roadst1;
-        //        [mMapView addAnnotation:pointAnnotation_1];
-        //
-        //        BMKPointAnnotation *pointAnnotation_2 = [[BMKPointAnnotation alloc] init];
-        //        pointAnnotation_2.coordinate = BMKCoordinateForMapPoint(comPoint2);
-        //        NSString *roadst2 =  @"C点-2";
-        //        pointAnnotation_2.title = roadst2;
-        //        [mMapView addAnnotation:pointAnnotation_2];
-        //
-        //        CLLocationCoordinate2D *testpoints = new CLLocationCoordinate2D[2];
-        //        testpoints[0].latitude = segTraffic.segment.start.lat;
-        //        testpoints[0].longitude = segTraffic.segment.start.lng;
-        //        testpoints[1].latitude = segTraffic.segment.end.lat;
-        //        testpoints[1].longitude = segTraffic.segment.end.lng;
-        //
-        //
-        //        BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:testpoints count:2];
-        //        polyLine.title = @"test";
-        //        [mMapView insertOverlay:polyLine atIndex:2];//放在导航线路下面效果会更好
-        //        delete []testpoints;
-        //        //ENDTEST
-        
-        
-        //逐段判断路径拟合点并保存
-        //        BOOL isStartSegPntMached = NO;
-        //        BOOL isEndSegPntMached = NO;
-        RttGTrafficInfo *pTrafficPath = [[RttGTrafficInfo alloc] init];
-        pTrafficPath.roadname = roadInfo.roadname;
-        pTrafficPath.detail = segTraffic.details;
-        
-        BMKMapPoint *roadPointList = new BMKMapPoint[roadPoincnt];
-        for (int icp = 0; icp < roadPoincnt; icp++)
-        {
-            roadPointList[icp] = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:icp] coordinate]);
-        }
-        STPointLineDistInfo stPLDinfoC1;
-        CLLocationDistance distCP1 = getNearestDistanceOfRoad(comPoint1, roadPointList, roadPoincnt, &stPLDinfoC1);
-        
-        STPointLineDistInfo stPLDinfoC2;
-        CLLocationDistance distCP2 = getNearestDistanceOfRoad(comPoint2, roadPointList, roadPoincnt, &stPLDinfoC2);
-        
-        NSLog(@"CP1, IDX=%d, Dist=%f; CP2, IDX=%d, Dist=%f", stPLDinfoC1.pointindex, distCP1, stPLDinfoC2.pointindex, distCP2);
-        
-        if ((distCP1 >= 0.0 && distCP1 <= 100.0) && (distCP2 >= 0.0 && distCP2 <= 100.0))
-        {
-            if (stPLDinfoC1.pointindex <= stPLDinfoC2.pointindex)
-            {
-                //如果拥堵路段比较短，在两个直线的端点之间；则需要判断两个投影点和起始端点的距离，通过这个距离来判断先后顺序（方向）
-                if (stPLDinfoC1.pointindex == stPLDinfoC2.pointindex)
-                {
-                    BMKMapPoint rdPoint = roadPointList[stPLDinfoC1.pointindex];
-                    CLLocationDistance distancM1 = BMKMetersBetweenMapPoints(stPLDinfoC1.projection, rdPoint);
-                    CLLocationDistance distancM2 = BMKMetersBetweenMapPoints(stPLDinfoC2.projection, rdPoint);
-                    if (distancM1 >= distancM2)
-                    {
-                        return false;
-                    }
-                    
-                }
-                
-                RttGMapPoint *mapPoint = [[RttGMapPoint alloc]init];
-                mapPoint.mappoint = stPLDinfoC1.projection;
-                [pTrafficPath.pointlist addObject:mapPoint];
-                //保存拥堵路段起始点在规划路径中的位置，后续用于提示
-                pTrafficPath.stepIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] stepIndex];
-                pTrafficPath.nextPointIndex = [[roadInfo.pointlist objectAtIndex:(stPLDinfoC1.pointindex)] pointIndex];
-                
-                
-                //中间路径
-                int iRdPointCnt = (stPLDinfoC2.pointindex - stPLDinfoC1.pointindex);
-                for (int iSPI = 0; iSPI < iRdPointCnt; iSPI++)
-                {
-                    RttGMapPoint *mapPointRd = [[RttGMapPoint alloc]init];
-                    int pointIndexOfRoad = stPLDinfoC1.pointindex + iSPI + 1;
-                    mapPointRd.mappoint = BMKMapPointForCoordinate([[roadInfo.pointlist objectAtIndex:(pointIndexOfRoad)] coordinate]);
-                    [pTrafficPath.pointlist addObject:mapPointRd];
-                }
-                
-                //终点
-                RttGMapPoint *mapPointE = [[RttGMapPoint alloc]init];
-                mapPointE.mappoint = stPLDinfoC2.projection;
-                [pTrafficPath.pointlist addObject:mapPointE];
-            }
-        }
-        if (pTrafficPath.pointlist.count > 0)
-        {
-            [runningDataset.filteredRouteTrafficList addObject: pTrafficPath];//增加到数据集中
-            //6.0对讯飞支持不好
-            float verValue = deviceVersion.floatValue;
-            if (verValue < 6.0)
-            {
-                NSString *strInfo = [[NSString alloc] initWithFormat:@"最新路况:%@ %@", pTrafficPath.roadname, pTrafficPath.detail];
-                [mSynTTS addTrafficStr:strInfo];
-            }
-        }
-        return TRUE;
-    }
-    
-}
-
-- (BMKMapRect) mapRectMakeFromPoint:(BMKMapPoint*) point1 withPoint:(BMKMapPoint*) point2
-{
-    //BMKMapPoint *pointLeftTop = [[BMKMapPoint alloc] init];
-    BMKMapPoint pointLeftTop;
-    pointLeftTop.x = (point1->x < point2->x)? point1->x:point2->x;
-    pointLeftTop.y = (point1->y < point2->y)? point1->y:point2->y;
-    double rectwidth = fabs(point1->x - point2->x);
-    double rectheight = fabs(point1->y - point2->y);
-    
-    return BMKMapRectMake(pointLeftTop.x, pointLeftTop.y, rectwidth, rectheight);
-}
-
-//获取能够抽取出来的路名列表；返回路名的条数，以及在retArray中的字符串对象
-- (int) GetRoadNamesFromBMKRoute:(BMKRoute*) route withRetArray:(NSMutableArray *)retArray
-{
-    if (!retArray)
-    {
-        __autoreleasing NSMutableArray *newArray = [[NSMutableArray alloc] init];
-        retArray = newArray;
-    }
-    
-    
-    //NSString *sRepStr = @"";
-    int iStepCnt = route.steps.count;
-    
-    for (int i = 0; i < iStepCnt; i++)
-    {
-        BMKStep* step = [route.steps objectAtIndex:i];
-        
-        //抽取路名，目前是根据“进入.....——xxKM“的规则来抽取
-        NSString *cmpFirstStr = @"进入";
-        NSString *cmpEndStr = @" - ";
-        
-        NSString *pKeyPtString =  [[NSString alloc] initWithString:step.content];
-        
-        NSRange strRange = [pKeyPtString rangeOfString:cmpFirstStr];
-        int iStrLocation = strRange.location;
-        int iStrLength = strRange.length;
-        
-        if (iStrLength > 0)
-        {
-            strRange = [pKeyPtString rangeOfString:cmpEndStr];
-            
-            if (strRange.length > 0) //存在“进入.........-XXKM”的描述字符，提取路名保存
-            {
-                iStrLocation = iStrLocation + iStrLength;
-                iStrLength = strRange.location - iStrLocation;
-                
-                NSString *string2 = [pKeyPtString substringWithRange:NSMakeRange(iStrLocation, iStrLength)];
-                NSString *strObj = [[NSString alloc] initWithString:string2];
-                
-                //比较路名是否重复，还没实现路名去重的功能(是否合理待考虑）
-                BOOL isRepeated = NO;
-                for (int j=0; j < retArray.count; j++)
-                {
-                    if ( [strObj isEqualToString:((NSString *)[retArray objectAtIndex:j])] )
-                    {
-                        isRepeated = YES;
-                        break;
-                    }
-                }
-                if (!isRepeated)
-                {
-                    [retArray addObject:strObj];
-                }
-            }
-        }
-    }
-    
-    return retArray.count;
-}
-
-- (NSString *) getRoadNameFromStepContent:(NSString *)stepContent
-{
-    NSString *roadName = @"";
-    
-    NSString *cmpFirstStr = @"进入";
-    NSString *cmpEndStr = @" - ";
-    
-    NSString *pKeyPtString =  [[NSString alloc] initWithString:stepContent];
-    NSRange strRange = [pKeyPtString rangeOfString:cmpFirstStr];
-    int iStrLocation = strRange.location;
-    int iStrLength = strRange.length;    
-    if (iStrLength > 0)
-    {
-        strRange = [pKeyPtString rangeOfString:cmpEndStr];
-        
-        if (strRange.length > 0) //存在“进入.........-XXKM”的描述字符，提取路名保存
-        {
-            iStrLocation = iStrLocation + iStrLength;
-            iStrLength = strRange.location - iStrLocation;
-            roadName = [pKeyPtString substringWithRange:NSMakeRange(iStrLocation, iStrLength)];
-        }
-    }
-    
-    __autoreleasing NSString *strObj = [[NSString alloc] initWithString:roadName];
-    return strObj;
-}
-
-- (RTTStepInfo *) getStepInfoFromStepContent:(NSString *)stepContent
-{
-
-    NSString *cmpSpliteStr = @" - ";
-//    NSString *cmpMStr = @"米";
-//    NSString *cmpKMStr = @"公里";
-
-
-    __autoreleasing RTTStepInfo * stepInfo = [[RTTStepInfo alloc] init];
-    stepInfo.discriptionStr = @"";
-    stepInfo.distanceStr = @"";
-    stepInfo.distanceMeter = 0;
-    stepInfo.degree = 0;
-    
-    
-    NSArray *listItems = [stepContent componentsSeparatedByString:cmpSpliteStr];
-
-    if (listItems.count > 1)
-    {
-        stepInfo.discriptionStr = [listItems objectAtIndex:0];
-        stepInfo.distanceStr = [listItems objectAtIndex:1];
-    }
-
-    return stepInfo;
-}
 
 
 - (void) formateRouteInfoandSave:(BMKRoute*) route
@@ -3707,7 +2339,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {
         BMKStep* step = [route.steps objectAtIndex:i];
         
-        NSString *strObj = [self getRoadNameFromStepContent:step.content];
+        NSString *strObj = [RTTMapKit getRoadNameFromStepContent:step.content];
         
         //增加起始路名的处理，百度API上，如果起始点在路上，并且路径很长，只会有“从起点向东南方出发”类似的提示
         if ((i == 0) && (strObj.length <= 0))
@@ -3808,7 +2440,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     {
         BMKStep* step = [route.steps objectAtIndex:i];
         
-        NSString *strObj = [self getRoadNameFromStepContent:step.content];
+        NSString *strObj = [RTTMapKit getRoadNameFromStepContent:step.content];
         
         //增加起始路名的处理，百度API上，如果起始点在路上，并且路径很长，只会有“从起点向东南方出发”类似的提示
         //未处理
@@ -3897,14 +2529,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 }
 
 
-- (void) CheckPointsSettingCompleted: (BOOL)isFromCurrentLocation 
+
+
+- (void) doRoutePlaning:(CLLocationCoordinate2D)startpoint end:(CLLocationCoordinate2D)endpoint
 {
-    
-    if (pStartPointAnnotation && pEndPointAnnotation)
-    {
-        CLLocationCoordinate2D point1 = pStartPointAnnotation.coordinate;
-        CLLocationCoordinate2D point2 = pEndPointAnnotation.coordinate;
-        bool ret = [self RoutePlanning:point1 end:point2];
+        bool ret = [self RouteSearch:startpoint end:endpoint];
         if (!ret)
         {
             NSLog(@"Route Planing Fail!");
@@ -3913,137 +2542,9 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             [self showModeIndicator:@"路况获取中" seconds:10];
             [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
         }
-    }
-    else 
-    {
-        NSLog(@"Not Start or End point!");
-        runningDataset.isPlaned = NO;
-    }
-    
 }
 
 
-- (BOOL) getPositionFromRoute:(BMKRoute *)route withLocation:(CLLocationCoordinate2D) locat 
-              andRetStepIndex:(int *)retStepIndex andretPointsIndex:(int*) retPointsIndex
-{
-    //关键路径点的数目
-    int iStepCnt = runningDataset.drivingRoute.steps.count;
-    
-    //可变数组，用于保存所有关键路径点的信息
-    NSMutableArray *StepIndexs = [[NSMutableArray alloc] init];
-    
-    for (int i = 0; i < (iStepCnt-1); i++) 
-    {
-        BMKStep* step_a = [runningDataset.drivingRoute.steps objectAtIndex:i];
-        BMKStep* step_b = [runningDataset.drivingRoute.steps objectAtIndex:(i+1)];
-        
-        //快速判断是否在大的路径上
-        bool is_inLine = [self isPointInLine:locat withStepA:step_a andStepB:step_b];
-        
-        if (is_inLine)
-        {
-            CandidateSteps *candStep = [[CandidateSteps alloc] init];
-            candStep.index = i;
-            candStep.StPoint = step_a.pt;
-            candStep.EdPoint = step_b.pt;
-            [StepIndexs addObject:candStep];
-        }
-    }
-    
-    if (0 == StepIndexs.count)
-    {
-        //NSLog(@"No Mach of Road");
-        return NO;
-    }
-    
-    BMKMapPoint locationPoint = BMKMapPointForCoordinate(locat);
-    
-    int iRetStepIndex = 0;
-    int iRetPointIndex = 0;
-    STPointLineDistInfo stPLDinfo;
-    CLLocationDistance nearestDist = 99999999999999999.0;
-    
-    for (int i=0; i<StepIndexs.count; i++)
-    {
-        CandidateSteps *candStep = [StepIndexs objectAtIndex:i];
-        int RoutePointIndex = candStep.index+1; //路径点和关键信息提示点在百度地图Routeplan中的Index不一样!
-        
-        int iPointCnt =  [runningDataset.drivingRoute getPointsNum:RoutePointIndex];
-        if (iPointCnt < 1)
-        {
-            continue;
-        }
-        
-        BMKMapPoint *roadPoints = (BMKMapPoint*)[runningDataset.drivingRoute getPoints:RoutePointIndex];
-        CLLocationDistance distOfRoad =  getNearestDistanceOfRoad(locationPoint, roadPoints, iPointCnt, &stPLDinfo);
-        
-        //BMKStep *pStep = [runningDataset.drivingRoute.steps objectAtIndex:(candStep.index)];
-        //NSLog(@"Distance of Road==%@, %f", pStep.content, distOfRoad);
-        
-        if ((distOfRoad >= 0.0) && (distOfRoad < nearestDist))
-        {
-            nearestDist = distOfRoad;
-            iRetStepIndex = candStep.index;
-            iRetPointIndex = stPLDinfo.pointindex;
-        }
-    }
-    
-    *retStepIndex = iRetStepIndex;
-    *retPointsIndex = iRetPointIndex;
-    
-    if ((nearestDist >= 0.0) && (nearestDist <= 50.0) ) //小于50M的范围，在路径上
-    {
-        return YES;
-    }
-    else 
-    {
-        return NO;
-    }
-    
-}
-
-
-
-//快速判断点是否在线段范围内；使用井形判断，在井的四个角就认为不在线段范围内了
-- (bool) isPointInLine:(CLLocationCoordinate2D)location withStepA:(BMKStep*) step_a andStepB:(BMKStep*) step_b
-{
-    bool is_inLine = false;
-    if (step_a.pt.latitude < step_b.pt.latitude)
-    {
-        if ((location.latitude >= step_a.pt.latitude) 
-            && (location.latitude <= step_b.pt.latitude)) 
-        {
-            is_inLine = true;
-        }
-    }
-    else 
-    {
-        if ((location.latitude <= step_a.pt.latitude) 
-            && (location.latitude >= step_b.pt.latitude)) 
-        {
-            is_inLine = true;
-        } 
-    }
-    
-    if (step_a.pt.longitude < step_b.pt.longitude)
-    {
-        if ((location.longitude >= step_a.pt.longitude) 
-            && (location.longitude <= step_b.pt.longitude)) 
-        {
-            is_inLine = true;
-        }
-    }
-    else 
-    {
-        if ((location.longitude <= step_a.pt.longitude) 
-            && (location.longitude >= step_b.pt.longitude)) 
-        {
-            is_inLine = true;
-        }
-    }
-    
-    return is_inLine;
-}
 
 
 
@@ -4153,15 +2654,15 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         switch (routetype) 
         {
             case RTTEN_ACTIVITYTYPE_GETTINGROUTE:
-            {[tssRouteBuild setIdentity:1];}
+            {[tssRouteBuild setIdentity:ROUTECODETEMPROUTE];}
                 break;
                 
             case RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE:
-            {[tssRouteBuild setIdentity:2];}
+            {[tssRouteBuild setIdentity:ROUTECODEGOTOOFFICE];}
                 break;
                 
             case RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE:
-            {[tssRouteBuild setIdentity:3];}
+            {[tssRouteBuild setIdentity:ROUTECODEGOHOME];}
                 break;
                 
             default:
@@ -4222,7 +2723,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         }
         
         NSData *const request = [sendPackage data];
-        NSLog(@"Sending request------------");
+        NSLog(@"Sending request 2 TSS------------");
 #warning FOR TEST 和TSS通信
         [mComm4TSS sendData:request withFlags:0];
     }
@@ -4281,6 +2782,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             
             if (recvPackage.hasTrafficPub)
             {
+                NSLog(@"***************Route ID=%d", recvPackage.trafficPub.routeId);
                 [self didReceiveTrafficPackage:recvPackage.trafficPub];
             }
             else 
@@ -4302,42 +2804,44 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     
     LYCityTraffic *pTrafficInfo = trafficPubPackage.cityTraffic;
     
-#warning FOR TEST 在接受到的拥堵信息上增加测试数据TRAFFIC
-    
-    //    TSS_CityTraffic* pTestTSSTraffic = [self ConstructTSSData];//:(BMKRoute*) routeinfo
-    //    TSS_CityTraffic_Builder *pCityTrafficBuild = [[TSS_CityTraffic_Builder alloc] init];
-    //    [pCityTrafficBuild setCity:@"深圳"];
-    //    [pCityTrafficBuild setRecorded:pTrafficInfo.recorded];
-    //    
-    //    int iTSSSegRdCnt = pTrafficInfo.roadtrafficList.count;
-    //    TSS_RoadTraffic *pAddRdTrc;
-    //    for (int i=0; i<iTSSSegRdCnt; i++)
-    //    {
-    //        pAddRdTrc = [pTrafficInfo.roadtrafficList objectAtIndex:i];
-    //        [pCityTrafficBuild addRoadtraffic:pAddRdTrc];
-    //    }
-    //    
-    //    int iTestSegRdCnt = pTestTSSTraffic.roadtrafficList.count;
-    //    for (int j=0; j<iTestSegRdCnt; j++)
-    //    {
-    //        pAddRdTrc = [pTestTSSTraffic.roadtrafficList objectAtIndex:j];
-    //        [pCityTrafficBuild addRoadtraffic:pAddRdTrc];
-    //    }
-    //    
-    //    TSS_CityTraffic *pComTrafficInfo = [pCityTrafficBuild build];
-    //    pTrafficInfo = pComTrafficInfo;
-    //    //END TEST
-    
-    
-    
-    //citytraffic4me = pTrafficInfo;
-    //[runningDataset setCityTraffic4Me:pTrafficInfo];
-    
 #warning 编码调试中...............
-    //[self AddTrafficOverlay:pTrafficInfo];
-    [self formatAndSaveTrafficData:pTrafficInfo];
+    switch (trafficPubPackage.routeId)
+    {
+        case TRAFFICTYPEHOT:
+        {
+            [self formatAndSaveTrafficData4Hot:pTrafficInfo];
+        }
+            break;
+            
+        case TRAFFICTYPEOFFICE:
+        {
+            //[self formatAndSaveTrafficData4Route:pTrafficInfo];
+
+        }
+            break;
+
+        case TRAFFICTYPEHOME:
+        {
+            //[self formatAndSaveTrafficData4Route:pTrafficInfo];
+
+        }
+            break;
+
+        case TRAFFICTYPETEMP:
+        {
+            [self formatAndSaveTrafficData4Route:pTrafficInfo];
+        }
+            break;
+            
+        default:
+        {
+            //
+        }
+            break;
+    }
     
     [self CheckAndUpdateTrafficListView];
+    [self setDestinationTrafficSegCnt:runningDataset.trafficContainer.filteredRouteTrafficList.count];
 
     
 #warning LOG-TRAFFIC
@@ -4388,6 +2892,7 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         {
             RTTTrafficListViewController *pTrafficCtrl = (RTTTrafficListViewController*)pCtrlinQue;
             [pTrafficCtrl.trafficListTBL reloadData];
+            [pTrafficCtrl getDatasourceFromRunningDataSet];
             NSLog(@"UpdateTrafficListView.........");
         }
     }
@@ -4824,12 +3329,12 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
     //上班时间段
     if (hour >= 2 && hour < 12)
     {
-        if (runningDataset.currentlyRoute != GOTOOFFICE)
+        if (runningDataset.currentlyRoute != ROUTECODEGOTOOFFICE)
         {
             //re-planing
             NSLog(@"Replaning to Office");
-            [self routePlantoOffice];
-            runningDataset.currentlyRoute = GOTOOFFICE;
+            [self routePlanCurLoctoOffice];
+            runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
         }
         else {
             if (runningDataset.isPlaned)
@@ -4838,18 +3343,18 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
                 [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
             }
             else {
-                [self routePlantoOffice];
-                runningDataset.currentlyRoute = GOTOOFFICE;
+                [self routePlanCurLoctoOffice];
+                runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
             }
         }
     }
     else //下班
     {
-        if (runningDataset.currentlyRoute != GOHOME)
+        if (runningDataset.currentlyRoute != ROUTECODEGOHOME)
         {
             //re-planing
-            [self routePlantoHome];
-            runningDataset.currentlyRoute = GOHOME;
+            [self routePlanCurLoctoHome];
+            runningDataset.currentlyRoute = ROUTECODEGOHOME;
         }
         else {
             if (runningDataset.isPlaned)
@@ -4859,8 +3364,8 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
             }
             else {
                 //re-planing
-                [self routePlantoHome];
-                runningDataset.currentlyRoute = GOHOME;
+                [self routePlanCurLoctoHome];
+                runningDataset.currentlyRoute = ROUTECODEGOHOME;
             }
         }
     }
@@ -4874,21 +3379,11 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
 {
     if (runningDataset.homeAddrInfo == nil)
     {
-        NSLog(@"家庭地址未设置");
+        NSLog(@"公司地址未设置");
         return;
     }
     
-    if (pStartPointAnnotation != nil){
-        [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
-    if (pEndPointAnnotation != nil){
-        [mMapView removeAnnotation:pEndPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
-    
-    pStartPointAnnotation = [self addAnnotation2Map:runningDataset.homeAddrInfo.pt withType:MAPPOINTTYPE_START];
-    pEndPointAnnotation = [self addAnnotation2Map:runningDataset.officeAddrInfo.pt withType:MAPPOINTTYPE_END];
-    
-    [self CheckPointsSettingCompleted:NO];
+    [self doRoutePlaning:runningDataset.homeAddrInfo.pt  end:runningDataset.officeAddrInfo.pt];
 
 }
 
@@ -4900,21 +3395,44 @@ CLLocationDistance getNearestDistanceOfRoad(BMKMapPoint LoctionPoint, BMKMapPoin
         return;
     }
     
-    if (pStartPointAnnotation != nil){
-        [mMapView removeAnnotation:pStartPointAnnotation]; //地图上只保留一个起始点或者终点
+    [self doRoutePlaning:runningDataset.officeAddrInfo.pt  end:runningDataset.homeAddrInfo.pt];
+}
+
+- (void) routePlanCurLoctoHome
+{    
+    if (runningDataset.homeAddrInfo == nil)
+    {
+        //NSLog(@"家庭地址未设置\n请通过搜索或者长按地图上对应的地址进行设置");
+        return;
     }
-    if (pEndPointAnnotation != nil){
-        [mMapView removeAnnotation:pEndPointAnnotation]; //地图上只保留一个起始点或者终点
-    }
+    [mSwipeBar toggle:NO];
+
     
-    pStartPointAnnotation = [self addAnnotation2Map:runningDataset.officeAddrInfo.pt withType:MAPPOINTTYPE_START];
-    pEndPointAnnotation = [self addAnnotation2Map:runningDataset.homeAddrInfo.pt withType:MAPPOINTTYPE_END];
-    
-    [self CheckPointsSettingCompleted:NO];
+    self.currentlyRouteEndAddr = @"回家路况";
+    CLLocationCoordinate2D curLoc =  [mMapView getCurLocation];
+    [self doRoutePlaning:curLoc  end:runningDataset.homeAddrInfo.pt];
+
     
 }
 
+- (void) routePlanCurLoctoOffice
+{
+    if (runningDataset.officeAddrInfo == nil)
+    {
+        //NSLog(@"办公室地址未设置\n请通过搜索或者长按地图上对应的地址进行设置");
+        return;
+    }
+    [mSwipeBar toggle:NO];
+    
+    self.currentlyRouteEndAddr = @"上班路况";
+    CLLocationCoordinate2D curLoc =  [mMapView getCurLocation];
+    [self doRoutePlaning:curLoc  end:runningDataset.officeAddrInfo.pt];
+}
 
-
+- (void) routePlanCurLoctoTemp:(CLLocationCoordinate2D) endLoc
+{
+    CLLocationCoordinate2D curLoc =  [mMapView getCurLocation];
+    [self doRoutePlaning:curLoc  end:endLoc];
+}
 
 @end

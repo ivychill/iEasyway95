@@ -22,7 +22,8 @@
     NSOperationQueue *rttThreadQue; 
 }
 
-- (id) initWithEndpoint:(NSString*) endpoint delegate:(NSObject <RttGTSSCommunication> *) delegate;
+//- (id) initWithEndpoint:(NSString*) endpoint delegate:(NSObject <RttGTSSCommunication> *) delegate;
+- (id) initWithEndpoint:(NSString*) endpoint uuID:(NSString*)uuID delegate:(NSObject <RttGTSSCommunication> *) delegate;
 - (BOOL)sendData:(NSData *)messageData withFlags:(ZMQMessageSendFlags)flags;
 
 

@@ -81,9 +81,15 @@
 
 - (IBAction)didStart2Use:(id)sender 
 {
+    //保存浏览过介绍页面的记录
+    NSString *strReaded = @"YES";
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    [saveDefaults setObject:strReaded forKey:@"isReadedIntroPage"];
+    [saveDefaults synchronize];
+    
     [self.navigationController popViewControllerAnimated:YES];
     
-    [delegate didHomeAddrReset:sender];
+    //[delegate didHomeAddrReset:sender];
 }
 
 - (IBAction)didSwipeLeft:(id)sender 

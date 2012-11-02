@@ -8,7 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		84037CDA1612F00A00717FC3 /* RTTTrafficTTSPlayRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 84037CD91612F00A00717FC3 /* RTTTrafficTTSPlayRecord.m */; };
+		841662EC163B78E6001CCFC9 /* closeBTN.png in Resources */ = {isa = PBXBuildFile; fileRef = 841662EA163B78E6001CCFC9 /* closeBTN.png */; };
+		841662ED163B78E6001CCFC9 /* closeBTN@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 841662EB163B78E6001CCFC9 /* closeBTN@2x.png */; };
+		841CE787163A74090002FDDA /* RTTSearchBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 841CE786163A74080002FDDA /* RTTSearchBar.xib */; };
+		841CE78A163A793A0002FDDA /* RTTSearchBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 841CE789163A793A0002FDDA /* RTTSearchBarView.m */; };
 		841EF8D315D4A0F70067ED4A /* Tss.pb.m in Sources */ = {isa = PBXBuildFile; fileRef = 841EF8D215D4A0F70067ED4A /* Tss.pb.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8426DFCC1640C12500A5F5D3 /* RTTTrafficContainer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8426DFCB1640C12500A5F5D3 /* RTTTrafficContainer.mm */; };
+		8426DFCF1640C15700A5F5D3 /* RTTRouteContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8426DFCE1640C15700A5F5D3 /* RTTRouteContainer.m */; };
+		8426DFD51640C81B00A5F5D3 /* RTTMapKit.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8426DFD41640C81B00A5F5D3 /* RTTMapKit.mm */; };
 		8437729615C9159300F807FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437729515C9159300F807FD /* UIKit.framework */; };
 		8437729815C9159300F807FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437729715C9159300F807FD /* Foundation.framework */; };
 		8437729A15C9159300F807FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437729915C9159300F807FD /* CoreGraphics.framework */; };
@@ -34,16 +41,12 @@
 		845317A315D4F239001C5F27 /* mapapi.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 845317A215D4F239001C5F27 /* mapapi.bundle */; };
 		845317A715D4FDCF001C5F27 /* RTTMapPointSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 845317A515D4FDCF001C5F27 /* RTTMapPointSettingViewController.m */; };
 		845317A815D4FDCF001C5F27 /* RTTMapPointSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 845317A615D4FDCF001C5F27 /* RTTMapPointSettingViewController.xib */; };
-		845317D115D6C354001C5F27 /* RTTRoutePreviewViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 845317CF15D6C354001C5F27 /* RTTRoutePreviewViewController.mm */; };
-		845317D215D6C354001C5F27 /* RTTRoutePreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 845317D015D6C354001C5F27 /* RTTRoutePreviewViewController.xib */; };
-		845317DF15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 845317DD15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.m */; };
-		845317E015D8ABEA001C5F27 /* RTTRouteBookmarkViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 845317DE15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.xib */; };
 		845B1E3D15ECEEF000AD7CCE /* trafficBTNv3.png in Resources */ = {isa = PBXBuildFile; fileRef = 845B1E3B15ECEEF000AD7CCE /* trafficBTNv3.png */; };
 		845B1E3E15ECEEF000AD7CCE /* trafficBTNv3@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 845B1E3C15ECEEF000AD7CCE /* trafficBTNv3@2x.png */; };
 		84640D3215CA2A6500F06CE9 /* BaiduMapApi_Lib_iOS_1.2.1 in Resources */ = {isa = PBXBuildFile; fileRef = 84640D3115CA2A6500F06CE9 /* BaiduMapApi_Lib_iOS_1.2.1 */; };
 		84640D3415CA308A00F06CE9 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84640D3315CA308A00F06CE9 /* CoreLocation.framework */; };
 		84640D3615CA309C00F06CE9 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84640D3515CA309C00F06CE9 /* QuartzCore.framework */; };
-		84640D4915CA354D00F06CE9 /* RTTMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84640D4815CA354D00F06CE9 /* RTTMapView.m */; };
+		84640D4915CA354D00F06CE9 /* RTTMapView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84640D4815CA354D00F06CE9 /* RTTMapView.mm */; };
 		84640D4C15CA536200F06CE9 /* ZMQ in Resources */ = {isa = PBXBuildFile; fileRef = 84640D4B15CA536200F06CE9 /* ZMQ */; };
 		846F7DD015F6F26000BD0B12 /* RTTComm4TSS.m in Sources */ = {isa = PBXBuildFile; fileRef = 846F7DCF15F6F26000BD0B12 /* RTTComm4TSS.m */; };
 		847BCBB915FDE48400D50D67 /* Instro-1.png in Resources */ = {isa = PBXBuildFile; fileRef = 847BCBB115FDE48400D50D67 /* Instro-1.png */; };
@@ -58,10 +61,10 @@
 		847BCBC415FDEC7C00D50D67 /* BegintoUse@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 847BCBC215FDEC7C00D50D67 /* BegintoUse@2x.png */; };
 		847BCBC715FF0E4100D50D67 /* Staruppage.png in Resources */ = {isa = PBXBuildFile; fileRef = 847BCBC515FF0E4100D50D67 /* Staruppage.png */; };
 		847BCBC815FF0E4100D50D67 /* Staruppage@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 847BCBC615FF0E4100D50D67 /* Staruppage@2x.png */; };
+		849C5359163BBD4300B4E2B9 /* RTTPrefSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849C5357163BBD4300B4E2B9 /* RTTPrefSettingViewController.m */; };
+		849C535A163BBD4300B4E2B9 /* RTTPrefSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 849C5358163BBD4300B4E2B9 /* RTTPrefSettingViewController.xib */; };
 		84A8CDD21611615F00F00508 /* RTTSynthesizeTTS.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8CDD11611615F00F00508 /* RTTSynthesizeTTS.m */; };
 		84A8CDD5161164CD00F00508 /* RTTSynTTSOpr.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8CDD4161164CD00F00508 /* RTTSynTTSOpr.m */; };
-		84A8CDEB16117ECC00F00508 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8CDEA16117ECC00F00508 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		84A8CDEF16117EF100F00508 /* iFlyTTS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A8CDED16117EF100F00508 /* iFlyTTS.framework */; };
 		84A8CDF116117F4600F00508 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A8CDF016117F4600F00508 /* AudioToolbox.framework */; };
 		84A8CDF316117F7500F00508 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A8CDF216117F7500F00508 /* SystemConfiguration.framework */; };
 		84A8CDF516117F7F00F00508 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84A8CDF416117F7F00F00508 /* CFNetwork.framework */; };
@@ -83,6 +86,8 @@
 		84CAD01215CFA2B200C24EDB /* button_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84CAD01015CFA2B200C24EDB /* button_bg@2x.png */; };
 		84CAD01615CFA9BD00C24EDB /* RTTToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CAD01515CFA9BD00C24EDB /* RTTToolbarView.m */; };
 		84CAD01815CFABA200C24EDB /* RTTToolbarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84CAD01715CFABA200C24EDB /* RTTToolbarView.xib */; };
+		84CAD783163A630700BEE7F7 /* searchBTN.png in Resources */ = {isa = PBXBuildFile; fileRef = 84CAD781163A630700BEE7F7 /* searchBTN.png */; };
+		84CAD784163A630700BEE7F7 /* searchBTN@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84CAD782163A630700BEE7F7 /* searchBTN@2x.png */; };
 		84D3BC6615DE9AA900F2CFBD /* RTTTrafficListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D3BC6415DE9AA900F2CFBD /* RTTTrafficListViewController.m */; };
 		84D3BC6715DE9AA900F2CFBD /* RTTTrafficListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84D3BC6515DE9AA900F2CFBD /* RTTTrafficListViewController.xib */; };
 		84D7446215ECB3F200672FF3 /* accountSetting.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D7445E15ECB3F200672FF3 /* accountSetting.png */; };
@@ -99,6 +104,9 @@
 		84D7447715ECDC4100672FF3 /* ButtomBarmap@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D7447515ECDC4100672FF3 /* ButtomBarmap@2x.png */; };
 		84D7447A15ECE05C00672FF3 /* arrowlogov2.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D7447815ECE05B00672FF3 /* arrowlogov2.png */; };
 		84D7447B15ECE05C00672FF3 /* arrowlogov2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D7447915ECE05C00672FF3 /* arrowlogov2@2x.png */; };
+		84DBA7C1163E27CC000CA13A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DBA7C0163E27CC000CA13A /* Default-568h@2x.png */; };
+		84DBA7C4163E721B000CA13A /* Grip.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DBA7C2163E721B000CA13A /* Grip.png */; };
+		84DBA7C5163E721B000CA13A /* Grip@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DBA7C3163E721B000CA13A /* Grip@2x.png */; };
 		84DBB4B915DDCB0B00AA9D08 /* RTTHomeAddrViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DBB4B715DDCB0B00AA9D08 /* RTTHomeAddrViewController.m */; };
 		84DBB4BA15DDCB0B00AA9D08 /* RTTHomeAddrViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84DBB4B815DDCB0B00AA9D08 /* RTTHomeAddrViewController.xib */; };
 		84DBB4BD15DDF42A00AA9D08 /* homelogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DBB4BB15DDF42A00AA9D08 /* homelogo.png */; };
@@ -110,14 +118,8 @@
 		84E9D1AE15D9FAAF004A885F /* Location.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1AD15D9FAAF004A885F /* Location.gpx */; };
 		84E9D1BA15DA5204004A885F /* RTTSuggestionListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9D1B815DA5203004A885F /* RTTSuggestionListViewController.m */; };
 		84E9D1BB15DA5204004A885F /* RTTSuggestionListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1B915DA5204004A885F /* RTTSuggestionListViewController.xib */; };
-		84E9D1BE15DC1370004A885F /* RTTTopBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9D1BD15DC1370004A885F /* RTTTopBarView.m */; };
-		84E9D1C015DC13CD004A885F /* RTTTopBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1BF15DC13CC004A885F /* RTTTopBarView.xib */; };
 		84E9D1C315DC141E004A885F /* toptoolbar_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1C115DC141E004A885F /* toptoolbar_bg.png */; };
 		84E9D1C415DC141E004A885F /* toptoolbar_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1C215DC141E004A885F /* toptoolbar_bg@2x.png */; };
-		84E9D1C815DC23EF004A885F /* RTTAccountSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9D1C615DC23EE004A885F /* RTTAccountSettingViewController.m */; };
-		84E9D1C915DC23EF004A885F /* RTTAccountSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1C715DC23EF004A885F /* RTTAccountSettingViewController.xib */; };
-		84E9D1CD15DC24E8004A885F /* RTTHomeAddressViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9D1CB15DC24E7004A885F /* RTTHomeAddressViewController.m */; };
-		84E9D1CE15DC24E8004A885F /* RTTHomeAddressViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1CC15DC24E8004A885F /* RTTHomeAddressViewController.xib */; };
 		84E9D1D215DC635C004A885F /* RTTTrafficBriefViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9D1D015DC635B004A885F /* RTTTrafficBriefViewController.m */; };
 		84E9D1D315DC635C004A885F /* RTTTrafficBriefViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1D115DC635C004A885F /* RTTTrafficBriefViewController.xib */; };
 		84E9D1D715DC89B6004A885F /* iconroad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84E9D1D515DC89B6004A885F /* iconroad@2x.png */; };
@@ -138,6 +140,13 @@
 		84EC8CA915E1542C0048B89B /* RTTIntroPageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC8CA715E1542C0048B89B /* RTTIntroPageViewController.xib */; };
 		84EC8CB215E1BE450048B89B /* RTTAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EC8CB015E1BE440048B89B /* RTTAccountViewController.m */; };
 		84EC8CB315E1BE450048B89B /* RTTAccountViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC8CB115E1BE450048B89B /* RTTAccountViewController.xib */; };
+		84F5FB63164269DC007C5668 /* iFlyMSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F5FB60164269DC007C5668 /* iFlyMSC.framework */; };
+		84F5FB64164269DC007C5668 /* JSON in Resources */ = {isa = PBXBuildFile; fileRef = 84F5FB61164269DC007C5668 /* JSON */; };
+		84F5FB691642779A007C5668 /* ButtomBarTranparant@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F5FB671642779A007C5668 /* ButtomBarTranparant@2x.png */; };
+		84F5FB6B164277BF007C5668 /* ButtomBarTranparant.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F5FB6A164277BF007C5668 /* ButtomBarTranparant.png */; };
+		84F5FB751642A77B007C5668 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F5FB741642A77B007C5668 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		84F5FB781643B693007C5668 /* GripBlue.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F5FB761643B693007C5668 /* GripBlue.png */; };
+		84F5FB791643B693007C5668 /* GripBlue@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84F5FB771643B693007C5668 /* GripBlue@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,8 +183,19 @@
 /* Begin PBXFileReference section */
 		84037CD81612F00A00717FC3 /* RTTTrafficTTSPlayRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTTrafficTTSPlayRecord.h; sourceTree = "<group>"; };
 		84037CD91612F00A00717FC3 /* RTTTrafficTTSPlayRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTTrafficTTSPlayRecord.m; sourceTree = "<group>"; };
+		841662EA163B78E6001CCFC9 /* closeBTN.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = closeBTN.png; sourceTree = "<group>"; };
+		841662EB163B78E6001CCFC9 /* closeBTN@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "closeBTN@2x.png"; sourceTree = "<group>"; };
+		841CE786163A74080002FDDA /* RTTSearchBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTSearchBar.xib; sourceTree = "<group>"; };
+		841CE788163A79390002FDDA /* RTTSearchBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTSearchBarView.h; sourceTree = "<group>"; };
+		841CE789163A793A0002FDDA /* RTTSearchBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTSearchBarView.m; sourceTree = "<group>"; };
 		841EF8D115D4A0F70067ED4A /* Tss.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tss.pb.h; sourceTree = "<group>"; };
 		841EF8D215D4A0F70067ED4A /* Tss.pb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tss.pb.m; sourceTree = "<group>"; };
+		8426DFCA1640C12400A5F5D3 /* RTTTrafficContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTTrafficContainer.h; sourceTree = "<group>"; };
+		8426DFCB1640C12500A5F5D3 /* RTTTrafficContainer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTTTrafficContainer.mm; sourceTree = "<group>"; };
+		8426DFCD1640C15700A5F5D3 /* RTTRouteContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTRouteContainer.h; sourceTree = "<group>"; };
+		8426DFCE1640C15700A5F5D3 /* RTTRouteContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTRouteContainer.m; sourceTree = "<group>"; };
+		8426DFD31640C81B00A5F5D3 /* RTTMapKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTMapKit.h; sourceTree = "<group>"; };
+		8426DFD41640C81B00A5F5D3 /* RTTMapKit.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTTMapKit.mm; sourceTree = "<group>"; };
 		8437729115C9159300F807FD /* Easyway95.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Easyway95.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8437729515C9159300F807FD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		8437729715C9159300F807FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -209,12 +229,6 @@
 		845317A415D4FDCF001C5F27 /* RTTMapPointSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTMapPointSettingViewController.h; sourceTree = "<group>"; };
 		845317A515D4FDCF001C5F27 /* RTTMapPointSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTMapPointSettingViewController.m; sourceTree = "<group>"; };
 		845317A615D4FDCF001C5F27 /* RTTMapPointSettingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTMapPointSettingViewController.xib; sourceTree = "<group>"; };
-		845317CE15D6C354001C5F27 /* RTTRoutePreviewViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTRoutePreviewViewController.h; sourceTree = "<group>"; };
-		845317CF15D6C354001C5F27 /* RTTRoutePreviewViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTTRoutePreviewViewController.mm; sourceTree = "<group>"; };
-		845317D015D6C354001C5F27 /* RTTRoutePreviewViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTRoutePreviewViewController.xib; sourceTree = "<group>"; };
-		845317DC15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTRouteBookmarkViewController.h; sourceTree = "<group>"; };
-		845317DD15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTRouteBookmarkViewController.m; sourceTree = "<group>"; };
-		845317DE15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTRouteBookmarkViewController.xib; sourceTree = "<group>"; };
 		845317E115D8ACED001C5F27 /* RTTVCDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RTTVCDelegate.h; sourceTree = "<group>"; };
 		845B1E3B15ECEEF000AD7CCE /* trafficBTNv3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trafficBTNv3.png; sourceTree = "<group>"; };
 		845B1E3C15ECEEF000AD7CCE /* trafficBTNv3@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trafficBTNv3@2x.png"; sourceTree = "<group>"; };
@@ -222,7 +236,7 @@
 		84640D3315CA308A00F06CE9 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		84640D3515CA309C00F06CE9 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		84640D4715CA354D00F06CE9 /* RTTMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTMapView.h; sourceTree = "<group>"; };
-		84640D4815CA354D00F06CE9 /* RTTMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTMapView.m; sourceTree = "<group>"; };
+		84640D4815CA354D00F06CE9 /* RTTMapView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTTMapView.mm; sourceTree = "<group>"; };
 		84640D4B15CA536200F06CE9 /* ZMQ */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ZMQ; sourceTree = "<group>"; };
 		846F7DCE15F6F26000BD0B12 /* RTTComm4TSS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTComm4TSS.h; sourceTree = "<group>"; };
 		846F7DCF15F6F26000BD0B12 /* RTTComm4TSS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTComm4TSS.m; sourceTree = "<group>"; };
@@ -238,13 +252,13 @@
 		847BCBC215FDEC7C00D50D67 /* BegintoUse@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "BegintoUse@2x.png"; path = "Easyway/BegintoUse@2x.png"; sourceTree = "<group>"; };
 		847BCBC515FF0E4100D50D67 /* Staruppage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Staruppage.png; sourceTree = "<group>"; };
 		847BCBC615FF0E4100D50D67 /* Staruppage@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Staruppage@2x.png"; sourceTree = "<group>"; };
+		849C5356163BBD4300B4E2B9 /* RTTPrefSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTPrefSettingViewController.h; sourceTree = "<group>"; };
+		849C5357163BBD4300B4E2B9 /* RTTPrefSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTPrefSettingViewController.m; sourceTree = "<group>"; };
+		849C5358163BBD4300B4E2B9 /* RTTPrefSettingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTPrefSettingViewController.xib; sourceTree = "<group>"; };
 		84A8CDD01611615F00F00508 /* RTTSynthesizeTTS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTSynthesizeTTS.h; sourceTree = "<group>"; };
 		84A8CDD11611615F00F00508 /* RTTSynthesizeTTS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTSynthesizeTTS.m; sourceTree = "<group>"; };
 		84A8CDD3161164CD00F00508 /* RTTSynTTSOpr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTSynTTSOpr.h; sourceTree = "<group>"; };
 		84A8CDD4161164CD00F00508 /* RTTSynTTSOpr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTSynTTSOpr.m; sourceTree = "<group>"; };
-		84A8CDE916117ECC00F00508 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		84A8CDEA16117ECC00F00508 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		84A8CDED16117EF100F00508 /* iFlyTTS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = iFlyTTS.framework; sourceTree = "<group>"; };
 		84A8CDF016117F4600F00508 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		84A8CDF216117F7500F00508 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		84A8CDF416117F7F00F00508 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -276,6 +290,8 @@
 		84CAD01415CFA9BD00C24EDB /* RTTToolbarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTToolbarView.h; sourceTree = "<group>"; };
 		84CAD01515CFA9BD00C24EDB /* RTTToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTToolbarView.m; sourceTree = "<group>"; };
 		84CAD01715CFABA200C24EDB /* RTTToolbarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTToolbarView.xib; sourceTree = "<group>"; };
+		84CAD781163A630700BEE7F7 /* searchBTN.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = searchBTN.png; sourceTree = "<group>"; };
+		84CAD782163A630700BEE7F7 /* searchBTN@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "searchBTN@2x.png"; sourceTree = "<group>"; };
 		84D3BC6315DE9AA900F2CFBD /* RTTTrafficListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTTrafficListViewController.h; sourceTree = "<group>"; };
 		84D3BC6415DE9AA900F2CFBD /* RTTTrafficListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTTrafficListViewController.m; sourceTree = "<group>"; };
 		84D3BC6515DE9AA900F2CFBD /* RTTTrafficListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTTrafficListViewController.xib; sourceTree = "<group>"; };
@@ -293,6 +309,9 @@
 		84D7447515ECDC4100672FF3 /* ButtomBarmap@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ButtomBarmap@2x.png"; sourceTree = "<group>"; };
 		84D7447815ECE05B00672FF3 /* arrowlogov2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arrowlogov2.png; sourceTree = "<group>"; };
 		84D7447915ECE05C00672FF3 /* arrowlogov2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "arrowlogov2@2x.png"; sourceTree = "<group>"; };
+		84DBA7C0163E27CC000CA13A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		84DBA7C2163E721B000CA13A /* Grip.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Grip.png; path = ../../ProjectPictures/Grip.png; sourceTree = "<group>"; };
+		84DBA7C3163E721B000CA13A /* Grip@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Grip@2x.png"; path = "../../ProjectPictures/Grip@2x.png"; sourceTree = "<group>"; };
 		84DBB4B615DDCB0B00AA9D08 /* RTTHomeAddrViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTHomeAddrViewController.h; sourceTree = "<group>"; };
 		84DBB4B715DDCB0B00AA9D08 /* RTTHomeAddrViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTHomeAddrViewController.m; sourceTree = "<group>"; };
 		84DBB4B815DDCB0B00AA9D08 /* RTTHomeAddrViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTHomeAddrViewController.xib; sourceTree = "<group>"; };
@@ -307,17 +326,8 @@
 		84E9D1B715DA5203004A885F /* RTTSuggestionListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTSuggestionListViewController.h; sourceTree = "<group>"; };
 		84E9D1B815DA5203004A885F /* RTTSuggestionListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTSuggestionListViewController.m; sourceTree = "<group>"; };
 		84E9D1B915DA5204004A885F /* RTTSuggestionListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTSuggestionListViewController.xib; sourceTree = "<group>"; };
-		84E9D1BC15DC136F004A885F /* RTTTopBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTTopBarView.h; sourceTree = "<group>"; };
-		84E9D1BD15DC1370004A885F /* RTTTopBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTTopBarView.m; sourceTree = "<group>"; };
-		84E9D1BF15DC13CC004A885F /* RTTTopBarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTTopBarView.xib; sourceTree = "<group>"; };
 		84E9D1C115DC141E004A885F /* toptoolbar_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = toptoolbar_bg.png; sourceTree = "<group>"; };
 		84E9D1C215DC141E004A885F /* toptoolbar_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "toptoolbar_bg@2x.png"; sourceTree = "<group>"; };
-		84E9D1C515DC23EE004A885F /* RTTAccountSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTAccountSettingViewController.h; sourceTree = "<group>"; };
-		84E9D1C615DC23EE004A885F /* RTTAccountSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTAccountSettingViewController.m; sourceTree = "<group>"; };
-		84E9D1C715DC23EF004A885F /* RTTAccountSettingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTAccountSettingViewController.xib; sourceTree = "<group>"; };
-		84E9D1CA15DC24E7004A885F /* RTTHomeAddressViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTHomeAddressViewController.h; sourceTree = "<group>"; };
-		84E9D1CB15DC24E7004A885F /* RTTHomeAddressViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTHomeAddressViewController.m; sourceTree = "<group>"; };
-		84E9D1CC15DC24E8004A885F /* RTTHomeAddressViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTHomeAddressViewController.xib; sourceTree = "<group>"; };
 		84E9D1CF15DC635A004A885F /* RTTTrafficBriefViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTTrafficBriefViewController.h; sourceTree = "<group>"; };
 		84E9D1D015DC635B004A885F /* RTTTrafficBriefViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTTrafficBriefViewController.m; sourceTree = "<group>"; };
 		84E9D1D115DC635C004A885F /* RTTTrafficBriefViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTTrafficBriefViewController.xib; sourceTree = "<group>"; };
@@ -341,6 +351,14 @@
 		84EC8CAF15E1BE440048B89B /* RTTAccountViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTTAccountViewController.h; sourceTree = "<group>"; };
 		84EC8CB015E1BE440048B89B /* RTTAccountViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RTTAccountViewController.m; sourceTree = "<group>"; };
 		84EC8CB115E1BE450048B89B /* RTTAccountViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RTTAccountViewController.xib; sourceTree = "<group>"; };
+		84F5FB60164269DC007C5668 /* iFlyMSC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = iFlyMSC.framework; sourceTree = "<group>"; };
+		84F5FB61164269DC007C5668 /* JSON */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JSON; sourceTree = "<group>"; };
+		84F5FB671642779A007C5668 /* ButtomBarTranparant@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ButtomBarTranparant@2x.png"; sourceTree = "<group>"; };
+		84F5FB6A164277BF007C5668 /* ButtomBarTranparant.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ButtomBarTranparant.png; sourceTree = "<group>"; };
+		84F5FB731642A77B007C5668 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Reachability/Reachability.h; sourceTree = "<group>"; };
+		84F5FB741642A77B007C5668 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Reachability/Reachability.m; sourceTree = "<group>"; };
+		84F5FB761643B693007C5668 /* GripBlue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GripBlue.png; sourceTree = "<group>"; };
+		84F5FB771643B693007C5668 /* GripBlue@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GripBlue@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -357,7 +375,7 @@
 				8437729615C9159300F807FD /* UIKit.framework in Frameworks */,
 				8437729815C9159300F807FD /* Foundation.framework in Frameworks */,
 				8437729A15C9159300F807FD /* CoreGraphics.framework in Frameworks */,
-				84A8CDEF16117EF100F00508 /* iFlyTTS.framework in Frameworks */,
+				84F5FB63164269DC007C5668 /* iFlyMSC.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +385,7 @@
 		8437728615C9159300F807FD = {
 			isa = PBXGroup;
 			children = (
+				84DBA7C0163E27CC000CA13A /* Default-568h@2x.png */,
 				84A8CDF416117F7F00F00508 /* CFNetwork.framework */,
 				84A8CDF216117F7500F00508 /* SystemConfiguration.framework */,
 				84A8CDF016117F4600F00508 /* AudioToolbox.framework */,
@@ -444,27 +463,12 @@
 		845317CD15D6C2E1001C5F27 /* SubViewAndControler */ = {
 			isa = PBXGroup;
 			children = (
-				84E9D1C515DC23EE004A885F /* RTTAccountSettingViewController.h */,
-				84E9D1C615DC23EE004A885F /* RTTAccountSettingViewController.m */,
-				84E9D1C715DC23EF004A885F /* RTTAccountSettingViewController.xib */,
-				84E9D1CA15DC24E7004A885F /* RTTHomeAddressViewController.h */,
-				84E9D1CB15DC24E7004A885F /* RTTHomeAddressViewController.m */,
-				84E9D1CC15DC24E8004A885F /* RTTHomeAddressViewController.xib */,
 				84CAD01415CFA9BD00C24EDB /* RTTToolbarView.h */,
 				84CAD01515CFA9BD00C24EDB /* RTTToolbarView.m */,
 				84CAD01715CFABA200C24EDB /* RTTToolbarView.xib */,
-				84E9D1BC15DC136F004A885F /* RTTTopBarView.h */,
-				84E9D1BD15DC1370004A885F /* RTTTopBarView.m */,
-				84E9D1BF15DC13CC004A885F /* RTTTopBarView.xib */,
 				845317A415D4FDCF001C5F27 /* RTTMapPointSettingViewController.h */,
 				845317A515D4FDCF001C5F27 /* RTTMapPointSettingViewController.m */,
 				845317A615D4FDCF001C5F27 /* RTTMapPointSettingViewController.xib */,
-				845317CE15D6C354001C5F27 /* RTTRoutePreviewViewController.h */,
-				845317CF15D6C354001C5F27 /* RTTRoutePreviewViewController.mm */,
-				845317D015D6C354001C5F27 /* RTTRoutePreviewViewController.xib */,
-				845317DC15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.h */,
-				845317DD15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.m */,
-				845317DE15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.xib */,
 				84E9D1A815D9E22B004A885F /* GuideBoard.xib */,
 				84E9D1AA15D9EA52004A885F /* RTTGuideBoardView.h */,
 				84E9D1AB15D9EA52004A885F /* RTTGuideBoardView.m */,
@@ -492,6 +496,12 @@
 				84AE196B15E3862E00645EA7 /* RTTModeActivityIndicatorView.h */,
 				84AE196C15E3862E00645EA7 /* RTTModeActivityIndicatorView.m */,
 				84AE196E15E3865F00645EA7 /* RTTModeActivityIndicator.xib */,
+				841CE788163A79390002FDDA /* RTTSearchBarView.h */,
+				841CE789163A793A0002FDDA /* RTTSearchBarView.m */,
+				841CE786163A74080002FDDA /* RTTSearchBar.xib */,
+				849C5356163BBD4300B4E2B9 /* RTTPrefSettingViewController.h */,
+				849C5357163BBD4300B4E2B9 /* RTTPrefSettingViewController.m */,
+				849C5358163BBD4300B4E2B9 /* RTTPrefSettingViewController.xib */,
 			);
 			name = SubViewAndControler;
 			sourceTree = "<group>";
@@ -535,32 +545,27 @@
 		84A8CDD616117E6C00F00508 /* Xunfei */ = {
 			isa = PBXGroup;
 			children = (
-				84A8CE18161187A700F00508 /* JSON */,
-				84A8CDED16117EF100F00508 /* iFlyTTS.framework */,
-				84A8CDD716117E9200F00508 /* Reachability */,
+				84F5FB731642A77B007C5668 /* Reachability.h */,
+				84F5FB741642A77B007C5668 /* Reachability.m */,
+				84F5FB60164269DC007C5668 /* iFlyMSC.framework */,
+				84F5FB61164269DC007C5668 /* JSON */,
 			);
 			name = Xunfei;
-			sourceTree = "<group>";
-		};
-		84A8CDD716117E9200F00508 /* Reachability */ = {
-			isa = PBXGroup;
-			children = (
-				84A8CDE916117ECC00F00508 /* Reachability.h */,
-				84A8CDEA16117ECC00F00508 /* Reachability.m */,
-			);
-			name = Reachability;
-			sourceTree = "<group>";
-		};
-		84A8CE18161187A700F00508 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = JSON;
 			sourceTree = "<group>";
 		};
 		84AE196615E3711D00645EA7 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				84F5FB761643B693007C5668 /* GripBlue.png */,
+				84F5FB771643B693007C5668 /* GripBlue@2x.png */,
+				84F5FB6A164277BF007C5668 /* ButtomBarTranparant.png */,
+				84F5FB671642779A007C5668 /* ButtomBarTranparant@2x.png */,
+				84DBA7C2163E721B000CA13A /* Grip.png */,
+				84DBA7C3163E721B000CA13A /* Grip@2x.png */,
+				841662EA163B78E6001CCFC9 /* closeBTN.png */,
+				841662EB163B78E6001CCFC9 /* closeBTN@2x.png */,
+				84CAD781163A630700BEE7F7 /* searchBTN.png */,
+				84CAD782163A630700BEE7F7 /* searchBTN@2x.png */,
 				847BCBC515FF0E4100D50D67 /* Staruppage.png */,
 				847BCBC615FF0E4100D50D67 /* Staruppage@2x.png */,
 				847BCBC115FDEC7C00D50D67 /* BegintoUse.png */,
@@ -633,9 +638,11 @@
 			isa = PBXGroup;
 			children = (
 				84640D4715CA354D00F06CE9 /* RTTMapView.h */,
-				84640D4815CA354D00F06CE9 /* RTTMapView.m */,
+				84640D4815CA354D00F06CE9 /* RTTMapView.mm */,
 				84B02A5515D3B3580029CB1A /* RTTMapPointAnnotation.h */,
 				84B02A5615D3B3580029CB1A /* RTTMapPointAnnotation.m */,
+				8426DFD31640C81B00A5F5D3 /* RTTMapKit.h */,
+				8426DFD41640C81B00A5F5D3 /* RTTMapKit.mm */,
 			);
 			name = BaiduMapExtention;
 			sourceTree = "<group>";
@@ -655,6 +662,10 @@
 				84B02A5A15D3B88F0029CB1A /* RTTRunningDataSet.m */,
 				84037CD81612F00A00717FC3 /* RTTTrafficTTSPlayRecord.h */,
 				84037CD91612F00A00717FC3 /* RTTTrafficTTSPlayRecord.m */,
+				8426DFCA1640C12400A5F5D3 /* RTTTrafficContainer.h */,
+				8426DFCB1640C12500A5F5D3 /* RTTTrafficContainer.mm */,
+				8426DFCD1640C15700A5F5D3 /* RTTRouteContainer.h */,
+				8426DFCE1640C15700A5F5D3 /* RTTRouteContainer.m */,
 			);
 			name = DataModle;
 			sourceTree = "<group>";
@@ -769,16 +780,11 @@
 				84CAD01815CFABA200C24EDB /* RTTToolbarView.xib in Resources */,
 				845317A315D4F239001C5F27 /* mapapi.bundle in Resources */,
 				845317A815D4FDCF001C5F27 /* RTTMapPointSettingViewController.xib in Resources */,
-				845317D215D6C354001C5F27 /* RTTRoutePreviewViewController.xib in Resources */,
-				845317E015D8ABEA001C5F27 /* RTTRouteBookmarkViewController.xib in Resources */,
 				84E9D1A915D9E22B004A885F /* GuideBoard.xib in Resources */,
 				84E9D1AE15D9FAAF004A885F /* Location.gpx in Resources */,
 				84E9D1BB15DA5204004A885F /* RTTSuggestionListViewController.xib in Resources */,
-				84E9D1C015DC13CD004A885F /* RTTTopBarView.xib in Resources */,
 				84E9D1C315DC141E004A885F /* toptoolbar_bg.png in Resources */,
 				84E9D1C415DC141E004A885F /* toptoolbar_bg@2x.png in Resources */,
-				84E9D1C915DC23EF004A885F /* RTTAccountSettingViewController.xib in Resources */,
-				84E9D1CE15DC24E8004A885F /* RTTHomeAddressViewController.xib in Resources */,
 				84E9D1D315DC635C004A885F /* RTTTrafficBriefViewController.xib in Resources */,
 				84E9D1D715DC89B6004A885F /* iconroad@2x.png in Resources */,
 				84E9D1D915DC8A38004A885F /* iconroad.png in Resources */,
@@ -846,6 +852,20 @@
 				847BCBC415FDEC7C00D50D67 /* BegintoUse@2x.png in Resources */,
 				847BCBC715FF0E4100D50D67 /* Staruppage.png in Resources */,
 				847BCBC815FF0E4100D50D67 /* Staruppage@2x.png in Resources */,
+				84CAD783163A630700BEE7F7 /* searchBTN.png in Resources */,
+				84CAD784163A630700BEE7F7 /* searchBTN@2x.png in Resources */,
+				841CE787163A74090002FDDA /* RTTSearchBar.xib in Resources */,
+				841662EC163B78E6001CCFC9 /* closeBTN.png in Resources */,
+				841662ED163B78E6001CCFC9 /* closeBTN@2x.png in Resources */,
+				849C535A163BBD4300B4E2B9 /* RTTPrefSettingViewController.xib in Resources */,
+				84DBA7C1163E27CC000CA13A /* Default-568h@2x.png in Resources */,
+				84DBA7C4163E721B000CA13A /* Grip.png in Resources */,
+				84DBA7C5163E721B000CA13A /* Grip@2x.png in Resources */,
+				84F5FB64164269DC007C5668 /* JSON in Resources */,
+				84F5FB691642779A007C5668 /* ButtomBarTranparant@2x.png in Resources */,
+				84F5FB6B164277BF007C5668 /* ButtomBarTranparant.png in Resources */,
+				84F5FB781643B693007C5668 /* GripBlue.png in Resources */,
+				84F5FB791643B693007C5668 /* GripBlue@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -859,7 +879,7 @@
 				843772A215C9159300F807FD /* main.m in Sources */,
 				843772A615C9159300F807FD /* RTTAppDelegate.m in Sources */,
 				843772A915C9159300F807FD /* RTTViewController.mm in Sources */,
-				84640D4915CA354D00F06CE9 /* RTTMapView.m in Sources */,
+				84640D4915CA354D00F06CE9 /* RTTMapView.mm in Sources */,
 				84CAD00A15CFA22A00C24EDB /* RNSwipeBar.m in Sources */,
 				84CAD01615CFA9BD00C24EDB /* RTTToolbarView.m in Sources */,
 				84B02A5715D3B3580029CB1A /* RTTMapPointAnnotation.m in Sources */,
@@ -871,13 +891,8 @@
 				841EF8D315D4A0F70067ED4A /* Tss.pb.m in Sources */,
 				8453179F15D4D971001C5F27 /* RttGOprRcvTSS.m in Sources */,
 				845317A715D4FDCF001C5F27 /* RTTMapPointSettingViewController.m in Sources */,
-				845317D115D6C354001C5F27 /* RTTRoutePreviewViewController.mm in Sources */,
-				845317DF15D8ABEA001C5F27 /* RTTRouteBookmarkViewController.m in Sources */,
 				84E9D1AC15D9EA52004A885F /* RTTGuideBoardView.m in Sources */,
 				84E9D1BA15DA5204004A885F /* RTTSuggestionListViewController.m in Sources */,
-				84E9D1BE15DC1370004A885F /* RTTTopBarView.m in Sources */,
-				84E9D1C815DC23EF004A885F /* RTTAccountSettingViewController.m in Sources */,
-				84E9D1CD15DC24E8004A885F /* RTTHomeAddressViewController.m in Sources */,
 				84E9D1D215DC635C004A885F /* RTTTrafficBriefViewController.m in Sources */,
 				84DBB4B915DDCB0B00AA9D08 /* RTTHomeAddrViewController.m in Sources */,
 				84D3BC6615DE9AA900F2CFBD /* RTTTrafficListViewController.m in Sources */,
@@ -888,8 +903,13 @@
 				846F7DD015F6F26000BD0B12 /* RTTComm4TSS.m in Sources */,
 				84A8CDD21611615F00F00508 /* RTTSynthesizeTTS.m in Sources */,
 				84A8CDD5161164CD00F00508 /* RTTSynTTSOpr.m in Sources */,
-				84A8CDEB16117ECC00F00508 /* Reachability.m in Sources */,
 				84037CDA1612F00A00717FC3 /* RTTTrafficTTSPlayRecord.m in Sources */,
+				841CE78A163A793A0002FDDA /* RTTSearchBarView.m in Sources */,
+				849C5359163BBD4300B4E2B9 /* RTTPrefSettingViewController.m in Sources */,
+				8426DFCC1640C12500A5F5D3 /* RTTTrafficContainer.mm in Sources */,
+				8426DFCF1640C15700A5F5D3 /* RTTRouteContainer.m in Sources */,
+				8426DFD51640C81B00A5F5D3 /* RTTMapKit.mm in Sources */,
+				84F5FB751642A77B007C5668 /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -996,11 +1016,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.1/libs/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/ZMQ/libs/ZMQ-$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"",
-					"${SRCROOT}/Reachability",
-					"${SRCROOT}/JSON",
 				);
 				OTHER_LDFLAGS = (
-					"-all_load",
 					"-lbaidumapapi",
 					"-lzmq",
 					"-lzmqobjc",
@@ -1037,11 +1054,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.1/libs/Release$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/ZMQ/libs/ZMQ-$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"",
-					"${SRCROOT}/Reachability",
-					"${SRCROOT}/JSON",
 				);
 				OTHER_LDFLAGS = (
-					"-all_load",
 					"-lbaidumapapi",
 					"-lzmq",
 					"-lzmqobjc",

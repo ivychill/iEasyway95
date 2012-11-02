@@ -77,14 +77,14 @@
 }
 
 - (IBAction)didSetRoute2Me:(id)sender {
-   [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_ROUTETO];
+    [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_ROUTETO];
 }
 
 - (IBAction)didSetStartPoint:(id)sender {
-    [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_START];
+    [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_HOME];// RTTSETMAPPOIN_START];
 }
 - (IBAction)didSetEndPoint:(id)sender {
-    [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_END];
+    [self SendBackPointTypeToDelegate:RTTSETMAPPOIN_OFFICE];//RTTSETMAPPOIN_END];
 }
 
 - (IBAction)didSetDeleteMe:(id)sender {

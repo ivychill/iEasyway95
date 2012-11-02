@@ -95,7 +95,7 @@
                 }
                 else
                 {
-                    NSLog(@"Progressing");
+                    //NSLog(@"Progressing");
                     progressTimer--;   //防止异常的超时保护，初始设置建议为30S
                     if (progressTimer ==0)
                     {
@@ -143,7 +143,12 @@
 
 - (BOOL) startSynTTS:(NSString*) strInfo
 {
-    NSLog(@"Will Send Request");
+    NSLog(@"Will Send TTS Request: %@", strInfo);
+    if ((strInfo == nil) && [strInfo isEqualToString:@""])
+    {
+        return NO;
+    }
+    
     [iFlySynthesizerControl setText:strInfo theParams:nil];
     BOOL ret = [iFlySynthesizerControl start];
     if(ret)
@@ -163,7 +168,7 @@
 
 - (BOOL) startHighPerioritySynTTS:(NSString*) strInfo
 {
-    NSLog(@"Will Send Request");
+    NSLog(@"Will Send TSS Request");
     [iFlySynthesizerControl setText:strInfo theParams:nil];
     BOOL ret = [iFlySynthesizerControl start];
     if(ret)
@@ -182,23 +187,23 @@
 }
 
 
-//	合成结束回调
+//	合成结束回调, mainThread
 - (void)onSynthesizerEnd:(IFlySynthesizerControl *)iFlySynthesizerControl theError:(SpeechError) error
 {
 	NSLog(@"finish.....");
 	//[self enableButton];
-    isInProgress = NO;
+    self.isInProgress = NO;
 	
 	NSLog(@"upFlow:%d,downFlow:%d",[self.iFlySynthesizerControl getUpflow], [self.iFlySynthesizerControl getDownflow]);
 }
 //xlhou add 20120305
 - (void)onSynthesizerBufferProgress:(float)bufferProgress
 {
-    NSLog(@"onSynthesizerBufferProgress = %f",bufferProgress);
+    //NSLog(@"onSynthesizerBufferProgress = %f",bufferProgress);
 }
 - (void)onSynthesizerPlayProgress:(float)playProgress
 {
-    NSLog(@"onSynthesizerPlayProgress = %f",playProgress);
+    //NSLog(@"onSynthesizerPlayProgress = %f",playProgress);
 //    if (playProgress >= 99.0)
 //    {
 //        isInProgress = NO;

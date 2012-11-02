@@ -12,7 +12,7 @@
 
 @interface RttGMapDataset : NSObject
 {
-    RttGRouteInfo *pDrivingRoute;
+    //RttGRouteInfo *pDrivingRoute;
     
     
 }

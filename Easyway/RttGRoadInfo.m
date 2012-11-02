@@ -34,7 +34,7 @@
 @end
 
 
-@implementation RttGTrafficInfo
+@implementation RttGMatchedTrafficInfo
 
 @synthesize roadname;
 @synthesize pointlist;
@@ -51,6 +51,7 @@
     pointlist = [[NSMutableArray alloc] init];
     stepIndex = 0;
     nextPointIndex = 0;
+    self.speedKMPH = 0;
     return self;
 }
 

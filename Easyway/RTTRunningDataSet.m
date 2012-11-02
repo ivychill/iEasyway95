@@ -30,7 +30,7 @@
 @synthesize historyPathInfoList;
 @synthesize lastUserLocation;
 
-@synthesize filteredRouteTrafficList;
+//@synthesize filteredRouteTrafficList;
 
 @synthesize homeAddrInfo;
 @synthesize officeAddrInfo;
@@ -41,10 +41,13 @@
 @synthesize manualRouteSettingType;
 
 @synthesize userToken;
+@synthesize deviceUuid;
+@synthesize thisDev;
+@synthesize deviceVersion;
 
 @synthesize trffTTSPlayRec;
 
-@synthesize allRouteTrafficFromTSS;
+//@synthesize routeTrafficFromTSS;
 
 - (id) init
 {
@@ -60,13 +63,12 @@
     startPointInfo = nil;
     endPointInfo = nil;
     isDriving = NO;
-    filteredRouteTrafficList = [[NSMutableArray alloc] init];
     historyPathInfoList = [[NSMutableArray alloc] init];
     
     homeAddrInfo = nil;//[[BMKPoiInfo alloc] init];
     
-    officeAddrInfo = [[BMKPoiInfo alloc] init];
-    CLLocationCoordinate2D officeLoc;
+    //officeAddrInfo = [[BMKPoiInfo alloc] init];
+    //CLLocationCoordinate2D officeLoc;
 
     //华为
 //    officeLoc.latitude = 22.656973; 
@@ -82,19 +84,81 @@
 //    officeLoc.longitude = 113.943761;
     
     //113.890581,22.570418
-    officeLoc.latitude = 22.570418;
-    officeLoc.longitude = 113.890581;
-    
-    officeAddrInfo.pt = officeLoc;
-    officeAddrInfo.address = @"华为坂田基地 深圳市龙岗区";
-    currentlyRoute = ROUTEUNKNOW;
+//    officeLoc.latitude = 22.570418;
+//    officeLoc.longitude = 113.890581;
+//    
+//    officeAddrInfo.pt = officeLoc;
+//    officeAddrInfo.address = @"华为坂田基地 深圳市龙岗区";
+    currentlyRoute = ROUTECODEUNKNOW;
 
     userToken = nil;
+    deviceUuid = nil;
+    thisDev = nil;
+    deviceVersion = nil;
+
     
     trffTTSPlayRec = [[RTTTrafficTTSPlayRecord alloc] init];
-    allRouteTrafficFromTSS = [[NSMutableArray alloc] init];
+//    routeTrafficFromTSS = [[NSMutableArray alloc] init];
+//    self.hotTrafficFromTSS   = [[NSMutableArray alloc] init];
+//    filteredRouteTrafficList = [[NSMutableArray alloc] init];
+    self.trafficContainer = [[RTTTrafficContainer alloc] init];
+
+    self.searchHistoryArray = [[NSMutableArray alloc] init];
+    [self loadHistorySearchTxt];
     
     return self;
+}
+
+- (void) saveSearchHistory:(NSString*) searchTxt
+{
+    if (self.searchHistoryArray == nil)
+    {
+        self.searchHistoryArray = [[NSMutableArray alloc] init];
+    }
+    if (searchTxt==nil || [searchTxt isEqualToString:@""])
+    {
+        return;
+    }
+    else
+    {
+        BOOL isSaved = NO;
+        for (NSString *strSaved in self.searchHistoryArray)
+        {
+            NSLog(@"******Saved Search Txt=%@", strSaved);
+            if([strSaved isEqualToString:searchTxt])
+            {
+                isSaved = YES;
+            }
+        }
+        
+        if (isSaved)
+        {
+            return;
+        }
+        else
+        {
+            NSInteger savedItemCnt = historyPathInfoList.count;
+            if (savedItemCnt >= 20)
+            {
+                [self.searchHistoryArray removeObjectAtIndex:(savedItemCnt-1)];
+            }
+            else
+            {
+                [self.searchHistoryArray insertObject:searchTxt atIndex:0]; //最后搜索的加入到最顶
+            }
+            
+            NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+            [saveDefaults setObject:self.searchHistoryArray forKey:@"HistorySearchSaveKey"];
+            [saveDefaults synchronize];
+
+        }
+    }
+}
+
+- (void) loadHistorySearchTxt
+{
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    self.searchHistoryArray = [saveDefaults objectForKey:@"HistorySearchSaveKey"];
 }
 
 

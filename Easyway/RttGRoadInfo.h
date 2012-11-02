@@ -34,7 +34,7 @@
 
 @end
 
-@interface RttGTrafficInfo : NSObject
+@interface RttGMatchedTrafficInfo : NSObject
 //{
 //    NSString *roadname;
 //    NSMutableArray *pointlist; //RttGMapPoint
@@ -42,10 +42,13 @@
 
 @property NSString *roadname;
 @property NSString *detail;
+@property int speedKMPH;
 @property TimeValue64 timeStamp;
-@property NSMutableArray *pointlist; //RttGMapPoint
-@property int stepIndex;             //在路径Step中的位置;
-@property int nextPointIndex;        //在路径点中的位置;
+@property NSMutableArray *pointlist;    //RttGMapPoint
+@property int stepIndex;                //在路径Step中的位置;
+@property int nextPointIndex;           //在路径点中的位置;
+//@property int BMKPolylineIndex;       //在ViewControler中，BMKPolyline队列的位置;
+@property BMKPolyline *trafficPolyLine; //在地图中的PolyLine，用于绘制和删除图层
 
 @end
 
@@ -68,6 +71,9 @@
 @property int speedKMPH;
 @property NSString *roadName;
 @property NSString *details;
+@property TimeValue64 lastTTSTimestamp;
+
+@property RttGMatchedTrafficInfo *matchedTrafficInfo;
 
 @end
 

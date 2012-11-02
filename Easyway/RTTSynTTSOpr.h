@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "iFlyTTS/IFlySynthesizerControl.h"
+#import "iFlyMSC/IFlySynthesizerControl.h"
 
 // 文本框
 #define H_BACK_TEXTVIEW_FRAME		CGRectMake(6, 0, 308, 187)
@@ -33,7 +33,7 @@
 @property NSMutableArray *loTTSArray;
 
 @property int timeLoop;
-@property BOOL isInProgress;
+@property (nonatomic) BOOL isInProgress;
 @property int progressTimer;
 //@property IFlySynthesizerControl *moSynControl;
 //@property IFlySynthesizerControl *hiSynControl;
