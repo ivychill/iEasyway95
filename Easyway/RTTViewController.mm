@@ -47,6 +47,7 @@
 #import "RTTSearchBarView.h"
 #import "RTTPrefSettingViewController.h"
 
+#import "Reachability.h"
 
 
 #pragma mark -
@@ -65,18 +66,75 @@
 #pragma mark view init
 - (void)viewDidLoad
 {
-    NSLog(@"INIT....................................");
+    NSLog(@"********************************View Will Did Load********************************");
+    
+    //初始化网络监控
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(checkNetworkStatus:)name:kReachabilityChangedNotification object:nil];
+
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    //初始化百度地图相关
-    [self initBaiduMap];
+    //初始化各种运行时相关内存参数
+    [self initRunningParam];
 
+    //把保存的数据Load进来
+    [self initLoadData];
+    
     //初始化各种窗口部件
     [self initMainViewUnit];
 
-    //初始化各种运行时视图相关内存参数
-    [self initRunningParam];
+    
+    self.internetReachable =[Reachability reachabilityForInternetConnection];
+    [self.internetReachable startNotifier];
+    
+    // check if a pathway to a random host exists
+    self.hostReachable =[Reachability reachabilityWithHostName:@"www.roadclouding.com"];
+    [self.hostReachable startNotifier];
+
+    
+    //检测是否需要显示启动页面
+    [self processIntroPage];
+
+    
+    if ([self isNetworkActive])
+    {
+        [self initWhenNetworkActive];
+    }
+    else
+    {
+        [self initWhenNetworkNotAvailable];
+    }
+    
+}
+
+- (void)viewDidUnload
+{
+    mCenterView = nil;
+    [self setBack2locBTN:nil];
+    [self setShowTrafficViewBTN:nil];
+    [self setShowSearchBarBTN:nil];
+    [self setUiDestinationLBL:nil];
+    
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+    [super viewDidUnload];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return NO;
+    //return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+}
+
+
+
+- (void) initWhenNetworkActive
+{
+
+    
+    //初始化百度地图相关
+    [self initBaiduMap];
+    
+    
     
     //初始化和启动通信模块
     [self initCommUnit];
@@ -88,28 +146,68 @@
     [self addTestData];
     
     
-    [self initLoadData];
-
-    [self processIntroPage];
+    
     
     [self detectPath];
     
+    [self.back2locBTN setHidden:NO];
+    [self.showSearchBarBTN setHidden:NO];
+    [self.showTrafficViewBTN setHidden:NO];
+    [self.uiDestinationLBL setHidden:NO];
+    [self hideTrafficBoard];
+    [mSwipeBar setHidden:NO];
+
+    [mRetryButton removeFromSuperview];
+    mRetryButton = nil;
+
 }
 
-- (void)viewDidUnload
+- (void) initWhenNetworkNotAvailable
 {
-    mCenterView = nil;
-    [self setBack2locBTN:nil];
-    [self setShowTrafficViewBTN:nil];
-    [self setShowSearchBarBTN:nil];
-    [self setUiDestinationLBL:nil];
-    [super viewDidUnload];
+    //[self initMainViewUnit];
+    
+    UIButton* retryButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [retryButton addTarget:self
+                    action:@selector(retryInitWithNetworkStat) //重新获取网络状态并初始化
+          forControlEvents:UIControlEventTouchUpInside];
+    retryButton.frame=CGRectMake(60, 250, 200, 40);
+    [retryButton setTitle:@"重试" forState:UIControlStateNormal];
+    
+    mRetryButton = retryButton;
+    [self.view addSubview:mRetryButton];
+    
+    [mCenterView setBackgroundColor:[UIColor grayColor]];
+    
+    mTrafficInfoBoard.mainInfoLBL.text  = @"抱歉";
+    mTrafficInfoBoard.detailInfoLBL.text = @"当前网络不能连接到互联网，请稍后再试";
+    
+    [self showTrafficBoard];
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"当前网络不能连接到互联网，请稍后再试"
+                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+    [alertView show];
+
+
+    [self.back2locBTN setHidden:YES];
+    [self.showSearchBarBTN setHidden:YES];
+    [self.showTrafficViewBTN setHidden:YES];
+    [self.uiDestinationLBL setHidden:YES];
+    [mSwipeBar setHidden:YES];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (void) retryInitWithNetworkStat
 {
-    return NO;
-    //return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    if ([self isNetworkReachable])
+    {
+        [self initWhenNetworkActive];
+    }
+    else
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"当前网络不能连接到互联网，请稍后再试"
+                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+        [alertView show];
+
+    }
+    
 }
 
 - (void) initTimer
@@ -189,6 +287,9 @@
     back2locBTN.layer.shadowRadius = 10.0f; // 阴影发散的程度
     
     [self initDestinationLBL];
+    
+    mRetryButton =  nil;
+    
 }
 
 - (void) initRunningParam
@@ -216,6 +317,11 @@
     mTSSMessageSerialNum = 0; //消息序列号
     
     mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:7001" uuID:runningDataset.deviceUuid delegate:self];
+}
+
+- (void) resetCommUnit
+{
+    [mComm4TSS Reset:@"tcp://roadclouding.com:7001" uuID:runningDataset.deviceUuid delegate:self];
 }
 
 - (void) initTTS
@@ -330,13 +436,13 @@
 
     
     switchStat = [saveDefaults objectForKey:@"AutoScaleOnOffSaveKey"];
-    if (switchStat && [switchStat isEqualToString: @"YES"])
+    if (switchStat && [switchStat isEqualToString: @"NO"])
     {
-        self.autoScaleOnOff = YES;
+        self.autoScaleOnOff = NO;
     }
     else
     {
-        self.autoScaleOnOff = NO;  //缺省不缩放
+        self.autoScaleOnOff = YES;  //缺省是ON
     }
 
 }
@@ -666,6 +772,7 @@
     //[mMapView setCenterCoordinate:[mMapView userLocation].coordinate animated:0];
     [mMapView setCenterOfMapView:([mMapView getCurLocation])];
 
+    self.isMoveMap = NO;
 }
 
 - (IBAction)didShowSearchbar:(id)sender
@@ -706,7 +813,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     //[self.navigationController setNavigationBarHidden:YES animated:(NO)];
-
 }
 
 //
@@ -841,6 +947,12 @@
 {
     NSString *strPOIName = inputStr;
     //[mBMKSearch poiSearchInCity:@"深圳" withKey:strPOIName pageIndex:0];
+    
+    if (![self detectNetworkReachableAndShowTips])
+    {
+        return;
+    }
+    
     BOOL result = [self getPoiLocationInCityfromMAPSVR:@"深圳" poiName:strPOIName];
     if (!result)
     {
@@ -854,7 +966,8 @@
     }
     else
     {
-        [self hideTopSearchBar];
+        //[self hideTopSearchBar];
+        [self didHideAddrSearchBar:nil];
 
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGGEO];
         [self showModeIndicator:@"获取地理坐标信息" seconds:10];
@@ -865,6 +978,11 @@
 {
     if ([inputStr length] != 0)
     {
+        if (![self isNetworkReachable])
+        {
+            return;
+        }
+        
         BOOL callresult = [self getPoinameSuggestionfromMAPSVR:inputStr];
         if (!callresult)
         {
@@ -899,6 +1017,21 @@
 }
 
 
+- (void)didResultlistSelected:(NSString *)poiName
+{
+	if (poiName)
+    {
+        [self didAddrSearchWasPressed:poiName];
+        [runningDataset saveSearchHistory:poiName];
+	}
+    [self setSearchListHidden:YES];
+    
+    //[self hideTopSearchBar];
+    [self didHideAddrSearchBar:nil];
+}
+
+
+
 #pragma mark -
 #pragma mark UserLogin and Token and Profile
 
@@ -911,17 +1044,6 @@
 
 
 
-- (void)didResultlistSelected:(NSString *)poiName
-{
-	if (poiName) 
-    {
-        [self didAddrSearchWasPressed:poiName];
-        [runningDataset saveSearchHistory:poiName];
-	}
-    [self setSearchListHidden:YES];
-    
-    [self hideTopSearchBar];
-}
 
 
 #pragma mark -
@@ -929,6 +1051,27 @@
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer 
 {
     //[self OnClickSearchInputCancel:nil];
+    
+    //CLLocationCoordinate2D centerLoc =  mMapView.centerCoordinate;// [mMapView getCenterCoordinate];
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan)
+    {
+        self.beginSpanPoint = [gestureRecognizer locationInView:mMapView];
+    }
+    
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded)
+    {
+        self.isMoveMap = YES;
+        
+        //坐标转换
+        CGPoint touchPoint = [gestureRecognizer locationInView:mMapView];
+        int moveX = touchPoint.x - self.beginSpanPoint.x;
+        int moveY = touchPoint.y - self.beginSpanPoint.y;
+        
+        CGPoint newCenterPoint = {160-moveX, 240-moveY};
+        
+        [mMapView lineCurLoc2MapCenterLoc:newCenterPoint];
+    }
+    
     return YES;
 }
 
@@ -939,6 +1082,11 @@
     
     if (sender.state == UIGestureRecognizerStateBegan)
     {
+        if (! [self detectNetworkReachableAndShowTips])
+        {
+            return;
+        }
+        
         //坐标转换
         CGPoint touchPoint = [sender locationInView:mMapView];
         CLLocationCoordinate2D touchMapCoordinate = [mMapView addUndefAnnotationWithTouchPoint:touchPoint];
@@ -1162,7 +1310,7 @@
     if (error != BMKErrorOk) 
     {
         NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
-        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法规划路径" 
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取路况路径"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
         
@@ -1301,10 +1449,12 @@
     temp_userLocation = userLocation.location.coordinate;
     if (runningDataset.isDriving)
     {
-        //[pmapview setCenterCoordinate:temp_userLocation animated:0];
-        [mMapView setCenterOfMapView:temp_userLocation];
+        if (! self.isMoveMap)
+        {
+            [mMapView setCenterOfMapView:temp_userLocation];
+        }
     }
-        
+    
     BMKMapPoint LocationPoint = BMKMapPointForCoordinate(temp_userLocation);
     int stepIndex, pointIndex;
     
@@ -1323,9 +1473,7 @@
         [self hideTrafficBoard];
         
 
-//#if !defined (HUAWEIVER)
-        //if (runningDataset.isRouteGuideON)
-        if (self.autoScaleOnOff == YES)
+        if (self.autoScaleOnOff == YES  &&   !self.isMoveMap)
         {
             //切换视图
             if (runningDataset.currentRoadStep !=  stepIndex)
@@ -1334,7 +1482,7 @@
                 [mMapView setCenterOfMapView:temp_userLocation];
             }
         }
-//#endif
+        
         //保存当前在Step的哪一步了
         runningDataset.currentRoadStep = stepIndex;
         runningDataset.nextRoadPointIndex = pointIndex;
@@ -1506,7 +1654,6 @@
             
             if (distance > 200)
             {
-#warning 调试屏蔽重规划
                 [self RePlanRouting:temp_userLocation];
                 
                 //后续把播放语音挪到RePlanRouting中，和提示框一起
@@ -2041,49 +2188,156 @@
     if ([annotation isKindOfClass:[RTTMapPointAnnotation class]]) 
     {   
         RTTMapPointAnnotation *pointAnnotation = (RTTMapPointAnnotation*) annotation;
-        static NSString* RoutePlanAnnotationIdentifier = @"RoutePlanAnnotationIdentifier";  
-        __autoreleasing BMKPinAnnotationView* pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:RoutePlanAnnotationIdentifier];
-        if (!pinView)  
-        {
-            // if an existing pin view was not available, create one  
-            BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:RoutePlanAnnotationIdentifier];
-            pinView = customPinView;
-        }  
-        else  
-        {  
-            pinView.annotation = annotation;  
-        }  
+        __autoreleasing BMKPinAnnotationView* pinView;
+//        static NSString* RoutePlanAnnotationIdentifier = @"RoutePlanAnnotationIdentifier";
+//        __autoreleasing BMKPinAnnotationView* pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:RoutePlanAnnotationIdentifier];
+//        if (!pinView)  
+//        {
+//            // if an existing pin view was not available, create one  
+//            BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:RoutePlanAnnotationIdentifier];
+//            pinView = customPinView;
+//        }  
+//        else  
+//        {  
+//            pinView.annotation = annotation;  
+//        }  
         
         pinView.animatesDrop = NO;  //如果需要从天而降的动画效果，设置为YES即可。
         pinView.opaque = YES;
         
         switch (pointAnnotation.pointType) {
             case MAPPOINTTYPE_START:
-            {pinView.pinColor = BMKPinAnnotationColorGreen;}
+            {
+                pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:@"STARTPOINTANNOIDENTI"];
+                if (!pinView)
+                {
+                    BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"STARTPOINTANNOIDENTI"];
+                    pinView = customPinView;
+                    
+                    pinView.pinColor = BMKPinAnnotationColorGreen;
+                    UIImage *anoImage = [UIImage imageNamed:@"StartPointV1.png"];
+                    pinView.image = anoImage;
+                    CGPoint offsetPoin = {0.0,0.0};
+                    pinView.centerOffset = offsetPoin;
+
+                }
+                else
+                {
+                    pinView.annotation = annotation;  
+                }  
+
+
+            }
                 break;
                 
             case MAPPOINTTYPE_END:
-            {pinView.pinColor = BMKPinAnnotationColorPurple;}
+            {
+                pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:@"ENDPOINTANNOIDENTI"];
+                if (!pinView)
+                {
+                    BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"ENDPOINTANNOIDENTI"];
+                    pinView = customPinView;
+                    
+                    pinView.pinColor = BMKPinAnnotationColorPurple;
+                    UIImage *anoImage = [UIImage imageNamed:@"EndPointV1.png"];
+                    pinView.image = anoImage;
+                    CGPoint offsetPoin = {0.0,0.0};
+                    pinView.centerOffset = offsetPoin;
+
+                }
+                else
+                {
+                    pinView.annotation = annotation;
+                }
+
+            }
                 break;
                 
             case MAPPOINTTYPE_HOME:
-            {pinView.pinColor = BMKPinAnnotationColorRed;}
+            {
+                pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:@"HOMEANNOIDENTI"];
+                if (!pinView)
+                {
+                    BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"HOMEANNOIDENTI"];
+                    pinView = customPinView;
+                    
+                    pinView.pinColor = BMKPinAnnotationColorRed;
+
+                }
+                else
+                {
+                    pinView.annotation = annotation;
+                }
+
+            }
                 break;
                 
-            default:
+            case MAPPOINTTYPE_UNDEF:
             {
-                pinView.pinColor = BMKPinAnnotationColorRed;
-                pinView.canShowCallout = YES;  //运行点击弹出标签 
-                if ((pointAnnotation.pointType != MAPPOINTTYPE_START) && (pointAnnotation.pointType != MAPPOINTTYPE_END))
+                
+                pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:@"UNDEFANNOIDENTI"];
+                if (!pinView)
                 {
-                    UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];  
-                    [rightButton addTarget:self  
+                    BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"UNDEFANNOIDENTI"];
+                    pinView = customPinView;
+                    
+                    pinView.pinColor = BMKPinAnnotationColorRed;
+                    pinView.canShowCallout = YES;  //运行点击弹出标签
+                    UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+                    [rightButton addTarget:self
                                     action:@selector(showSettingRoutPointView:)  //点击右边的按钮之后，显示设置导航点的页面
                           forControlEvents:UIControlEventTouchUpInside];
                     pinView.rightCalloutAccessoryView = rightButton;
-                    [pinView setSelected:YES];
-                    mMapView.currentlySelectedAnnotation = pointAnnotation;
+
                 }
+                else
+                {
+                    pinView.annotation = annotation;
+                }
+                
+                [pinView setSelected:YES];
+                mMapView.currentlySelectedAnnotation = pointAnnotation;
+            }
+                break;
+                
+            case MAPPOINTTYPE_CENTER:
+                {
+                    pinView = (BMKPinAnnotationView *) [mMapView dequeueReusableAnnotationViewWithIdentifier:@"CENTERANNOIDENTI"];
+                    if (!pinView)
+                    {
+                        BMKPinAnnotationView* customPinView = [[BMKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"CENTERANNOIDENTI"];
+                        pinView = customPinView;
+                        
+                        pinView.pinColor = BMKPinAnnotationColorRed;
+                        UIImage *anoImage = [UIImage imageNamed:@"CrossLogoV1.png"];
+                        pinView.image = anoImage;
+                        CGPoint offsetPoin = {0.0,0.0};
+                        pinView.centerOffset = offsetPoin;
+                        
+                    }
+                    else
+                    {
+                        pinView.annotation = annotation;
+                    }
+
+
+                }
+                    break;
+
+            default:
+            {
+                pinView.pinColor = BMKPinAnnotationColorRed;
+//                pinView.canShowCallout = YES;  //运行点击弹出标签 
+//                if ((pointAnnotation.pointType != MAPPOINTTYPE_START) && (pointAnnotation.pointType != MAPPOINTTYPE_END))
+//                {
+//                    UIButton* rightButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];  
+//                    [rightButton addTarget:self  
+//                                    action:@selector(showSettingRoutPointView:)  //点击右边的按钮之后，显示设置导航点的页面
+//                          forControlEvents:UIControlEventTouchUpInside];
+//                    pinView.rightCalloutAccessoryView = rightButton;
+//                    [pinView setSelected:YES];
+//                    mMapView.currentlySelectedAnnotation = pointAnnotation;
+//                }
             }
                 break;
         }
@@ -2135,6 +2389,15 @@
             polylineView.strokeColor = [[UIColor blueColor] colorWithAlphaComponent:0.7];
             polylineView.lineWidth = 3.0;
             polylineView.alpha = 0.9;
+            
+            //NSLog(@"**************Drawing Routing Overlay************");
+        }
+        else if([overlay.title isEqualToString:@"OffsetLine"])
+        {
+            polylineView.fillColor = [[UIColor greenColor] colorWithAlphaComponent:1];
+            polylineView.strokeColor = [[UIColor greenColor] colorWithAlphaComponent:0.7];
+            polylineView.lineWidth = 1.5;
+            polylineView.alpha = 1.0;
             
             //NSLog(@"**************Drawing Routing Overlay************");
             
@@ -2265,6 +2528,7 @@
 #pragma mark Process Map Element Data
 
 
+
 - (void) getH2ORoute
 {
     if (runningDataset.homeAddrInfo == nil)
@@ -2272,7 +2536,7 @@
         NSLog(@"家庭地址未设置");
         return;
     }
-
+    
     CLLocationCoordinate2D point1 = runningDataset.homeAddrInfo.pt;
     CLLocationCoordinate2D point2 = runningDataset.officeAddrInfo.pt;
     bool ret = [self RouteSearch:point1 end:point2];
@@ -2282,7 +2546,7 @@
     }
     else 
     {
-        [self showModeIndicator:@"路径计算中" seconds:10];
+        //[self showModeIndicator:@"回家路况获取中" seconds:10];
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE];
     }
 
@@ -2304,9 +2568,9 @@
     {
         NSLog(@"Route Planing Fail!");
     }
-    else 
+    else
     {
-        [self showModeIndicator:@"路径计算中" seconds:10];
+        [self showModeIndicator:@"上班路况获取中" seconds:10];
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE];
     }
 }
@@ -2533,15 +2797,21 @@
 
 - (void) doRoutePlaning:(CLLocationCoordinate2D)startpoint end:(CLLocationCoordinate2D)endpoint
 {
-        bool ret = [self RouteSearch:startpoint end:endpoint];
-        if (!ret)
-        {
-            NSLog(@"Route Planing Fail!");
-        }
-        else {
-            [self showModeIndicator:@"路况获取中" seconds:10];
-            [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-        }
+    //根据情况在外面调用中提示
+//    if (! [self detectNetworkReachableAndShowTips])
+//    {
+//        return;
+//    }
+    
+    bool ret = [self RouteSearch:startpoint end:endpoint];
+    if (!ret)
+    {
+        NSLog(@"Route Planing Fail!");
+    }
+    else {
+        [self showModeIndicator:@"路况获取中" seconds:10];
+        [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+    }
 }
 
 
@@ -2551,6 +2821,135 @@
 
 #pragma mark -
 #pragma mark TSS Communication
+
+- (BOOL) isNetworkActive
+{
+    BOOL isNetworkReachable = NO;
+    Reachability *r = [Reachability reachabilityForInternetConnection];
+    switch ([r currentReachabilityStatus]) {
+        case NotReachable:
+            // 没有网络连接
+            NSLog(@"############# Not Reachable#######");
+            break;
+        case ReachableViaWWAN:
+            // 使用3G网络
+        {
+            NSLog(@"############# Use 3G #######");
+            isNetworkReachable = YES;
+        }
+            break;
+        case ReachableViaWiFi:
+            // 使用WiFi网络
+        {
+            NSLog(@"############# Use WiFi #######");
+            isNetworkReachable = YES;
+        }
+            break;
+    }
+    return isNetworkReachable;
+}
+
+- (BOOL) isNetworkReachable
+{
+    BOOL isNetworkReachable = NO;
+    Reachability *r = [Reachability reachabilityWithHostName:@"www.roadclouding.com"];
+    switch ([r currentReachabilityStatus]) {
+        case NotReachable:
+            // 没有网络连接
+            NSLog(@"############# Not Reachable#######");
+            break;
+        case ReachableViaWWAN:
+            // 使用3G网络
+        {
+            NSLog(@"############# Use 3G #######");
+            isNetworkReachable = YES;
+        }
+            break;
+        case ReachableViaWiFi:
+            // 使用WiFi网络
+        {
+            NSLog(@"############# Use WiFi #######");
+            isNetworkReachable = YES;
+        }
+            break;
+    }
+    return isNetworkReachable;
+}
+
+- (BOOL) detectNetworkReachableAndShowTips
+{
+
+    BOOL isReachable = [self isNetworkReachable];
+    if (!isReachable)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"当前网络无法连接到互联网\n请稍后再试"
+                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+        [alertView show];
+    }
+    return isReachable;
+}
+
+
+-(void)checkNetworkStatus:(NSNotification*)notice
+{
+    // called after network status changes
+    NetworkStatus internetStatus =[self.internetReachable currentReachabilityStatus];
+    switch(internetStatus)
+    {
+        case NotReachable:
+        {
+            NSLog(@"The internet is down.");
+            self.internetActive =NO;
+            break;
+            
+        }
+        case ReachableViaWiFi:
+        {
+            NSLog(@"The internet is working via WIFI.");
+            self.internetActive =YES;
+            break;
+        }
+        case ReachableViaWWAN:
+        {
+            NSLog(@"The internet is working via WWAN.");
+            self.internetActive =YES;
+            break;
+        }
+    }
+
+    
+    NetworkStatus hostStatus =[self.hostReachable currentReachabilityStatus];
+    switch(hostStatus)
+    {
+        case NotReachable:
+        {
+            NSLog(@"A gateway to the host server is down.");
+            self.hostActive =NO;
+            break;
+        }
+        case ReachableViaWiFi:
+        {
+            NSLog(@"A gateway to the host server is working via WIFI.");
+            self.hostActive =YES;
+            break;
+        }
+        case ReachableViaWWAN:
+        {
+            NSLog(@"A gateway to the host server is working via WWAN.");
+            self.hostActive =YES;
+            break;
+        }
+    }
+    
+    if (self.hostActive || self.internetActive)
+    {
+        //[self resetCommUnit];
+        [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+    }
+    
+}
+
+
 
 - (bool) sendDeviceInfo2TSS:(NSData *)deviceToken
 {
@@ -3311,6 +3710,11 @@
 //上班 0; 下班 1
 - (NSInteger) detectPath
 {
+    if (! self.autoDetectOnOff)
+    {
+        return -1;
+    }
+    
     if (runningDataset.homeAddrInfo == nil)
     {
         NSLog(@"家庭地址未设置");
@@ -3340,7 +3744,10 @@
             if (runningDataset.isPlaned)
             {
                 //update_traffic
-                [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+                if ([self isNetworkReachable])
+                {
+                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+                }
             }
             else {
                 [self routePlanCurLoctoOffice];
@@ -3359,8 +3766,11 @@
         else {
             if (runningDataset.isPlaned)
             {
-            //update_traffic
-            [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+                //update_traffic
+                if ([self isNetworkReachable])
+                {
+                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+                }
             }
             else {
                 //re-planing
@@ -3383,6 +3793,11 @@
         return;
     }
     
+    if (! [self detectNetworkReachableAndShowTips])
+    {
+        return;
+    }
+    
     [self doRoutePlaning:runningDataset.homeAddrInfo.pt  end:runningDataset.officeAddrInfo.pt];
 
 }
@@ -3392,6 +3807,11 @@
     if (runningDataset.homeAddrInfo == nil)
     {
         NSLog(@"家庭地址未设置");
+        return;
+    }
+    
+    if (! [self detectNetworkReachableAndShowTips])
+    {
         return;
     }
     
@@ -3405,6 +3825,13 @@
         //NSLog(@"家庭地址未设置\n请通过搜索或者长按地图上对应的地址进行设置");
         return;
     }
+    
+    if (! [self detectNetworkReachableAndShowTips])
+    {
+        return;
+    }
+    
+    
     [mSwipeBar toggle:NO];
 
     
@@ -3422,6 +3849,12 @@
         //NSLog(@"办公室地址未设置\n请通过搜索或者长按地图上对应的地址进行设置");
         return;
     }
+    
+    if (! [self detectNetworkReachableAndShowTips])
+    {
+        return;
+    }
+    
     [mSwipeBar toggle:NO];
     
     self.currentlyRouteEndAddr = @"上班路况";
@@ -3431,6 +3864,11 @@
 
 - (void) routePlanCurLoctoTemp:(CLLocationCoordinate2D) endLoc
 {
+    if (! [self detectNetworkReachableAndShowTips])
+    {
+        return;
+    }
+    
     CLLocationCoordinate2D curLoc =  [mMapView getCurLocation];
     [self doRoutePlaning:curLoc  end:endLoc];
 }

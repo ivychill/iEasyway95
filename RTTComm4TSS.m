@@ -24,9 +24,9 @@
     zmqTSSSocket = [zmqTSSContext socketWithType:ZMQ_DEALER];
     
     NSData* uuIDData=[uuID dataUsingEncoding: [NSString defaultCStringEncoding] ];
-    [zmqTSSSocket setData:uuIDData forOption:ZMQ_IDENTITY];
+    //[zmqTSSSocket setData:uuIDData forOption:ZMQ_IDENTITY];
     //NSLog(@"Device UUID=%@", uuID);
-    
+        
     BOOL didBind = [zmqTSSSocket connectToEndpoint:endpoint];
     if (!didBind) 
     {
@@ -55,5 +55,44 @@
 
 //接收，delegate实现RttGTSSCommunication协议的OnRceivePacket方法
 
+
+
+//初始化：endpoint: 连接的端点；delegate:实现OnRceivePacket方法的类实例
+- (id) Reset:(NSString*) endpoint uuID:(NSString*)uuID delegate:(NSObject <RttGTSSCommunication> *) delegate
+{
+    [rttThreadQue cancelAllOperations];
+    [zmqTSSContext terminate];
+    zmqTSSContext = nil;
+    
+    
+    //初始化和启动通信模块
+    zmqTSSContext = [[ZMQContext alloc] initWithIOThreads:1U];
+    //static NSString *const kEndpoint = endpoint;//@"tcp://42.121.18.140:6001";
+    NSLog(@"*** Start to connect to endpoint [%@].", endpoint);
+    zmqTSSSocket = [zmqTSSContext socketWithType:ZMQ_DEALER];
+    
+    NSData* uuIDData=[uuID dataUsingEncoding: [NSString defaultCStringEncoding] ];
+    [zmqTSSSocket setData:uuIDData forOption:ZMQ_IDENTITY];
+    //NSLog(@"Device UUID=%@", uuID);
+    
+    BOOL didBind = [zmqTSSSocket connectToEndpoint:endpoint];
+    if (!didBind)
+    {
+        NSLog(@"*** Failed to connect to endpoint [%@].", endpoint);
+        return nil;
+    }
+    else
+    {
+        NSLog(@"*** Successed to connected to endpoint [%@].", endpoint);
+    }
+    
+    RttGOprRcvTSS *pRcvThread = [[RttGOprRcvTSS alloc] initWithZMQ:zmqTSSContext andSocket:zmqTSSSocket];
+    rttThreadQue = [[NSOperationQueue alloc] init];
+    [pRcvThread setDelegate:delegate];
+    
+    [rttThreadQue addOperation:pRcvThread];
+    
+    return self;
+}
 
 @end

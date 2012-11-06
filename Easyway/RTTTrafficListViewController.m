@@ -126,7 +126,25 @@
             if (ptrfInfo)
             {
                 //NSString *cellString = ptrfInfo.roadname;
-                NSString *cellString = [[NSString alloc] initWithFormat:@"%@ (%@)", ptrfInfo.roadname, [self getTimeInterner:ptrfInfo.timeStamp]];
+                
+                NSString *strSpeed;
+                if (ptrfInfo.speedKMPH < 5)
+                {
+                    strSpeed = @"严重拥堵";
+                }
+                else
+                {
+                    if (ptrfInfo.speedKMPH < 15)
+                    {
+                        strSpeed = @"中度拥堵";
+                    }
+                    else
+                    {
+                        strSpeed = @"轻度拥堵";
+                    }
+                }
+
+                NSString *cellString = [[NSString alloc] initWithFormat:@"%@-%@ (%@)", ptrfInfo.roadname, strSpeed, [self getTimeInterner:ptrfInfo.timeStamp]];
 
                 [[cell textLabel] setText:cellString];
                 [[cell detailTextLabel] setText:ptrfInfo.detail];
@@ -258,7 +276,26 @@
     for (RTTFormatedTrafficFromTSS *trafficList in self.runtimeDataset.trafficContainer.routeTrafficFromTSS)
     {
         RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
-        trafficInfoItem.roadName = trafficList.roadName;
+        //trafficInfoItem.roadName = trafficList.roadName;
+        NSString *strSpeed;
+        if (trafficList.speedKMPH < 5)
+        {
+            strSpeed = @"严重拥堵";
+        }
+        else
+        {
+            if (trafficList.speedKMPH < 15)
+            {
+                strSpeed = @"中度拥堵";
+            }
+            else
+            {
+                strSpeed = @"轻度拥堵";
+            }
+        }
+        
+        trafficInfoItem.roadName = [[NSString alloc] initWithFormat:@"%@-%@", trafficList.roadName, strSpeed];
+
         trafficInfoItem.trafficDetail = trafficList.details;
         trafficInfoItem.timestamp = trafficList.timestamp;
         
@@ -269,7 +306,26 @@
     for (RTTFormatedTrafficFromTSS *trafficList in self.runtimeDataset.trafficContainer.hotTrafficFromTSS)
     {
         RoadTrafficInfo *trafficInfoItem = [[RoadTrafficInfo alloc] init];
-        trafficInfoItem.roadName = trafficList.roadName;
+        
+        NSString *strSpeed;
+        if (trafficList.speedKMPH < 5)
+        {
+            strSpeed = @"严重拥堵";
+        }
+        else
+        {
+            if (trafficList.speedKMPH < 15)
+            {
+                strSpeed = @"中度拥堵";
+            }
+            else
+            {
+                strSpeed = @"轻度拥堵";
+            }
+        }
+        
+        trafficInfoItem.roadName = [[NSString alloc] initWithFormat:@"%@-%@", trafficList.roadName, strSpeed];
+
         trafficInfoItem.trafficDetail = trafficList.details;
         trafficInfoItem.timestamp = trafficList.timestamp;
         

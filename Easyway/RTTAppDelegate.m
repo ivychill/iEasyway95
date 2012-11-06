@@ -36,6 +36,11 @@
     if (!ret) {
         NSLog(@"manager start failed!");
     }
+//    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"输入为空，请输入要查找的地址"
+//                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+//    [alertView show];
+//
+//    return NO;
     
     //    // Add the navigation controller's view to the window and display.
     //    [self.window addSubview:navigationController.view]; 
@@ -53,7 +58,6 @@
     
     //设置屏幕常亮
     [ [ UIApplication sharedApplication] setIdleTimerDisabled:YES ] ;
-
     
     //ANPS注册和设置
     //启动后目前把图标上的数字先去掉

@@ -43,6 +43,9 @@
 
 @property BMKPolyline     *pCurrentlyPolyLine;
 @property NSMutableArray *trafficPolylineList;
+@property BMKPolyline     *offsetPolyLine;
+@property RTTMapPointAnnotation *offsetCenPoint;
+
 
 @property RTTMapPointAnnotation *startPointAnnotation;
 @property RTTMapPointAnnotation *endPointAnnotation;
@@ -68,7 +71,7 @@
 - (void) DrawTrafficPolyline:(NSMutableArray*)trafficSegList;
 - (void) AddDrivingRouteOverlay:(BMKRoute*) route;
 - (void) DrawSpeedPolyline: (double) speed startPoint:(CLLocationCoordinate2D)startPoint endPoint:(CLLocationCoordinate2D)endPoint;
-- (void) addRouteGuidePoints;
+//- (void) addRouteGuidePoints;
 - (void) changeMapVisibleRect:(BMKRoute*) route withIndex:(int) stepIndex;
 - (RTTMapPointAnnotation*) addAnnotation2Map:(CLLocationCoordinate2D)coordinate withType:(RTTEN_MAPPOINTTYPE) type addr:(NSString*) addrTxt;
 - (CLLocationCoordinate2D)addUndefAnnotationWithTouchPoint:(CGPoint) touchPoint;
@@ -80,6 +83,8 @@
 
 - (CLLocationCoordinate2D) getCurLocation;
 - (BOOL) checkIfLocOutofRange;
+
+- (void) lineCurLoc2MapCenterLoc:(CGPoint)centerPoint;
 
 @end
 

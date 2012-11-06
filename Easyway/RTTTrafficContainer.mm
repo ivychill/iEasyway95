@@ -371,7 +371,7 @@
         
         NSDate *segDate = [NSDate dateWithTimeIntervalSince1970:trfseg.timestamp];
         NSTimeInterval secondsBetweenNow =  [segDate timeIntervalSinceNow];
-        if (secondsBetweenNow <= -900.0) //间隔超过15分钟就丢弃
+        if (secondsBetweenNow <= -360.0) //间隔超过6分钟就丢弃
         {
 #warning WORKING.......
             //先删除地图上的图层，以及队列信息
@@ -449,7 +449,7 @@
         
         NSDate *segDate = [NSDate dateWithTimeIntervalSince1970:trfseg.timestamp];
         NSTimeInterval secondsBetweenNow =  [segDate timeIntervalSinceNow];
-        if (secondsBetweenNow <= -900.0) //间隔超过15分钟就丢弃
+        if (secondsBetweenNow <= -360.0) //间隔超过6分钟就丢弃
         {
             [self.hotTrafficFromTSS removeObjectAtIndex:i];
         }

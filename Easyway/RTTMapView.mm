@@ -484,8 +484,22 @@
     {
         [self setCenterCoordinate:coordinate animated:0];
     }
+    
+    [self removeOffsetLineandAnno];
 }
 
+- (void) removeOffsetLineandAnno
+{
+    if (self.offsetPolyLine)
+    {
+        [self removeOverlay:self.offsetPolyLine];
+    }
+    
+    if (self.offsetCenPoint)
+    {
+        [self removeAnnotation:self.offsetCenPoint];
+    }
+}
 
 - (void) removeAllUndefAnnotation
 {
@@ -717,6 +731,14 @@
             pointAnnotation.title = @"家";
         }
             break;
+            
+        case MAPPOINTTYPE_CENTER:
+        {
+            pointAnnotation.pointType = MAPPOINTTYPE_CENTER;
+            pointAnnotation.title = nil;
+        }
+            break;
+            
         default:
         {
             pointAnnotation.pointType = MAPPOINTTYPE_UNDEF;
@@ -819,6 +841,25 @@
     
 }
 
+
+- (void) lineCurLoc2MapCenterLoc:(CGPoint)centerPoint
+{
+    //得到经纬度，指触摸区域
+    CLLocationCoordinate2D centerMapCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
+    
+    [self removeOffsetLineandAnno];
+    
+    CLLocationCoordinate2D linePoints[2];
+    linePoints[0] = [self getCurLocation];
+    linePoints[1] = centerMapCoordinate;
+    
+    BMKPolyline* polyLine = [BMKPolyline polylineWithCoordinates:linePoints count:2];
+    polyLine.title = @"OffsetLine";
+    [self addOverlay:polyLine];
+    
+    self.offsetCenPoint = [self addAnnotation2Map:centerMapCoordinate withType:MAPPOINTTYPE_CENTER addr:nil];
+    self.offsetPolyLine = polyLine;
+}
 
 
 

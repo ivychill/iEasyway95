@@ -26,5 +26,7 @@
 - (id) initWithEndpoint:(NSString*) endpoint uuID:(NSString*)uuID delegate:(NSObject <RttGTSSCommunication> *) delegate;
 - (BOOL)sendData:(NSData *)messageData withFlags:(ZMQMessageSendFlags)flags;
 
+- (id) Reset:(NSString*) endpoint uuID:(NSString*)uuID delegate:(NSObject <RttGTSSCommunication> *) delegate;
+
 
 @end

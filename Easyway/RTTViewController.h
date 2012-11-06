@@ -21,6 +21,8 @@
 @class RTTSynthesizeTTS;
 @class RTTSearchBarView;
 
+@class Reachability;
+
 #import <UIKit/UIKit.h>
 #import "BMapKit.h"
 //#import "RTTMapView.h"
@@ -68,9 +70,10 @@ enum RTTEN_ACTIVITYTYPE {
     RTTTrafficBoardView *mTrafficInfoBoard;
     RTTSearchBarView *mTopSearchBar;
 
+    UIButton *mRetryButton;
     
     RTTSuggestionListViewController *mSuggestionListVC;
-    RNSwipeBar *mTopbar;
+    //RNSwipeBar *mTopbar;
     
     UIActivityIndicatorView *mActivityIndicatorView;
     RTTModeActivityIndicatorView *mModeIndicatorView;
@@ -141,11 +144,18 @@ enum RTTEN_ACTIVITYTYPE {
 //@property (nonatomic) CLLocationCoordinate2D lastOnPlanLocation;
 @property CLLocationCoordinate2D currentlyRouteEndPoint;
 @property NSString *currentlyRouteEndAddr;
-@property BOOL isViewMap;
+@property BOOL isMoveMap;
+@property CGPoint beginSpanPoint;
+
 
 @property BOOL TTSSwitchOnOff;
 @property BOOL autoScaleOnOff;
 @property BOOL autoDetectOnOff;
+
+@property Reachability *internetReachable;
+@property Reachability *hostReachable;
+@property BOOL internetActive;
+@property BOOL hostActive;
 
 @property (strong, nonatomic) IBOutlet UIButton *back2locBTN;
 @property (strong, nonatomic) IBOutlet UIButton *showTrafficViewBTN;
@@ -168,6 +178,6 @@ enum RTTEN_ACTIVITYTYPE {
 
 - (bool) sendDeviceInfo2TSS:(NSData *)deviceToken;
 
-
+-(void)checkNetworkStatus:(NSNotification*)notice;
 
 @end
