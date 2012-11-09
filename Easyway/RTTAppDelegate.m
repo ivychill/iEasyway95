@@ -34,7 +34,7 @@
     // 如果要关注网络及授权验证事件,请设定 generalDelegate 参数
     BOOL ret = [_mapManager start:@"513CBE299AB953DDFAEBC4A608F1F6557C30D685" generalDelegate:nil];
     if (!ret) {
-        NSLog(@"manager start failed!");
+        NSLog(@"Baidu manager start failed!");
     }
 //    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"输入为空，请输入要查找的地址"
 //                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
@@ -70,7 +70,7 @@
     NSString *tagStr = [saveDefaults objectForKey:@"SendedDevice2TSS"];
     if ([tagStr isEqualToString:@"YES"])
     {
-        NSLog(@"Have success saved registered device ID");
+        //NSLog(@"Have success saved registered device ID");
         
     }
     else 
@@ -99,7 +99,7 @@
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-    NSLog(@"applicationWillResignActive....................................");
+    //NSLog(@"applicationWillResignActive....................................");
 
 }
 
@@ -107,14 +107,14 @@
 {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    NSLog(@"applicationDidEnterBackground....................................");
+    //NSLog(@"applicationDidEnterBackground....................................");
 
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-    NSLog(@"applicationWillEnterForeground....................................");
+    //NSLog(@"applicationWillEnterForeground....................................");
     
 
 }
@@ -122,7 +122,7 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    NSLog(@"Active....................................");
+    //NSLog(@"Active....................................");
 
     [self.viewController detectPath];
     if (application.applicationIconBadgeNumber > 0)
@@ -151,7 +151,7 @@
 //注册ANPS的回调方法
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken 
 {   
-    NSLog(@"deviceToken: %@", deviceToken);
+    //NSLog(@"deviceToken: %@", deviceToken);
     NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
     [saveDefaults setObject:@"YES" forKey:@"IsSuccessRegAPS"];
     [saveDefaults setObject:deviceToken forKey:@"DeviceToken"];
@@ -159,7 +159,7 @@
     
     if ([self.viewController sendDeviceInfo2TSS:deviceToken])
     {
-        NSLog(@"Success call send device token to TSS");
+        //NSLog(@"Success call send device token to TSS");
 #warning 目前暂时屏蔽发送成功记录
         //[saveDefaults setObject:@"YES" forKey:@"SendedDevice2TSS"];
     }
@@ -168,7 +168,7 @@
 //注册失败
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error 
 {       
-    NSLog(@"Error in registration. Error: %@", error);   
+    //NSLog(@"Error in registration. Error: %@", error);
 }   
 
 
@@ -182,12 +182,12 @@
     //如果是点击Push消息启动的，直接进入路况显示界面
     if (application.applicationState == UIApplicationStateInactive)
     {
-        NSLog(@"have remote notification --- inactive");
+        //NSLog(@"have remote notification --- inactive");
         [self.viewController didShowTraffic:nil];
     }
     else
     {
-        NSLog(@"have remote notification --- active");
+        //NSLog(@"have remote notification --- active");
     }
     
 //    NSLog(@" 收到推送消息 ： %@",[[userInfo objectForKey:@"aps"] objectForKey:@"alert"]);

@@ -40,5 +40,6 @@ struct STPointLineDistInfo
 + (BOOL) getPositionFromRoute:(BMKRoute *)route withLocation:(CLLocationCoordinate2D) locat andRetStepIndex:(int *)retStepIndex andretPointsIndex:(int*) retPointsIndex;
 + (bool) isPointInLine:(CLLocationCoordinate2D)location withStepA:(BMKStep*) step_a andStepB:(BMKStep*) step_b;
 
++ (CLLocationDirection) cacDirectionChange:(CLLocationDirection)firstDrect secondDirection:(CLLocationDirection) secondDrect;
 
 @end

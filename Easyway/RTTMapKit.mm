@@ -395,4 +395,16 @@ CLLocationDistance GetNearLineDistance(BMKMapPoint pnt,  BMKMapPoint p1, BMKMapP
     
 }
 
+
++ (CLLocationDirection) cacDirectionChange:(CLLocationDirection)firstDrect secondDirection:(CLLocationDirection) secondDrect
+{
+    CLLocationDirection retValue = fabs(firstDrect - secondDrect);
+    if (retValue > 180.0)
+    {
+        retValue = 360.0 - retValue;
+    }
+    
+    return retValue;
+}
+
 @end

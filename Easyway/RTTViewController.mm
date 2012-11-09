@@ -66,7 +66,7 @@
 #pragma mark view init
 - (void)viewDidLoad
 {
-    NSLog(@"********************************View Will Did Load********************************");
+    //NSLog(@"********************************View Will Did Load********************************");
     
     //初始化网络监控
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(checkNetworkStatus:)name:kReachabilityChangedNotification object:nil];
@@ -135,20 +135,20 @@
     [self initBaiduMap];
     
     
-    
     //初始化和启动通信模块
     [self initCommUnit];
     
     //初始化合成语音模块
     [self initTTS];
     
-    //增加测试数据
-    [self addTestData];
     
+    [self setFirstTimeInitDelayToDoTimer];
     
+    //以下初始化动作移动到延时1秒执行中取
+//    [self setCheckBKJobTimer];
+//    [self sendChechinInfo2TSS];
+//    [self detectPath];
     
-    
-    [self detectPath];
     
     [self.back2locBTN setHidden:NO];
     [self.showSearchBarBTN setHidden:NO];
@@ -170,7 +170,7 @@
     [retryButton addTarget:self
                     action:@selector(retryInitWithNetworkStat) //重新获取网络状态并初始化
           forControlEvents:UIControlEventTouchUpInside];
-    retryButton.frame=CGRectMake(60, 250, 200, 40);
+    retryButton.frame=CGRectMake(30, 250, 260, 40);
     [retryButton setTitle:@"重试" forState:UIControlStateNormal];
     
     mRetryButton = retryButton;
@@ -214,6 +214,9 @@
 {
     mModeIndicatorTimer = nil;
     mActivityTimer = nil;
+    mCheckBKJobTimer = nil;
+    mFirstTimeInitDelayToDoTimer = nil;
+    mSendSampePoints2TSSTimer = nil;
 }
 
 - (void) initBaiduMap
@@ -222,7 +225,7 @@
     RTTMapView *baiduMapView = [[RTTMapView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
     if (!baiduMapView)
     {
-        NSLog(@"Error when init baidu map");
+        //NSLog(@"Error when init baidu map");
         return;
     }
     
@@ -301,14 +304,19 @@
     mActivityTimer = nil;
     
     mSpeedIndex = 0;
-    mSpeedSedList = [[NSMutableArray alloc] initWithCapacity:1000];
+    mSpeedSedList = [[NSMutableArray alloc] init];
+    mSpeedSamplePoints = [[NSMutableArray alloc] init];
     
     mIsOutofRange = NO;
     
+    mIsGetedH2ORoute = NO;
+    mIsGetedH2ORoute = NO;
     
     runningDataset.thisDev = [UIDevice currentDevice];
     runningDataset.deviceVersion = runningDataset.thisDev.systemVersion;
     runningDataset.deviceUuid = runningDataset.thisDev.uniqueIdentifier;
+    
+    runningDataset.lastRoutePlanedTime = [NSDate dateWithTimeIntervalSince1970:0];
 }
 
 - (void) initCommUnit
@@ -316,18 +324,18 @@
     //初始化和启动通信模块
     mTSSMessageSerialNum = 0; //消息序列号
     
-    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:7001" uuID:runningDataset.deviceUuid delegate:self];
+    mComm4TSS = [[RTTComm4TSS alloc] initWithEndpoint:@"tcp://roadclouding.com:6001" uuID:runningDataset.deviceUuid delegate:self];
 }
 
 - (void) resetCommUnit
 {
-    [mComm4TSS Reset:@"tcp://roadclouding.com:7001" uuID:runningDataset.deviceUuid delegate:self];
+    [mComm4TSS Reset:@"tcp://roadclouding.com:6001" uuID:runningDataset.deviceUuid delegate:self];
 }
 
 - (void) initTTS
 {
     float verValue = runningDataset.deviceVersion.floatValue;
-    if (verValue < 6.0)
+    if (verValue < 7.0)
     {
         mSynTTS = [[RTTSynthesizeTTS alloc] init:10];
     }
@@ -336,14 +344,17 @@
 - (void) initLoadData
 {
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    if (!documentsDirectory) {
-        NSLog(@"Documents directory not found!");
-    }
-    NSString *appFile = [documentsDirectory stringByAppendingPathComponent:@"Savedatas.plist"];
-    
-    NSLog(@"PATH: %@", appFile);
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//    NSString *documentsDirectory = [paths objectAtIndex:0];
+//    if (!documentsDirectory)
+//    {
+//        //NSLog(@"Documents directory not found!");
+//    }
+//    else
+//    {
+//        NSString *appFile = [documentsDirectory stringByAppendingPathComponent:@"Savedatas.plist"];
+//        //NSLog(@"PATH: %@", appFile);
+//    }
     
     //Load Home Address Info
     NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
@@ -360,12 +371,12 @@
         if (!loadHomeAddr || !loadHomeLat || !loadHomeLon)
         {
             NSLog(@"无法加载家庭地址");
-            NSLog(@"str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
+            //NSLog(@"str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
 
         }
         else
         {
-            NSLog(@"加载家庭地址str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
+            //NSLog(@"加载家庭地址str:%@, %@, %@",loadHomeAddr, loadHomeLat, loadHomeLon);
             
             __autoreleasing BMKPoiInfo *homePoi = [[BMKPoiInfo alloc] init];
             homePoi.address = loadHomeAddr;
@@ -393,7 +404,7 @@
         }
         else
         {
-            NSLog(@"str:%@, %@, %@",loadOfficeAddr, loadOfficeLat, loadOfficeLon);
+            //NSLog(@"str:%@, %@, %@",loadOfficeAddr, loadOfficeLat, loadOfficeLon);
             
             __autoreleasing BMKPoiInfo *officePoi = [[BMKPoiInfo alloc] init];
             officePoi.address = loadOfficeAddr;
@@ -410,8 +421,18 @@
     if ([isIntroReaded isEqualToString: @"YES"])
     {
         runningDataset.isReadedIntroPage = YES;
-    }
+    }    
     
+    NSString *getedH2ORoute = [saveDefaults objectForKey:@"isGetedH2ORoute"];
+    if ([getedH2ORoute isEqualToString: @"YES"])
+    {
+        mIsGetedH2ORoute = YES;
+    }
+    NSString *getedO2HRoute = [saveDefaults objectForKey:@"isGetedO2HRoute"];
+    if ([getedO2HRoute isEqualToString: @"YES"])
+    {
+        mISGetedO2HRoute = YES;
+    }
     
     NSString *switchStat = [saveDefaults objectForKey:@"TSSSwitchOnOffSaveKey"];
     if (switchStat && [switchStat isEqualToString: @"NO"])
@@ -483,13 +504,10 @@
 
 - (void) setRunningActivityTimer:(int) seconds activity:(RTTEN_ACTIVITYTYPE) acttype
 {
+    [self stopRunningActivityTimer];
+
     mRunningActivity = acttype;
-    if (mActivityTimer)
-    {
-        [mActivityTimer invalidate];
-        mActivityTimer = nil;
-    }
-    mActivityTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(didRunningActivityTimeout) userInfo:nil repeats:NO]; 
+    mActivityTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(didRunningActivityTimeout) userInfo:nil repeats:NO];
 }
 
 - (void) stopRunningActivityTimer
@@ -548,12 +566,129 @@
             break;
     }
     
-    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:errorMsg 
+    if (errorMsg)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:errorMsg
                                                       delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
-    [alertView show];
+        [alertView show];
+    }
     
     mRunningActivity = RTTEN_ACTIVITYTYPE_IDLE;
 }
+
+
+//5秒定期检查后台需要做的工作
+- (void) setCheckBKJobTimer
+{
+    [self stopCheckBKJobTimer];
+    
+    mCheckBKJobTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(didCheckBKJob) userInfo:nil repeats:YES];
+}
+
+- (void) stopCheckBKJobTimer
+{
+    if (mCheckBKJobTimer)
+    {
+        [mCheckBKJobTimer invalidate];
+        mCheckBKJobTimer = nil;
+    }
+}
+
+- (void) didCheckBKJob
+{
+    //NSLog(@"Enter didCheckBKJob");
+    if (mRunningActivity == RTTEN_ACTIVITYTYPE_IDLE)
+    {
+        
+        if (runningDataset.officeAddrInfo && runningDataset.homeAddrInfo)
+        {
+            if (!mIsGetedH2ORoute)
+            {
+                if ([self isNetworkReachable])
+                {
+                    [self getH2ORoute];
+                    //NSLog(@"getH2ORoute");
+                    return;
+                }
+            }
+            if (!mISGetedO2HRoute)
+            {
+                if ([self isNetworkReachable])
+                {
+                    [self getO2HRoute];
+                    //NSLog(@"getO2HRoute");
+                    return;
+                }
+            }
+        }
+        
+    }
+}
+
+
+//1秒后启动初始化工作，（目的是为了避免刚刚启动时当前位置、网络等不稳定的因素）
+- (void) setFirstTimeInitDelayToDoTimer
+{
+    [self stopFirstTimeInitDelayToDoTimer];
+    
+    mFirstTimeInitDelayToDoTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(didFirstTimeInitDelayToDo) userInfo:nil repeats:NO];
+}
+
+- (void) stopFirstTimeInitDelayToDoTimer
+{
+    if (mFirstTimeInitDelayToDoTimer)
+    {
+        [mFirstTimeInitDelayToDoTimer invalidate];
+        mFirstTimeInitDelayToDoTimer = nil;
+    }
+}
+
+- (void) didFirstTimeInitDelayToDo
+{
+    //NSLog(@"Enter didFirstTimeInitDelayToDo");
+    if ([self isNetworkActive])
+    {
+        [self setCheckBKJobTimer];
+        [self sendChechinInfo2TSS];
+        [self detectPath];
+        [self setSendSampePoints2TSSTimer];
+    }
+}
+
+
+//定时发送路况采样点到TSS
+- (void) setSendSampePoints2TSSTimer
+{
+    [self stopSendSampePoints2TSSTimer];
+    
+    mSendSampePoints2TSSTimer = [NSTimer scheduledTimerWithTimeInterval:120 target:self selector:@selector(didSendSampePoints2TSS) userInfo:nil repeats:YES];
+}
+
+- (void) stopSendSampePoints2TSSTimer
+{
+    if (mSendSampePoints2TSSTimer)
+    {
+        [mSendSampePoints2TSSTimer invalidate];
+        mSendSampePoints2TSSTimer = nil;
+    }
+}
+
+- (void) didSendSampePoints2TSS
+{
+    //NSLog(@"Enter didCheckBKJob");
+    if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground)
+    {
+        //NSLog(@"Send Sample Points, Count=%d", mSpeedSamplePoints.count);
+        if (mSpeedSamplePoints.count < 1)
+        {
+            return;
+        }
+        
+        [self sendSamplePoints2TSS];
+        [mSpeedSamplePoints removeAllObjects];
+    }
+}
+
 
 #pragma mark -
 #pragma mark UI event process
@@ -609,22 +744,22 @@
 
 - (IBAction)didSaveSpeedSegs:(id)sender
 {
-    //路况1
-    //6.0对讯飞支持不好
-    float verValue = runningDataset.deviceVersion.floatValue;
-    if (verValue < 6.0)
-    {
-        [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
-        
-        [mSynTTS addTrafficStr:@"深南大道 前方拥堵：南山大道路口到南新路路口 方向：西向"];
-        
-        [mSynTTS addTrafficStr:@"南海大道 前方拥堵: 北环立交到东滨路路口 方向：蛇口方向"];
-    }
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    NSString *docPath = [paths objectAtIndex:0];
-//    NSString *myFile = [docPath stringByAppendingPathComponent:@"SpeedInfo.data"];
-//
-//    [mSpeedSedList writeToFile:myFile atomically:YES];
+//    //路况1
+//    //6.0对讯飞支持不好
+//    float verValue = runningDataset.deviceVersion.floatValue;
+//    if (verValue < 6.0)
+//    {
+//        [mSynTTS addEmegencyStr:@"您已经偏移路径，正在重新获取路况"];
+//        
+//        [mSynTTS addTrafficStr:@"深南大道 前方拥堵：南山大道路口到南新路路口 方向：西向"];
+//        
+//        [mSynTTS addTrafficStr:@"南海大道 前方拥堵: 北环立交到东滨路路口 方向：蛇口方向"];
+//    }
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docPath = [paths objectAtIndex:0];
+    NSString *myFile = [docPath stringByAppendingPathComponent:@"SpeedInfo.data"];
+
+    [mSpeedSedList writeToFile:myFile atomically:YES];
     
 }
 
@@ -749,6 +884,7 @@
     }
     
     [self routePlanCurLoctoHome];
+    self.isMoveMap = NO;
 }
 
 - (void)didToolbarGoOfficeBTN:(id)sender
@@ -763,6 +899,7 @@
     }
     
     [self routePlanCurLoctoOffice];
+    self.isMoveMap = NO;
 }
 
 
@@ -781,6 +918,11 @@
     //[mTopSearchBar setHidden:NO];
     [self hideDestinationLBL];
 }
+
+//- (IBAction)didTrafficTitleSwipeRight:(UISwipeGestureRecognizer *)sender
+//{
+//    NSLog(@"**************Right");
+//}
 
 - (void)didHideAddrSearchBar:(id)sender
 {
@@ -860,6 +1002,8 @@
             self.currentlyRouteEndAddr = [[NSString  alloc] initWithFormat:@"到%@路况", strRdName];
             
             [self routePlanCurLoctoTemp:endLoc];
+                        
+            self.isMoveMap = NO;
 
         }
             break;
@@ -894,6 +1038,12 @@
             
             runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;//
             [self routePlanCurLoctoOffice];
+            
+            //需要重新获取家-公司之间的线路
+            mIsGetedH2ORoute = NO;
+            mISGetedO2HRoute = NO;
+            
+            self.isMoveMap = NO;
         }
             break;
             
@@ -921,21 +1071,21 @@
             
             runningDataset.currentlyRoute = ROUTECODEGOHOME;//
             [self routePlanCurLoctoHome];
+            
+            //需要重新获取家-公司之间的线路
+            mIsGetedH2ORoute = NO;
+            mISGetedO2HRoute = NO;
+
+            self.isMoveMap = NO;
+
         }
             break;
-            
             
             
             
         default:
             break;
     }
-    
-    //因为只能有一个Undefine的点，所以设置了具体类型后，这个点就不是Undef了。
-    //mMapView.pUndefAnnotation = nil;
-    
-    //[self CheckPointsSettingCompleted:0];
-    
     
 }
 
@@ -957,7 +1107,7 @@
     if (!result)
     {
         
-        NSLog(@"Failure when get poi location from map server");
+        //NSLog(@"Failure when get poi location from map server");
         //百度已经有提示了，所以不用重复提示
         //            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:errorMsg
         //                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
@@ -986,7 +1136,7 @@
         BOOL callresult = [self getPoinameSuggestionfromMAPSVR:inputStr];
         if (!callresult)
         {
-            NSLog(@"######Call sugession Error");
+            //NSLog(@"######Call sugession Error");
         }
         
         mSuggestionListVC.searchText = inputStr;
@@ -1007,7 +1157,7 @@
     {
         for (NSString *searchHisTxt in runningDataset.searchHistoryArray)
         {
-            NSLog(@"**********Input TXT=%@************", searchHisTxt);
+            //NSLog(@"**********Input TXT=%@************", searchHisTxt);
             [mSuggestionListVC.resultList addObject:searchHisTxt];
         }
         [mSuggestionListVC updateData];
@@ -1039,7 +1189,7 @@
 {
     [runningDataset setUserToken:token];
     //[self sendUserProfile2Server:token];
-    NSLog(@"Will Send Profile to Server");
+    //NSLog(@"Will Send Profile to Server");
 }
 
 
@@ -1109,7 +1259,7 @@
 {
     if (error != BMKErrorOk)
     {
-        NSLog(@"######get sugession Error, errorcode:%d", error);
+        //NSLog(@"######get sugession Error, errorcode:%d", error);
         //        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获得输入建议" 
         //                                                          delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         //        [alertView show];
@@ -1122,7 +1272,7 @@
     for (int i = 0; i < result.keyList.count; i++)
     {
         NSString *strPoiName = [result.keyList objectAtIndex:i];
-        NSLog(@"POISuggestion: %@", strPoiName);
+        //NSLog(@"POISuggestion: %@", strPoiName);
         
         [mSuggestionListVC.resultList addObject:strPoiName];
         //[mSuggestionListVC updateData];
@@ -1161,7 +1311,7 @@
 	}
     else
     {
-        NSLog(@"POI Search Fail, Error Code=%d", error);
+        //NSLog(@"POI Search Fail, Error Code=%d", error);
         UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取检索结果"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
@@ -1180,7 +1330,7 @@
     
 	if (error != BMKErrorOk) 
     {
-    	NSLog(@"onGetDrivingRouteResult:error:%d", error);
+    	//NSLog(@"onGetDrivingRouteResult:error:%d", error);
         return;
     }
     
@@ -1190,7 +1340,7 @@
 
 - (void)onGetDrivingRouteResult:(BMKPlanResult*)result errorCode:(int)error
 {
-	NSLog(@"onGetDrivingRouteResult, activity=%d", mRunningActivity);
+	//NSLog(@"onGetDrivingRouteResult, activity=%d", mRunningActivity);
     
     [self closeModeIndicator];
 
@@ -1224,11 +1374,11 @@
 
 - (void) didGetedRouteH2O:(BMKPlanResult*)result errorCode:(int)error
 {
-    NSLog(@"Processing H2O route result");
+    //NSLog(@"Processing H2O route result");
 
     if (error != BMKErrorOk) 
     {
-        NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
+        //NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
         UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取上下班路径，请重新设定家庭地址" 
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
@@ -1241,7 +1391,7 @@
     
     //int iRoutePointCnt = 0; //路径上所有坐标点的个数
     int iRouteCnt = [plan.routes count]; //每个方案上路径的个数，目前只有一条路径，也就说数组的个数是1
-    NSLog(@"routes counts:%d", iRouteCnt);
+    //NSLog(@"routes counts:%d", iRouteCnt);
     if (iRouteCnt < 1)
     {
         return;
@@ -1254,23 +1404,21 @@
         [self sendRouteInfo2TSS:runningDataset.formatedH2ORouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE];
     }
     
-    if (runningDataset.currentlyRoute == ROUTECODEGOTOOFFICE)
-    {
-        [self processGetedDrivingRoute:result errorCode:error];
-    }
-    
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    [saveDefaults setObject:@"YES" forKey:@"isGetedH2ORoute"];
+    mIsGetedH2ORoute =  YES;
     //已经获得上班路线，继续获取下班路线
-    [self getO2HRoute];
+    //[self getO2HRoute]; //目前已经靠后台定时器单独执行
 }
 
 
 - (void) didGetedRouteO2H:(BMKPlanResult*)result errorCode:(int)error
 {
-    NSLog(@"Processing O2H route result");
+    //NSLog(@"Processing O2H route result");
 
     if (error != BMKErrorOk) 
     {
-        NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
+        //NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
         UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取上下班路径，请重新设定家庭地址" 
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
@@ -1283,7 +1431,7 @@
     
     //int iRoutePointCnt = 0; //路径上所有坐标点的个数
     int iRouteCnt = [plan.routes count]; //每个方案上路径的个数，目前只有一条路径，也就说数组的个数是1
-    NSLog(@"routes counts:%d", iRouteCnt);
+    //NSLog(@"routes counts:%d", iRouteCnt);
     if (iRouteCnt < 1)
     {
         return;
@@ -1295,21 +1443,20 @@
         [self formateHomeOfficeRouteInfoandSave:runningDataset.drivingRoute direction:1];
         [self sendRouteInfo2TSS:runningDataset.formatedO2HRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE];
     }
-    if (runningDataset.currentlyRoute == ROUTECODEGOHOME)
-    {
-        [self processGetedDrivingRoute:result errorCode:error];
-    }
     
-    [self detectPath];
+    NSUserDefaults *saveDefaults = [NSUserDefaults standardUserDefaults];
+    [saveDefaults setObject:@"YES" forKey:@"isGetedO2HRoute"];
+    mISGetedO2HRoute = YES;
+
 }
 
 - (void) processGetedDrivingRoute:(BMKPlanResult*)result errorCode:(int)error
 {
-    NSLog(@"Processing Driving route result");
+    //NSLog(@"Processing Driving route result");
 
     if (error != BMKErrorOk) 
     {
-        NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
+       // NSLog(@"######onGetDrivingRouteResult-Error, errorcode:%d", error);
         UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"无法获取路况路径"
                                                           delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
         [alertView show];
@@ -1322,7 +1469,7 @@
     
     //int iRoutePointCnt = 0; //路径上所有坐标点的个数
     int iRouteCnt = [plan.routes count]; //每个方案上路径的个数，目前只有一条路径，也就说数组的个数是1
-    NSLog(@"routes counts:%d", iRouteCnt);
+    //NSLog(@"routes counts:%d", iRouteCnt);
     if (iRouteCnt < 1)
     {
         return;
@@ -1349,6 +1496,7 @@
     }
     
     [runningDataset setIsPlaned:YES];
+    [runningDataset setLastRoutePlanedTime:[NSDate date]];
     
     //清理地图和路况数据
     [mMapView removeAllTrafficPolylines];
@@ -1359,6 +1507,7 @@
     
     [runningDataset.trafficContainer reFilteTrafficWithRoadList:runningDataset.formatedRouteInfo.roadlist];
 
+    [self setDestinationTrafficSegCnt:-1];
     
     [mSwipeBar toggle:NO];
     [self start2Go];    
@@ -1371,7 +1520,9 @@
     if (userLocation.isUpdating)
     {
         return;
-    }    
+    }
+    
+    //if ([mMapView checkIfLocOutofRange])
     
     if (!((userLocation.location.coordinate.latitude >= 18.0 && userLocation.location.coordinate.latitude <= 54.0)
           && (userLocation.location.coordinate.longitude >= 73.0 && userLocation.location.coordinate.longitude <= 135.0)) )
@@ -1390,7 +1541,14 @@
     {
         mIsOutofRange = NO;
     }
-        
+    
+    
+    if (runningDataset.lastUserLocation == nil)
+    {
+        runningDataset.lastUserLocation = userLocation.location;
+        return;
+    }
+    
     //判断和上次更新的距离，用于获取速度，以及减少路径相关计算
     CLLocationDistance distance = 0.0;
     distance = BMKMetersBetweenMapPoints(BMKMapPointForCoordinate(userLocation.location.coordinate),
@@ -1403,33 +1561,79 @@
     //减少计算量，以及刷新地图的频率; 后续建议根据速度动态调整该值
     //目前尝试根据准确度来调整更新，避免在基站和WiFi等情况下乱漂移。
     CLLocationAccuracy accuracy = (userLocation.location.horizontalAccuracy + userLocation.location.verticalAccuracy)/2.0;
+    //NSLog(@"Accuracy=%f, Speed=%f, Cource=%f", accuracy, userLocation.location.speed, userLocation.location.course);
+    
     if (distance < (accuracy*2.0)) //20.0)
     {
-        if (locupdateTimeInterval >= 60.0) //如果时间间隔过长，意味着可能是重新打开应用程序，先记录当前位置待后续位置更新后处理
+        if (locupdateTimeInterval >= 600.0) //如果时间间隔过长，意味着可能是重新打开应用程序，先记录当前位置待后续位置更新后处理
         {
             runningDataset.lastUserLocation = userLocation.location;
             return;
         }
-        if ((locupdateTimeInterval <= 5.0))
+        if ((locupdateTimeInterval <= 10.0))
         {
             return;
         }
     }
-    
-
-    
-    avgSegSpeed = distance/locupdateTimeInterval*3600.0/1000.0;
-    //avgSegSpeed = avgSegSpeed/4000.0*80.0;
-    if (avgSegSpeed <= 80.0)
+        
+            
+    if (userLocation.location.speed > 0) //静止的时候是 -1 M/S
     {
-//        [self DrawSpeedPolyline:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
-//        [self saveSpeed:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
+        if (userLocation.location.speed > 10.0) //10x3.6=36KM/H
+        {
+            if (distance < 80
+                &&  [RTTMapKit cacDirectionChange:runningDataset.lastUserLocation.course secondDirection:userLocation.location.course] < 20.0 )  //加上拐弯因素？
+            {
+                return;
+            }
+        }
+        else if(userLocation.location.speed > 5.0) //5x3.6=18KM/H
+        {
+            if (distance < 40
+                &&  [RTTMapKit cacDirectionChange:runningDataset.lastUserLocation.course secondDirection:userLocation.location.course] < 20.0)  //加上拐弯因素？
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (distance < 20
+                &&  [RTTMapKit cacDirectionChange:runningDataset.lastUserLocation.course secondDirection:userLocation.location.course] < 20.0)  //加上拐弯因素？
+            {
+                return;
+            }
+        }
     }
+    else
+    {
+        if ((locupdateTimeInterval <= 10.0))
+        {
+            return;
+        }
+
+    }
+    
+    [self saveSamplePoint:userLocation.location];
+    
+//    avgSegSpeed = distance/locupdateTimeInterval*3600.0/1000.0;
+//    //if (avgSegSpeed <= 160.0)
+//    {
+//        [mMapView DrawSpeedPolyline:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate];
+//        [self saveSpeed:avgSegSpeed startPoint:(runningDataset.lastUserLocation.coordinate) endPoint:userLocation.location.coordinate GPSCourse:userLocation.location.course GPSSpeed:userLocation.location.speed GPSAccuracy:accuracy];
+//    }
+
     
     //更新上一次获得的当前坐标
     //#warning BMKUserLocation似乎不能正确执行copy方法；缺省赋值保存后内容和userLocation一致了，无法使用 
     runningDataset.lastUserLocation = userLocation.location;
     
+    
+    //后台运行，只是采集数据
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground)
+    {
+        return;
+    }
+
     
     //如果路径没有规划，则不需要做路径计算
     if (!runningDataset.isPlaned)
@@ -1539,7 +1743,7 @@
                 [self setTrafficBoardContent:nearestTrffSeg.roadname distance:nextTrafficDistance detail:nearestTrffSeg.detail];
                 [self showTrafficBoard];
                 
-                NSLog(@"%@", trafficInfoText);
+                //NSLog(@"%@", trafficInfoText);
                 
                 //播放语音，每隔500M
                 if (![runningDataset.trffTTSPlayRec ifRecorded:nextTrafficDistance stepIndex:nearestTrffSeg.stepIndex pointIndex:nearestTrffSeg.nextPointIndex])
@@ -1743,17 +1947,46 @@
 //    //[self detectPath];
 //}
 
-
 - (void) saveSpeed:(CLLocationSpeed)speed startPoint:(CLLocationCoordinate2D) startpoint endPoint:(CLLocationCoordinate2D) endpoint
+         GPSCourse:(double)cur GPSSpeed:(double) GPSSpeed GPSAccuracy:(double)accuracy
 {
     NSString *strSpeed = [[NSString alloc] initWithFormat:@"%.2f", speed];
     NSString *stpt = [[NSString alloc] initWithFormat:@"%f, %f", startpoint.longitude, startpoint.latitude];
     NSString *edpt = [[NSString alloc] initWithFormat:@"%f, %f", endpoint.longitude, endpoint.latitude];
+    NSString *course = [[NSString alloc] initWithFormat:@"%f", cur];
+    NSString *gpsspeed = [[NSString alloc] initWithFormat:@"%f", GPSSpeed];
+    NSString *gpsaccuracy = [[NSString alloc] initWithFormat:@"%f", accuracy];
 
-    NSArray *writearray = [NSArray arrayWithObjects: strSpeed, stpt, edpt, nil];
+
+    NSArray *writearray = [NSArray arrayWithObjects: strSpeed, stpt, edpt, course,gpsspeed,gpsaccuracy,nil];
 
     [mSpeedSedList addObject:writearray];
 }
+
+- (void) saveSamplePoint:(CLLocation*) locationInfo
+{
+    LYCoordinate_Builder *coordinateBuild = [[LYCoordinate_Builder alloc] init];
+    [coordinateBuild setLat:locationInfo.coordinate.latitude];
+    [coordinateBuild setLng:locationInfo.coordinate.longitude];
+    LYCoordinate *samplePointLoc = [coordinateBuild build];
+    
+    LYSamplePoint_Builder *samplePointBuild = [[LYSamplePoint_Builder alloc] init];
+    [samplePointBuild setAltitude:locationInfo.altitude];
+    [samplePointBuild setCourse:locationInfo.course];
+    [samplePointBuild setSpCoordinate:samplePointLoc];
+    [samplePointBuild setTimestamp: [locationInfo.timestamp timeIntervalSince1970]];
+    
+    //NSLog(@"SamplePoint TimeStamp=%d", samplePointBuild.timestamp);
+    
+    LYSamplePoint *samplePointItem = [samplePointBuild build];
+    
+    if (mSpeedSamplePoints.count > 1000)
+    {
+        [mSpeedSamplePoints removeObjectAtIndex:0];
+    }
+    [mSpeedSamplePoints addObject:samplePointItem];
+}
+
 
 - (void) saveHomeData
 {
@@ -2099,9 +2332,14 @@
     NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 拥堵路段: %d",  self.currentlyRouteEndAddr , segCount ];
     [self.uiDestinationLBL setText:strLable];
     }
-    else
+    else if (segCount == 0)
     {
         NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 全线无拥堵",  self.currentlyRouteEndAddr];
+        [self.uiDestinationLBL setText:strLable];
+    }
+    else
+    {
+        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 无路况信息",  self.currentlyRouteEndAddr];
         [self.uiDestinationLBL setText:strLable];
     }
 }
@@ -2215,9 +2453,11 @@
                     pinView = customPinView;
                     
                     pinView.pinColor = BMKPinAnnotationColorGreen;
-                    UIImage *anoImage = [UIImage imageNamed:@"StartPointV1.png"];
+                    //UIImage *anoImage = [UIImage imageNamed:@"StartPointV1.png"];
+                    UIImage *anoImage = [UIImage imageNamed:@"mapapi.bundle/images/icon_nav_start.png"];
+
                     pinView.image = anoImage;
-                    CGPoint offsetPoin = {0.0,0.0};
+                    CGPoint offsetPoin = {0.0,-10.0};
                     pinView.centerOffset = offsetPoin;
 
                 }
@@ -2239,9 +2479,11 @@
                     pinView = customPinView;
                     
                     pinView.pinColor = BMKPinAnnotationColorPurple;
-                    UIImage *anoImage = [UIImage imageNamed:@"EndPointV1.png"];
+                    //UIImage *anoImage = [UIImage imageNamed:@"EndPointV1.png"];
+                    UIImage *anoImage = [UIImage imageNamed:@"mapapi.bundle/images/icon_nav_end.png"];
+
                     pinView.image = anoImage;
-                    CGPoint offsetPoin = {0.0,0.0};
+                    CGPoint offsetPoin = {0.0,-10.0};
                     pinView.centerOffset = offsetPoin;
 
                 }
@@ -2404,7 +2646,7 @@
         }
         else
         {
-            NSLog(@"***Drawing Speed Overlay: %@ ***", overlay.title);
+            //NSLog(@"***Drawing Speed Overlay: %@ ***", overlay.title);
             NSArray *titleCompnArray = [overlay.title componentsSeparatedByString:@"--"];
             if ([[titleCompnArray objectAtIndex:0] isEqualToString:@"Seg4Speed"])
             {
@@ -2466,7 +2708,7 @@
     bool result = [self->mBMKSearch reverseGeocode:coordinate];
     if (!result)
     {
-        NSLog(@"***设置导航点，获取当前地址错误***");
+        //NSLog(@"***设置导航点，获取当前地址错误***");
     }
 
     //[self showModeIndicator:@"正在获取位置信息" seconds:0];
@@ -2477,12 +2719,13 @@
 
 - (bool) RouteSearch:(CLLocationCoordinate2D)startpoint end:(CLLocationCoordinate2D)endpoint
 {
-    NSLog(@"RoutPlaning.....");
-    
-    self.currentlyRouteEndPoint = endpoint;
-    
-    //情况前方拥堵的语音播放记录
-    [runningDataset.trffTTSPlayRec clear];
+//    //清除前方拥堵的语音播放记录
+//    [runningDataset.trffTTSPlayRec clear];
+//    
+//    [runningDataset setIsPlaned:NO];
+//    [runningDataset setCurrentRoadStep:0];
+//    self.currentlyRouteEndPoint = endpoint;
+
     
 	if (!mBMKSearch)
     {
@@ -2496,26 +2739,18 @@
     start.pt = startpoint;//(22.559205, 113.963739);
     end.pt = endpoint;//CLLocationCoordinate2DMake(22.575145, 113.907856);
     
-    [runningDataset setIsPlaned:NO];
-    [runningDataset setCurrentRoadStep:0];
-    
+//    if ( (mRunningActivity != RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE) && (mRunningActivity != RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE) )
+//    {
+//        [runningDataset setIsPlaned:NO];
+//        [runningDataset setCurrentRoadStep:0];
+//    }
     
 	bool isSuccPlanCall = [mBMKSearch drivingSearch:@"深圳" startNode:start endCity:@"深圳" endNode:end];
     if (!isSuccPlanCall)
     {
-//#if defined (HUAWEIVER)
-//        runningDataset.currentlyRoute = ROUTECODEUNKNOW;
-//#endif
-        NSLog(@"Call driving search failure");
         runningDataset.isPlaningFailed = YES;
         return false;
     }
-//    else 
-//    {
-//        [self showModeIndicator:@"路径规划中" seconds:10];
-//        [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-//    }
-    NSLog(@"End of RoutPlaning.....");
     
     return true;
 }
@@ -2533,7 +2768,7 @@
 {
     if (runningDataset.homeAddrInfo == nil)
     {
-        NSLog(@"家庭地址未设置");
+        //NSLog(@"家庭地址未设置");
         return;
     }
     
@@ -2542,11 +2777,11 @@
     bool ret = [self RouteSearch:point1 end:point2];
     if (!ret)
     {
-        NSLog(@"Route Planing Fail!");
+        //NSLog(@"Route Planing Fail!");
     }
     else 
     {
-        //[self showModeIndicator:@"回家路况获取中" seconds:10];
+        [self showModeIndicator:@"路况获取中" seconds:10];
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGH2OROUTE];
     }
 
@@ -2556,7 +2791,7 @@
 {
     if (runningDataset.homeAddrInfo == nil)
     {
-        NSLog(@"家庭地址未设置");
+        //NSLog(@"家庭地址未设置");
         return;
     }
     
@@ -2566,11 +2801,11 @@
     bool ret = [self RouteSearch:point1 end:point2];
     if (!ret)
     {
-        NSLog(@"Route Planing Fail!");
+        //NSLog(@"Route Planing Fail!");
     }
     else
     {
-        [self showModeIndicator:@"上班路况获取中" seconds:10];
+        [self showModeIndicator:@"路况获取中" seconds:10];
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGO2HROUTE];
     }
 }
@@ -2806,11 +3041,18 @@
     bool ret = [self RouteSearch:startpoint end:endpoint];
     if (!ret)
     {
-        NSLog(@"Route Planing Fail!");
+        //NSLog(@"Route Planing Fail!");
     }
     else {
         [self showModeIndicator:@"路况获取中" seconds:10];
         [self setRunningActivityTimer:10 activity:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+        
+        //清除前方拥堵的语音播放记录
+        [runningDataset.trffTTSPlayRec clear];
+        
+        [runningDataset setIsPlaned:NO];
+        [runningDataset setCurrentRoadStep:0];
+        self.currentlyRouteEndPoint = endpoint;
     }
 }
 
@@ -2829,19 +3071,19 @@
     switch ([r currentReachabilityStatus]) {
         case NotReachable:
             // 没有网络连接
-            NSLog(@"############# Not Reachable#######");
+            //NSLog(@"############# Not Reachable#######");
             break;
         case ReachableViaWWAN:
             // 使用3G网络
         {
-            NSLog(@"############# Use 3G #######");
+            //NSLog(@"############# Use 3G #######");
             isNetworkReachable = YES;
         }
             break;
         case ReachableViaWiFi:
             // 使用WiFi网络
         {
-            NSLog(@"############# Use WiFi #######");
+            //NSLog(@"############# Use WiFi #######");
             isNetworkReachable = YES;
         }
             break;
@@ -2856,19 +3098,19 @@
     switch ([r currentReachabilityStatus]) {
         case NotReachable:
             // 没有网络连接
-            NSLog(@"############# Not Reachable#######");
+            //NSLog(@"############# Not Reachable#######");
             break;
         case ReachableViaWWAN:
             // 使用3G网络
         {
-            NSLog(@"############# Use 3G #######");
+            //NSLog(@"############# Use 3G #######");
             isNetworkReachable = YES;
         }
             break;
         case ReachableViaWiFi:
             // 使用WiFi网络
         {
-            NSLog(@"############# Use WiFi #######");
+            //NSLog(@"############# Use WiFi #######");
             isNetworkReachable = YES;
         }
             break;
@@ -2898,20 +3140,20 @@
     {
         case NotReachable:
         {
-            NSLog(@"The internet is down.");
+            //NSLog(@"The internet is down.");
             self.internetActive =NO;
             break;
             
         }
         case ReachableViaWiFi:
         {
-            NSLog(@"The internet is working via WIFI.");
+            //NSLog(@"The internet is working via WIFI.");
             self.internetActive =YES;
             break;
         }
         case ReachableViaWWAN:
         {
-            NSLog(@"The internet is working via WWAN.");
+            //NSLog(@"The internet is working via WWAN.");
             self.internetActive =YES;
             break;
         }
@@ -2923,19 +3165,19 @@
     {
         case NotReachable:
         {
-            NSLog(@"A gateway to the host server is down.");
+            //NSLog(@"A gateway to the host server is down.");
             self.hostActive =NO;
             break;
         }
         case ReachableViaWiFi:
         {
-            NSLog(@"A gateway to the host server is working via WIFI.");
+            //NSLog(@"A gateway to the host server is working via WIFI.");
             self.hostActive =YES;
             break;
         }
         case ReachableViaWWAN:
         {
-            NSLog(@"A gateway to the host server is working via WWAN.");
+            //NSLog(@"A gateway to the host server is working via WWAN.");
             self.hostActive =YES;
             break;
         }
@@ -2950,6 +3192,60 @@
 }
 
 
+- (bool) sendChechinInfo2TSS
+{
+    UIDevice *dev = [UIDevice currentDevice];
+    NSString *deviceUuid = dev.uniqueIdentifier;
+    NSString *deviceName = dev.name;
+    NSString *deviceModel = dev.model;
+    NSString *deviceSystemVersion = dev.systemVersion;
+    NSString *deviceOSType = dev.systemName;
+    
+    //NSLog(@"UUID=%@, Name=%@, Model=%@, Version=%@", deviceUuid, deviceName, deviceModel, deviceSystemVersion);
+//    int32_t lyMajorRelease;
+//    int32_t lyMinorRelease;
+//    NSString* deviceModel;
+//    NSString* osVersion;
+//    LYOsType osType;
+
+    LYCheckin_Builder *chechinBuilder = [[LYCheckin_Builder alloc] init];
+    [chechinBuilder setDeviceModel:deviceModel];
+    [chechinBuilder setOsType:LYOsTypeLyIos];
+    [chechinBuilder setOsVersion:deviceSystemVersion];
+    [chechinBuilder setLyMajorRelease:1];
+    [chechinBuilder setLyMinorRelease:0];
+    
+    
+    LYCheckin * chechinRptMsg = [chechinBuilder build];
+    
+    LYMsgOnAir_Builder *sendPackageBuilder = [[LYMsgOnAir_Builder alloc] init];
+    [sendPackageBuilder setVersion:1];
+    [sendPackageBuilder setFromParty:LYPartyLyClient];
+    [sendPackageBuilder setToParty:LYPartyLyTss];
+    [sendPackageBuilder setMsgType:LYMsgTypeLyCheckin];
+    [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
+    [sendPackageBuilder setSndId:runningDataset.deviceUuid];
+    
+    [sendPackageBuilder setCheckin:chechinRptMsg];
+    
+    NSDate *now = [NSDate date];
+    NSTimeInterval timeStamp = now.timeIntervalSince1970;
+    [sendPackageBuilder setTimestamp:timeStamp];
+    
+    LYMsgOnAir *sendPackage = [sendPackageBuilder build];
+    if (sendPackage == nil)
+    {
+        //NSLog(@"*********Failed to build sendPackage");
+        return false;
+    }
+    
+    NSData *const request = [sendPackage data];
+    //NSLog(@"Sending Token------------");
+    [mComm4TSS sendData:request withFlags:0];
+    
+    return true;
+}
+
 
 - (bool) sendDeviceInfo2TSS:(NSData *)deviceToken
 {
@@ -2959,7 +3255,7 @@
     NSString *deviceModel = dev.model;
     NSString *deviceSystemVersion = dev.systemVersion;
     
-    NSLog(@"UUID=%@, Name=%@, Model=%@, Version=%@", deviceUuid, deviceName, deviceModel, deviceSystemVersion);
+    //NSLog(@"UUID=%@, Name=%@, Model=%@, Version=%@", deviceUuid, deviceName, deviceModel, deviceSystemVersion);
 
     LYDeviceReport_Builder *devrptBuilder = [[LYDeviceReport_Builder alloc] init];
     [devrptBuilder setDeviceId:deviceUuid];
@@ -2977,6 +3273,7 @@
     //[sendPackageBuilder setMsgDir:TSSMsgDirClient2Tss];
     [sendPackageBuilder setMsgType:LYMsgTypeLyDeviceReport];
     [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
+    [sendPackageBuilder setSndId:runningDataset.deviceUuid];
     
     [sendPackageBuilder setDeviceReport:devrptMsg];
     
@@ -2987,13 +3284,49 @@
     LYMsgOnAir *sendPackage = [sendPackageBuilder build];
     if (sendPackage == nil)
     {
-        NSLog(@"*********Failed to build sendPackage");
+        //NSLog(@"*********Failed to build sendPackage");
         return false;
     }
     
     NSData *const request = [sendPackage data];
-    NSLog(@"Sending Token------------");
+    //NSLog(@"Sending Token------------");
     [mComm4TSS sendData:request withFlags:0]; 
+    
+    return true;
+}
+
+
+- (bool) sendSamplePoints2TSS
+{
+    
+    LYTrafficReport_Builder *trfReportBuilder = [[LYTrafficReport_Builder alloc] init];
+    [trfReportBuilder addAllPoints:mSpeedSamplePoints];
+    
+    LYTrafficReport * trfRptMsg = [trfReportBuilder build];
+    
+    LYMsgOnAir_Builder *sendPackageBuilder = [[LYMsgOnAir_Builder alloc] init];
+    [sendPackageBuilder setVersion:1];
+    [sendPackageBuilder setFromParty:LYPartyLyClient];
+    [sendPackageBuilder setToParty:LYPartyLyTc];
+    [sendPackageBuilder setMsgType:LYMsgTypeLyTrafficReport];
+    [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
+    [sendPackageBuilder setSndId:runningDataset.deviceUuid];
+    
+    [sendPackageBuilder setTrafficReport:trfRptMsg];
+    
+    NSDate *now = [NSDate date];
+    NSTimeInterval timeStamp = now.timeIntervalSince1970;
+    [sendPackageBuilder setTimestamp:timeStamp];
+    
+    LYMsgOnAir *sendPackage = [sendPackageBuilder build];
+    if (sendPackage == nil)
+    {
+        //NSLog(@"*********Failed to build sendPackage");
+        return false;
+    }
+    
+    NSData *const request = [sendPackage data];
+    [mComm4TSS sendData:request withFlags:0];
     
     return true;
 }
@@ -3035,7 +3368,7 @@
             LYCoordinate *endPoint = [endPointBuild build];
             if (endPoint == nil)
             {
-                NSLog(@"*********Failed to build Point");
+                //NSLog(@"*********Failed to build Point");
                 return false;
             }
             
@@ -3044,7 +3377,7 @@
             LYSegment *roadSegment = [tssDrvSegmtBuild build];
             if (roadSegment == nil)
             {
-                NSLog(@"*********Failed to build roadSegment");
+                //NSLog(@"*********Failed to build roadSegment");
                 return false;
             }
             [tssRouteBuild addSegments:roadSegment];
@@ -3071,7 +3404,7 @@
         LYRoute *pDrvRoute = [tssRouteBuild build];
         if (pDrvRoute == nil)
         {
-            NSLog(@"*********Failed to build Route");
+            //NSLog(@"*********Failed to build Route");
             return false;
         }
         
@@ -3094,7 +3427,7 @@
         LYTrafficSub *subscriberMsg = [subscMsgBuilder build];
         if (subscriberMsg == nil)
         {
-            NSLog(@"*********Failed to build subscriberMsg");
+            //NSLog(@"*********Failed to build subscriberMsg");
             return false;
         }
         
@@ -3108,6 +3441,9 @@
         [sendPackageBuilder setTrafficSub:subscriberMsg];
         [sendPackageBuilder setMsgId:++mTSSMessageSerialNum];
 
+        [sendPackageBuilder setSndId:runningDataset.deviceUuid];
+        
+
         NSDate *now = [NSDate date];
         NSTimeInterval timeStamp = now.timeIntervalSince1970;
         [sendPackageBuilder setTimestamp:timeStamp];
@@ -3117,12 +3453,12 @@
         LYMsgOnAir *sendPackage = [sendPackageBuilder build];
         if (sendPackage == nil)
         {
-            NSLog(@"*********Failed to build sendPackage");
+            //NSLog(@"*********Failed to build sendPackage");
             return false;
         }
         
         NSData *const request = [sendPackage data];
-        NSLog(@"Sending request 2 TSS------------");
+        //NSLog(@"Sending request 2 TSS------------");
 #warning FOR TEST 和TSS通信
         [mComm4TSS sendData:request withFlags:0];
     }
@@ -3132,7 +3468,7 @@
 
 - (void) OnRceivePacket:(NSData*) rcvdata
 {
-    NSLog(@"*********RECEIVED DATA******************");
+    //NSLog(@"*********RECEIVED DATA******************");
     if (rcvdata == nil)
     {
         NSLog(@"invalid data");
@@ -3163,7 +3499,7 @@
 
     int iSeconds = recvPackage.timestamp;
     NSString *recodedTime = [[NSString alloc]initWithUTF8String:(asctime(localtime((time_t*)&iSeconds )))];
-    NSLog(@"Package TimeStamp: %@", recodedTime);
+    //NSLog(@"Package TimeStamp: %@", recodedTime);
     
     NSDate *packetDate = [NSDate dateWithTimeIntervalSince1970:recvPackage.timestamp];
     NSTimeInterval secondsBetweenNow =  [packetDate timeIntervalSinceNow];
@@ -3191,12 +3527,81 @@
         }
             break;
             
+        case LYMsgTypeLyRetCode:
+        {
+            
+            if (recvPackage.hasRetCode)
+            {
+                NSLog(@"***************Receive a return code=%d**********", recvPackage.retCode);
+                [self didReceiveReturnCode:recvPackage.retCode];
+            }
+            else
+            {
+                NSLog(@"Received a retCode package but have not Content");
+            }
+        }
+            break;
+
+        case LYMsgTypeLyCheckin:
+        {
+            
+            if (recvPackage.hasCheckin)
+            {
+                //NSLog(@"***************Receive a return code=%d**********", recvPackage.retCode);
+                [self didReceiveChechin:recvPackage.checkin];
+            }
+            else
+            {
+                NSLog(@"Received a checkin package but have not Content");
+            }
+        }
+            break;
+
+            
         default:
             break;
     }
         
 }
 
+- (void) didReceiveChechin:(LYCheckin*) checkinInfo
+{
+    if ([checkinInfo hasLyMajorRelease])
+    {
+        NSLog(@"Version: %d", checkinInfo.lyMajorRelease);
+
+        if (checkinInfo.lyMajorRelease > 3)
+        {
+            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"该版本过低，已经停止服务\n建议立即到APPStore升级新版本"
+                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+            [alertView show];
+        }
+        else
+        {
+            if ([checkinInfo hasLyMinorRelease])
+            {
+                NSLog(@"Release: %d", checkinInfo.hasLyMinorRelease);
+
+                if (checkinInfo.lyMinorRelease > 1)
+                {
+                    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"该应用版本已经更新，可能无法提供良好的路况服务\n建议立即到APPStore升级新版本"
+                                                                      delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+                    [alertView show];
+                }
+            }
+        }
+    }
+}
+
+- (void) didReceiveReturnCode:(LYRetCode) retCode
+{
+        if (retCode == LYRetCodeLyVersionImcompatible)
+        {
+            UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"版本过低，无法兼容服务端获取路况"
+                                                              delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
+            [alertView show];
+        }
+}
 
 - (void) didReceiveTrafficPackage:(LYTrafficPub*) trafficPubPackage
 {
@@ -3244,7 +3649,7 @@
 
     
 #warning LOG-TRAFFIC
-//#if defined (DEBUG)
+#if defined (DEBUG)
     NSLog(@"---------------Received TrafficInfo--------------");
     NSLog(@"City Name: %@", pTrafficInfo.city);
     NSLog(@"RoadCount: %d", pTrafficInfo.roadTrafficsList.count);
@@ -3275,14 +3680,14 @@
             NSLog(@"TimeStamp formated: %@", recodedTime);
         }
     }
-//#endif
+#endif
     
 }
 
 
 - (void) CheckAndUpdateTrafficListView
 {
-    NSLog(@"Test CheckAndUpdateTrafficListView");
+    //NSLog(@"Test CheckAndUpdateTrafficListView");
     int ctrlCnt = [self.navigationController.viewControllers count];
     for (int i = 0; i < ctrlCnt; i++)
     {
@@ -3292,7 +3697,7 @@
             RTTTrafficListViewController *pTrafficCtrl = (RTTTrafficListViewController*)pCtrlinQue;
             [pTrafficCtrl.trafficListTBL reloadData];
             [pTrafficCtrl getDatasourceFromRunningDataSet];
-            NSLog(@"UpdateTrafficListView.........");
+            //NSLog(@"UpdateTrafficListView.........");
         }
     }
 }
@@ -3302,7 +3707,7 @@
 
 - (void) addTestData
 {
-    [self createTestPath];
+    //[self createTestPath];
     
     //iTestLocIndex = 0;
     //locUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(timeLocUpdate) userInfo:nil repeats:YES]; 
@@ -3317,13 +3722,13 @@
 - (void) TestRoadNameAndPoints
 {
     int iRoadCnt = runningDataset.formatedRouteInfo.roadlist.count;
-    NSLog(@"Road Cnt %d", iRoadCnt);
+    //NSLog(@"Road Cnt %d", iRoadCnt);
     for (int i = 0; i < iRoadCnt; i++)
     {
         //RttGRoadInfo *road = [formatedrouteinfo.roadlist objectAtIndex:i];
         RttGRoadInfo *road = [runningDataset.formatedRouteInfo.roadlist objectAtIndex:i];
         int iPoincnt = [road.pointlist count];
-        NSLog(@"Road Index: %d, Name: %@, PoinCnt %d", i, road.roadname, iPoincnt);
+        //NSLog(@"Road Index: %d, Name: %@, PoinCnt %d", i, road.roadname, iPoincnt);
         
         CLLocationCoordinate2D pPoints[2];
         
@@ -3620,87 +4025,7 @@
 }
 
 
-- (void) createTestPath
-{
-    BMKAddrInfo *startAddr = [[BMKAddrInfo alloc]init];
-    startAddr.addressComponent.streetName = @"文心二路";
-    CLLocationCoordinate2D startLoc;
-    startLoc.latitude = 22.5256;
-    startLoc.longitude = 113.937464;
-    startAddr.geoPt = startLoc;
-    startAddr.strAddr = @"";
-    
-    BMKAddrInfo *endAddr = [[BMKAddrInfo alloc]init];
-    endAddr.addressComponent.streetName = @"办公室";
-    CLLocationCoordinate2D endLoc;
-    endLoc.latitude = 22.575232;
-    endLoc.longitude = 113.907802;
-    endAddr.geoPt = endLoc;
-    endAddr.strAddr = @"";
-    
-    RttGHistoryPathInfo *pathInfo = [[RttGHistoryPathInfo alloc] init];
-    pathInfo.startPointInfo = startAddr;
-    pathInfo.endPointInfo = endAddr;
-    pathInfo.pathName = @"路线1:文心二路-华丰时代广场";
-    
-    [runningDataset.historyPathInfoList addObject:pathInfo];
-    
-    RttGHistoryPathInfo *pathInfo2 = [[RttGHistoryPathInfo alloc] init];
-    pathInfo2.startPointInfo = endAddr;
-    pathInfo2.endPointInfo = startAddr;
-    pathInfo2.pathName = @"路线2:华丰时代广场-文心二路";
-    
-    
-    [runningDataset.historyPathInfoList addObject:pathInfo2];
-    
-    BMKAddrInfo *startAddr3 = [[BMKAddrInfo alloc]init];
-    startAddr3.addressComponent.streetName = @"五和大道";
-    CLLocationCoordinate2D startLoc3;
-    startLoc3.latitude = 22.660177;
-    startLoc3.longitude = 114.063939;
-    startAddr3.geoPt = startLoc3;
-    startAddr3.strAddr = @"";
-    
-    BMKAddrInfo *endAddr3 = [[BMKAddrInfo alloc]init];
-    endAddr3.addressComponent.streetName = @"万科城";
-    CLLocationCoordinate2D endLoc3;
-    endLoc3.latitude = 22.651723;
-    endLoc3.longitude = 114.073568;
-    endAddr3.geoPt = endLoc3;
-    endAddr3.strAddr = @"";
-    
-    RttGHistoryPathInfo *pathInfo3 = [[RttGHistoryPathInfo alloc] init];
-    pathInfo3.startPointInfo = startAddr3;
-    pathInfo3.endPointInfo = endAddr3;
-    pathInfo3.pathName = @"路线3:华电门口-万科城";
-    
-    [runningDataset.historyPathInfoList addObject:pathInfo3];
-    
-    
-    BMKAddrInfo *startAddr4 = [[BMKAddrInfo alloc]init];
-    startAddr4.addressComponent.streetName = @"松坪街";
-    CLLocationCoordinate2D startLoc4;
-    startLoc4.latitude = 22.561224;
-    startLoc4.longitude = 113.962787;
-    startAddr4.geoPt = startLoc4;
-    startAddr4.strAddr = @"";
-    
-    BMKAddrInfo *endAddr4 = [[BMKAddrInfo alloc]init];
-    endAddr4.addressComponent.streetName = @"世界之窗";
-    CLLocationCoordinate2D endLoc4;
-    endLoc4.latitude = 22.54297;
-    endLoc4.longitude = 113.9807;
-    endAddr4.geoPt = endLoc4;
-    endAddr4.strAddr = @"";
-    
-    RttGHistoryPathInfo *pathInfo4 = [[RttGHistoryPathInfo alloc] init];
-    pathInfo4.startPointInfo = startAddr4;
-    pathInfo4.endPointInfo = endAddr4;
-    pathInfo4.pathName = @"路线4:松坪街-世界之窗";
-    
-    [runningDataset.historyPathInfoList addObject:pathInfo4];
-    
-}
+
 
 
 
@@ -3712,12 +4037,18 @@
 {
     if (! self.autoDetectOnOff)
     {
+        
+        if (runningDataset.isPlaned && [self isNetworkReachable])
+        {
+            [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+        }
+
         return -1;
     }
     
-    if (runningDataset.homeAddrInfo == nil)
+    if (runningDataset.homeAddrInfo == nil && runningDataset.officeAddrInfo == nil)
     {
-        NSLog(@"家庭地址未设置");
+        //NSLog(@"家庭地址未设置");
         return -1;
     }
     
@@ -3733,51 +4064,126 @@
     //上班时间段
     if (hour >= 2 && hour < 12)
     {
+        BOOL isNeedReplan = NO;
+        
         if (runningDataset.currentlyRoute != ROUTECODEGOTOOFFICE)
         {
-            //re-planing
-            NSLog(@"Replaning to Office");
+            NSTimeInterval secondsBetweenNow =  [runningDataset.lastRoutePlanedTime timeIntervalSinceNow];
+            if (secondsBetweenNow <= -14400.0) //超过4个小时
+            {
+                isNeedReplan = YES;
+            }
+        }
+        else
+        {
+            if (!runningDataset.isPlaned)
+            {
+                isNeedReplan = YES;
+            }
+        }
+        
+        if (isNeedReplan)
+        {
             [self routePlanCurLoctoOffice];
             runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
         }
-        else {
-            if (runningDataset.isPlaned)
+        else
+        {
+            //update_traffic
+            if ([self isNetworkReachable])
             {
-                //update_traffic
-                if ([self isNetworkReachable])
-                {
-                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-                }
-            }
-            else {
-                [self routePlanCurLoctoOffice];
-                runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
+                [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
             }
         }
+//
+//        
+//        if (runningDataset.currentlyRoute != ROUTECODEGOTOOFFICE)
+//        {
+//            NSTimeInterval secondsBetweenNow =  [runningDataset.lastRoutePlanedTime timeIntervalSinceNow];
+//            if (secondsBetweenNow <= -18000.0) //超过5个小时
+//            {
+//                //re-planing
+//                NSLog(@"Replaning to Office");
+//                [self routePlanCurLoctoOffice];
+//                runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
+//            }
+//            else
+//            {
+//                
+//            }
+//        }
+//        else
+//        {
+//            if (runningDataset.isPlaned)
+//            {
+//                //update_traffic
+//                if ([self isNetworkReachable])
+//                {
+//                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+//                }
+//            }
+//            else {
+//                [self routePlanCurLoctoOffice];
+//                runningDataset.currentlyRoute = ROUTECODEGOTOOFFICE;
+//            }
+//        }
     }
     else //下班
     {
-        if (runningDataset.currentlyRoute != ROUTECODEGOHOME)
+        BOOL isNeedReplan = NO;
+        
+        if (runningDataset.currentlyRoute != ROUTECODEGOTOOFFICE)
+        {
+            NSTimeInterval secondsBetweenNow =  [runningDataset.lastRoutePlanedTime timeIntervalSinceNow];
+            if (secondsBetweenNow <= -14400.0) //超过4个小时
+            {
+                isNeedReplan = YES;
+            }
+        }
+        else
+        {
+            if (!runningDataset.isPlaned)
+            {
+                isNeedReplan = YES;
+            }
+        }
+        
+        if (isNeedReplan)
         {
             //re-planing
             [self routePlanCurLoctoHome];
             runningDataset.currentlyRoute = ROUTECODEGOHOME;
         }
-        else {
-            if (runningDataset.isPlaned)
+        else
+        {
+            //update_traffic
+            if ([self isNetworkReachable])
             {
-                //update_traffic
-                if ([self isNetworkReachable])
-                {
-                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
-                }
-            }
-            else {
-                //re-planing
-                [self routePlanCurLoctoHome];
-                runningDataset.currentlyRoute = ROUTECODEGOHOME;
+                [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
             }
         }
+
+//        if (runningDataset.currentlyRoute != ROUTECODEGOHOME)
+//        {
+//            //re-planing
+//            [self routePlanCurLoctoHome];
+//            runningDataset.currentlyRoute = ROUTECODEGOHOME;
+//        }
+//        else {
+//            if (runningDataset.isPlaned)
+//            {
+//                //update_traffic
+//                if ([self isNetworkReachable])
+//                {
+//                    [self sendRouteInfo2TSS:runningDataset.formatedRouteInfo type:RTTEN_ACTIVITYTYPE_GETTINGROUTE];
+//                }
+//            }
+//            else {
+//                //re-planing
+//                [self routePlanCurLoctoHome];
+//                runningDataset.currentlyRoute = ROUTECODEGOHOME;
+//            }
+//        }
     }
     
     
@@ -3789,7 +4195,7 @@
 {
     if (runningDataset.homeAddrInfo == nil)
     {
-        NSLog(@"公司地址未设置");
+        //NSLog(@"公司地址未设置");
         return;
     }
     
@@ -3806,7 +4212,7 @@
 {
     if (runningDataset.homeAddrInfo == nil)
     {
-        NSLog(@"家庭地址未设置");
+        //NSLog(@"家庭地址未设置");
         return;
     }
     

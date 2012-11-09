@@ -445,7 +445,7 @@
 
 - (CLLocationCoordinate2D) getCurLocation
 {
-    NSLog(@"UserLocation=%.6f, %.6f", self.userLocation.coordinate.latitude, self.userLocation.coordinate.longitude);
+    //NSLog(@"UserLocation=%.6f, %.6f", self.userLocation.coordinate.latitude, self.userLocation.coordinate.longitude);
     
     if ((self.userLocation == nil) || [self checkIfLocOutofRange])
     {
@@ -580,7 +580,7 @@
         int len = [route getPointsNum:j];
         iRoutePointCnt += len;
     }
-    NSLog(@"Points Cnt in Steps: %d", iRoutePointCnt);
+    //NSLog(@"Points Cnt in Steps: %d", iRoutePointCnt);
     
     
     //DrivingRoute = route;//[plan.routes objectAtIndex:i];
@@ -756,7 +756,7 @@
     
     if (addrTxt != nil)
     {
-        NSLog(@"AddrTxt=%@", addrTxt);
+        //NSLog(@"AddrTxt=%@", addrTxt);
         pointAnnotation.addrString = [[NSString alloc] initWithString:addrTxt];
     }
     

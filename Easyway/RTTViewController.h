@@ -51,18 +51,8 @@ enum RTTEN_ACTIVITYTYPE {
 //<BMKMapViewDelegate, BMKSearchDelegate, RttGTSSCommunication, RttgRDVCdelegate, UISearchBarDelegate, RttGPassDataV2C, UIGestureRecognizerDelegate, IFlySynthesizerControlDelegate> 
 
 {
-    //IBOutlet UIView *mMapView;
-    
-
     IBOutlet UIView *mCenterView;
-    
-    //非路径提示版本这些都不用了
-//    IBOutlet UIButton *mRoutePreviewBTN;
-//    IBOutlet UIView *mInfoboadView;
-//    IBOutlet UIButton *mOnGoBTN;
-//    IBOutlet UIButton *mRoutePreviewInInfoBoadBTN;
-    
-    
+        
     RTTMapView *mMapView;
     RNSwipeBar *mSwipeBar;
     BMKSearch  *mBMKSearch;
@@ -73,72 +63,39 @@ enum RTTEN_ACTIVITYTYPE {
     UIButton *mRetryButton;
     
     RTTSuggestionListViewController *mSuggestionListVC;
-    //RNSwipeBar *mTopbar;
     
     UIActivityIndicatorView *mActivityIndicatorView;
     RTTModeActivityIndicatorView *mModeIndicatorView;
 
-    
-//    BOOL mIsHomeAddrSetting;
-//    BMKPoiInfo *mHomeAddrInfo;
-//    BMKPoiInfo *mOfficeAddrInfo;
-//    NSInteger *mCurrentRoute;
-    
-//    BMKPolyline     *pCurrentlyPolyLine;
-//    NSMutableArray *trafficPolylineList;
-//    
-//    RTTMapPointAnnotation *pStartPointAnnotation;
-//    RTTMapPointAnnotation *pEndPointAnnotation;
-//    RTTMapPointAnnotation *pHomePointAnnotation;
-//    RTTMapPointAnnotation *pUndefAnnotation;
-//
-//    RTTMapPointAnnotation *pCurrentlySelectedAnnotation;  //当前选择的点
-//    RTTMapPointAnnotation *pWaitPOIResultAnnotation;  //当前等待返回POI结果的点
-//    
-//    NSMutableArray *mAnnotationArray;  //当前未定义的点
-//
-//
-//    
     RTTRunningDataSet *runningDataset;
     
     CLLocationCoordinate2D mLastOnPlanLocation;
     
-    //BOOL isSearchBarInuse;
-    
-//    ZMQContext *zmqTSSContext;
-//    ZMQSocket *zmqTSSSocket;
-//    NSOperationQueue *rttThreadQue; 
+
     RTTComm4TSS *mComm4TSS;
+    int mTSSMessageSerialNum;
     
-//    NSTimer *locUpdateTimer;
-//    NSTimer *btnDismissTimer;
     NSTimer *mModeIndicatorTimer;
+    NSTimer *mActivityTimer;
+    NSTimer *mCheckBKJobTimer;
+    NSTimer *mFirstTimeInitDelayToDoTimer;
+    NSTimer *mSendSampePoints2TSSTimer;
     
     enum RTTEN_ACTIVITYTYPE mRunningActivity;
-    NSTimer *mActivityTimer;
 
-    
-//    bool isBTNDismissTimeOut;
-//    int iTestLocIndex;
-    
-//    BMKPointAnnotation *pTestCareAnnotation;
-//    NSMutableArray *testLocationList;
-//
-//    NSTimer *mStart2GoTimer;
-//    int     mTicks4StartGo;
-    
-    int mTSSMessageSerialNum;
     
     int mSpeedIndex;
     NSMutableArray *mSpeedSedList;
+    NSMutableArray *mSpeedSamplePoints;
+
     
     RTTSynthesizeTTS *mSynTTS;
     
+    
     BOOL mIsOutofRange;
     
-    //UIDevice *dev; //= [UIDevice currentDevice];
-    //NSString *deviceVersion; //= dev.systemVersion;
-    //NSString *deviceUuid; //= dev.uniqueIdentifier;
+    BOOL mIsGetedH2ORoute;
+    BOOL mISGetedO2HRoute;
 }
 
 //@property (nonatomic) CLLocationCoordinate2D lastOnPlanLocation;
@@ -173,6 +130,7 @@ enum RTTEN_ACTIVITYTYPE {
 - (IBAction)didBack2UserLocation:(id)sender;
 - (IBAction)didShowSearchbar:(id)sender;
 
+//- (IBAction)didTrafficTitleSwipeRight:(UISwipeGestureRecognizer *)sender;
 
 - (NSInteger) detectPath;
 

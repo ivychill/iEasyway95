@@ -19,6 +19,16 @@ static PBExtensionRegistry* extensionRegistry = nil;
 }
 @end
 
+BOOL LYOsTypeIsValidValue(LYOsType value) {
+  switch (value) {
+    case LYOsTypeLyAndroid:
+    case LYOsTypeLyIos:
+    case LYOsTypeLyWp:
+      return YES;
+    default:
+      return NO;
+  }
+}
 BOOL LYDirectionIsValidValue(LYDirection value) {
   switch (value) {
     case LYDirectionLyUnknown:
@@ -53,6 +63,7 @@ BOOL LYPartyIsValidValue(LYParty value) {
   switch (value) {
     case LYPartyLyClient:
     case LYPartyLyTss:
+    case LYPartyLyTc:
       return YES;
     default:
       return NO;
@@ -60,7 +71,7 @@ BOOL LYPartyIsValidValue(LYParty value) {
 }
 BOOL LYMsgTypeIsValidValue(LYMsgType value) {
   switch (value) {
-    case LYMsgTypeLyVoid:
+    case LYMsgTypeLyCheckin:
     case LYMsgTypeLyRetCode:
     case LYMsgTypeLyTrafficSub:
     case LYMsgTypeLyTrafficReport:
@@ -3581,11 +3592,434 @@ static LYDeviceReport* defaultLYDeviceReportInstance = nil;
 }
 @end
 
+@interface LYCheckin ()
+@property (retain) NSString* deviceModel;
+@property LYOsType osType;
+@property (retain) NSString* osVersion;
+@property int32_t lyMajorRelease;
+@property int32_t lyMinorRelease;
+@property (retain) NSString* downloadUrl;
+@property (retain) NSString* desc;
+@end
+
+@implementation LYCheckin
+
+- (BOOL) hasDeviceModel {
+  return !!hasDeviceModel_;
+}
+- (void) setHasDeviceModel:(BOOL) value {
+  hasDeviceModel_ = !!value;
+}
+@synthesize deviceModel;
+- (BOOL) hasOsType {
+  return !!hasOsType_;
+}
+- (void) setHasOsType:(BOOL) value {
+  hasOsType_ = !!value;
+}
+@synthesize osType;
+- (BOOL) hasOsVersion {
+  return !!hasOsVersion_;
+}
+- (void) setHasOsVersion:(BOOL) value {
+  hasOsVersion_ = !!value;
+}
+@synthesize osVersion;
+- (BOOL) hasLyMajorRelease {
+  return !!hasLyMajorRelease_;
+}
+- (void) setHasLyMajorRelease:(BOOL) value {
+  hasLyMajorRelease_ = !!value;
+}
+@synthesize lyMajorRelease;
+- (BOOL) hasLyMinorRelease {
+  return !!hasLyMinorRelease_;
+}
+- (void) setHasLyMinorRelease:(BOOL) value {
+  hasLyMinorRelease_ = !!value;
+}
+@synthesize lyMinorRelease;
+- (BOOL) hasDownloadUrl {
+  return !!hasDownloadUrl_;
+}
+- (void) setHasDownloadUrl:(BOOL) value {
+  hasDownloadUrl_ = !!value;
+}
+@synthesize downloadUrl;
+- (BOOL) hasDesc {
+  return !!hasDesc_;
+}
+- (void) setHasDesc:(BOOL) value {
+  hasDesc_ = !!value;
+}
+@synthesize desc;
+- (void) dealloc {
+  self.deviceModel = nil;
+  self.osVersion = nil;
+  self.downloadUrl = nil;
+  self.desc = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.deviceModel = @"";
+    self.osType = LYOsTypeLyAndroid;
+    self.osVersion = @"";
+    self.lyMajorRelease = 0;
+    self.lyMinorRelease = 0;
+    self.downloadUrl = @"";
+    self.desc = @"";
+  }
+  return self;
+}
+static LYCheckin* defaultLYCheckinInstance = nil;
++ (void) initialize {
+  if (self == [LYCheckin class]) {
+    defaultLYCheckinInstance = [[LYCheckin alloc] init];
+  }
+}
++ (LYCheckin*) defaultInstance {
+  return defaultLYCheckinInstance;
+}
+- (LYCheckin*) defaultInstance {
+  return defaultLYCheckinInstance;
+}
+- (BOOL) isInitialized {
+  if (!self.hasOsType) {
+    return NO;
+  }
+  if (!self.hasLyMajorRelease) {
+    return NO;
+  }
+  if (!self.hasLyMinorRelease) {
+    return NO;
+  }
+  return YES;
+}
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output {
+  if (self.hasDeviceModel) {
+    [output writeString:1 value:self.deviceModel];
+  }
+  if (self.hasOsType) {
+    [output writeEnum:2 value:self.osType];
+  }
+  if (self.hasOsVersion) {
+    [output writeString:3 value:self.osVersion];
+  }
+  if (self.hasLyMajorRelease) {
+    [output writeInt32:4 value:self.lyMajorRelease];
+  }
+  if (self.hasLyMinorRelease) {
+    [output writeInt32:5 value:self.lyMinorRelease];
+  }
+  if (self.hasDownloadUrl) {
+    [output writeString:6 value:self.downloadUrl];
+  }
+  if (self.hasDesc) {
+    [output writeString:7 value:self.desc];
+  }
+  [self.unknownFields writeToCodedOutputStream:output];
+}
+- (int32_t) serializedSize {
+  int32_t size = memoizedSerializedSize;
+  if (size != -1) {
+    return size;
+  }
+
+  size = 0;
+  if (self.hasDeviceModel) {
+    size += computeStringSize(1, self.deviceModel);
+  }
+  if (self.hasOsType) {
+    size += computeEnumSize(2, self.osType);
+  }
+  if (self.hasOsVersion) {
+    size += computeStringSize(3, self.osVersion);
+  }
+  if (self.hasLyMajorRelease) {
+    size += computeInt32Size(4, self.lyMajorRelease);
+  }
+  if (self.hasLyMinorRelease) {
+    size += computeInt32Size(5, self.lyMinorRelease);
+  }
+  if (self.hasDownloadUrl) {
+    size += computeStringSize(6, self.downloadUrl);
+  }
+  if (self.hasDesc) {
+    size += computeStringSize(7, self.desc);
+  }
+  size += self.unknownFields.serializedSize;
+  memoizedSerializedSize = size;
+  return size;
+}
++ (LYCheckin*) parseFromData:(NSData*) data {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromData:data] build];
+}
++ (LYCheckin*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromData:data extensionRegistry:extensionRegistry] build];
+}
++ (LYCheckin*) parseFromInputStream:(NSInputStream*) input {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromInputStream:input] build];
+}
++ (LYCheckin*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYCheckin*) parseFromCodedInputStream:(PBCodedInputStream*) input {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromCodedInputStream:input] build];
+}
++ (LYCheckin*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  return (LYCheckin*)[[[LYCheckin builder] mergeFromCodedInputStream:input extensionRegistry:extensionRegistry] build];
+}
++ (LYCheckin_Builder*) builder {
+  return [[[LYCheckin_Builder alloc] init] autorelease];
+}
++ (LYCheckin_Builder*) builderWithPrototype:(LYCheckin*) prototype {
+  return [[LYCheckin builder] mergeFrom:prototype];
+}
+- (LYCheckin_Builder*) builder {
+  return [LYCheckin builder];
+}
+@end
+
+@interface LYCheckin_Builder()
+@property (retain) LYCheckin* result;
+@end
+
+@implementation LYCheckin_Builder
+@synthesize result;
+- (void) dealloc {
+  self.result = nil;
+  [super dealloc];
+}
+- (id) init {
+  if ((self = [super init])) {
+    self.result = [[[LYCheckin alloc] init] autorelease];
+  }
+  return self;
+}
+- (PBGeneratedMessage*) internalGetResult {
+  return result;
+}
+- (LYCheckin_Builder*) clear {
+  self.result = [[[LYCheckin alloc] init] autorelease];
+  return self;
+}
+- (LYCheckin_Builder*) clone {
+  return [LYCheckin builderWithPrototype:result];
+}
+- (LYCheckin*) defaultInstance {
+  return [LYCheckin defaultInstance];
+}
+- (LYCheckin*) build {
+  [self checkInitialized];
+  return [self buildPartial];
+}
+- (LYCheckin*) buildPartial {
+  LYCheckin* returnMe = [[result retain] autorelease];
+  self.result = nil;
+  return returnMe;
+}
+- (LYCheckin_Builder*) mergeFrom:(LYCheckin*) other {
+  if (other == [LYCheckin defaultInstance]) {
+    return self;
+  }
+  if (other.hasDeviceModel) {
+    [self setDeviceModel:other.deviceModel];
+  }
+  if (other.hasOsType) {
+    [self setOsType:other.osType];
+  }
+  if (other.hasOsVersion) {
+    [self setOsVersion:other.osVersion];
+  }
+  if (other.hasLyMajorRelease) {
+    [self setLyMajorRelease:other.lyMajorRelease];
+  }
+  if (other.hasLyMinorRelease) {
+    [self setLyMinorRelease:other.lyMinorRelease];
+  }
+  if (other.hasDownloadUrl) {
+    [self setDownloadUrl:other.downloadUrl];
+  }
+  if (other.hasDesc) {
+    [self setDesc:other.desc];
+  }
+  [self mergeUnknownFields:other.unknownFields];
+  return self;
+}
+- (LYCheckin_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input {
+  return [self mergeFromCodedInputStream:input extensionRegistry:[PBExtensionRegistry emptyRegistry]];
+}
+- (LYCheckin_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry {
+  PBUnknownFieldSet_Builder* unknownFields = [PBUnknownFieldSet builderWithUnknownFields:self.unknownFields];
+  while (YES) {
+    int32_t tag = [input readTag];
+    switch (tag) {
+      case 0:
+        [self setUnknownFields:[unknownFields build]];
+        return self;
+      default: {
+        if (![self parseUnknownField:input unknownFields:unknownFields extensionRegistry:extensionRegistry tag:tag]) {
+          [self setUnknownFields:[unknownFields build]];
+          return self;
+        }
+        break;
+      }
+      case 10: {
+        [self setDeviceModel:[input readString]];
+        break;
+      }
+      case 16: {
+        int32_t value = [input readEnum];
+        if (LYOsTypeIsValidValue(value)) {
+          [self setOsType:value];
+        } else {
+          [unknownFields mergeVarintField:2 value:value];
+        }
+        break;
+      }
+      case 26: {
+        [self setOsVersion:[input readString]];
+        break;
+      }
+      case 32: {
+        [self setLyMajorRelease:[input readInt32]];
+        break;
+      }
+      case 40: {
+        [self setLyMinorRelease:[input readInt32]];
+        break;
+      }
+      case 50: {
+        [self setDownloadUrl:[input readString]];
+        break;
+      }
+      case 58: {
+        [self setDesc:[input readString]];
+        break;
+      }
+    }
+  }
+}
+- (BOOL) hasDeviceModel {
+  return result.hasDeviceModel;
+}
+- (NSString*) deviceModel {
+  return result.deviceModel;
+}
+- (LYCheckin_Builder*) setDeviceModel:(NSString*) value {
+  result.hasDeviceModel = YES;
+  result.deviceModel = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearDeviceModel {
+  result.hasDeviceModel = NO;
+  result.deviceModel = @"";
+  return self;
+}
+- (BOOL) hasOsType {
+  return result.hasOsType;
+}
+- (LYOsType) osType {
+  return result.osType;
+}
+- (LYCheckin_Builder*) setOsType:(LYOsType) value {
+  result.hasOsType = YES;
+  result.osType = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearOsType {
+  result.hasOsType = NO;
+  result.osType = LYOsTypeLyAndroid;
+  return self;
+}
+- (BOOL) hasOsVersion {
+  return result.hasOsVersion;
+}
+- (NSString*) osVersion {
+  return result.osVersion;
+}
+- (LYCheckin_Builder*) setOsVersion:(NSString*) value {
+  result.hasOsVersion = YES;
+  result.osVersion = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearOsVersion {
+  result.hasOsVersion = NO;
+  result.osVersion = @"";
+  return self;
+}
+- (BOOL) hasLyMajorRelease {
+  return result.hasLyMajorRelease;
+}
+- (int32_t) lyMajorRelease {
+  return result.lyMajorRelease;
+}
+- (LYCheckin_Builder*) setLyMajorRelease:(int32_t) value {
+  result.hasLyMajorRelease = YES;
+  result.lyMajorRelease = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearLyMajorRelease {
+  result.hasLyMajorRelease = NO;
+  result.lyMajorRelease = 0;
+  return self;
+}
+- (BOOL) hasLyMinorRelease {
+  return result.hasLyMinorRelease;
+}
+- (int32_t) lyMinorRelease {
+  return result.lyMinorRelease;
+}
+- (LYCheckin_Builder*) setLyMinorRelease:(int32_t) value {
+  result.hasLyMinorRelease = YES;
+  result.lyMinorRelease = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearLyMinorRelease {
+  result.hasLyMinorRelease = NO;
+  result.lyMinorRelease = 0;
+  return self;
+}
+- (BOOL) hasDownloadUrl {
+  return result.hasDownloadUrl;
+}
+- (NSString*) downloadUrl {
+  return result.downloadUrl;
+}
+- (LYCheckin_Builder*) setDownloadUrl:(NSString*) value {
+  result.hasDownloadUrl = YES;
+  result.downloadUrl = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearDownloadUrl {
+  result.hasDownloadUrl = NO;
+  result.downloadUrl = @"";
+  return self;
+}
+- (BOOL) hasDesc {
+  return result.hasDesc;
+}
+- (NSString*) desc {
+  return result.desc;
+}
+- (LYCheckin_Builder*) setDesc:(NSString*) value {
+  result.hasDesc = YES;
+  result.desc = value;
+  return self;
+}
+- (LYCheckin_Builder*) clearDesc {
+  result.hasDesc = NO;
+  result.desc = @"";
+  return self;
+}
+@end
+
 @interface LYSamplePoint ()
 @property (retain) LYCoordinate* spCoordinate;
 @property int64_t timestamp;
 @property Float64 altitude;
-@property int32_t course;
+@property Float64 course;
 @end
 
 @implementation LYSamplePoint
@@ -3666,7 +4100,7 @@ static LYSamplePoint* defaultLYSamplePointInstance = nil;
     [output writeDouble:3 value:self.altitude];
   }
   if (self.hasCourse) {
-    [output writeInt32:4 value:self.course];
+    [output writeDouble:4 value:self.course];
   }
   [self.unknownFields writeToCodedOutputStream:output];
 }
@@ -3687,7 +4121,7 @@ static LYSamplePoint* defaultLYSamplePointInstance = nil;
     size += computeDoubleSize(3, self.altitude);
   }
   if (self.hasCourse) {
-    size += computeInt32Size(4, self.course);
+    size += computeDoubleSize(4, self.course);
   }
   size += self.unknownFields.serializedSize;
   memoizedSerializedSize = size;
@@ -3814,8 +4248,8 @@ static LYSamplePoint* defaultLYSamplePointInstance = nil;
         [self setAltitude:[input readDouble]];
         break;
       }
-      case 32: {
-        [self setCourse:[input readInt32]];
+      case 33: {
+        [self setCourse:[input readDouble]];
         break;
       }
     }
@@ -3886,10 +4320,10 @@ static LYSamplePoint* defaultLYSamplePointInstance = nil;
 - (BOOL) hasCourse {
   return result.hasCourse;
 }
-- (int32_t) course {
+- (Float64) course {
   return result.course;
 }
-- (LYSamplePoint_Builder*) setCourse:(int32_t) value {
+- (LYSamplePoint_Builder*) setCourse:(Float64) value {
   result.hasCourse = YES;
   result.course = value;
   return self;
@@ -4109,7 +4543,11 @@ static LYTrafficReport* defaultLYTrafficReportInstance = nil;
 @property LYParty fromParty;
 @property LYParty toParty;
 @property LYMsgType msgType;
+@property (retain) NSString* sndId;
+@property (retain) NSString* rcvId;
+@property (retain) NSData* signature;
 @property LYRetCode retCode;
+@property (retain) LYCheckin* checkin;
 @property (retain) LYDeviceReport* deviceReport;
 @property (retain) LYTrafficSub* trafficSub;
 @property (retain) LYTrafficPub* trafficPub;
@@ -4160,6 +4598,27 @@ static LYTrafficReport* defaultLYTrafficReportInstance = nil;
   hasMsgType_ = !!value;
 }
 @synthesize msgType;
+- (BOOL) hasSndId {
+  return !!hasSndId_;
+}
+- (void) setHasSndId:(BOOL) value {
+  hasSndId_ = !!value;
+}
+@synthesize sndId;
+- (BOOL) hasRcvId {
+  return !!hasRcvId_;
+}
+- (void) setHasRcvId:(BOOL) value {
+  hasRcvId_ = !!value;
+}
+@synthesize rcvId;
+- (BOOL) hasSignature {
+  return !!hasSignature_;
+}
+- (void) setHasSignature:(BOOL) value {
+  hasSignature_ = !!value;
+}
+@synthesize signature;
 - (BOOL) hasRetCode {
   return !!hasRetCode_;
 }
@@ -4167,6 +4626,13 @@ static LYTrafficReport* defaultLYTrafficReportInstance = nil;
   hasRetCode_ = !!value;
 }
 @synthesize retCode;
+- (BOOL) hasCheckin {
+  return !!hasCheckin_;
+}
+- (void) setHasCheckin:(BOOL) value {
+  hasCheckin_ = !!value;
+}
+@synthesize checkin;
 - (BOOL) hasDeviceReport {
   return !!hasDeviceReport_;
 }
@@ -4196,6 +4662,10 @@ static LYTrafficReport* defaultLYTrafficReportInstance = nil;
 }
 @synthesize trafficReport;
 - (void) dealloc {
+  self.sndId = nil;
+  self.rcvId = nil;
+  self.signature = nil;
+  self.checkin = nil;
   self.deviceReport = nil;
   self.trafficSub = nil;
   self.trafficPub = nil;
@@ -4209,8 +4679,12 @@ static LYTrafficReport* defaultLYTrafficReportInstance = nil;
     self.timestamp = 0L;
     self.fromParty = LYPartyLyClient;
     self.toParty = LYPartyLyClient;
-    self.msgType = LYMsgTypeLyVoid;
+    self.msgType = LYMsgTypeLyCheckin;
+    self.sndId = @"";
+    self.rcvId = @"";
+    self.signature = [NSData data];
     self.retCode = LYRetCodeLySuccess;
+    self.checkin = [LYCheckin defaultInstance];
     self.deviceReport = [LYDeviceReport defaultInstance];
     self.trafficSub = [LYTrafficSub defaultInstance];
     self.trafficPub = [LYTrafficPub defaultInstance];
@@ -4248,6 +4722,11 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
   }
   if (!self.hasMsgType) {
     return NO;
+  }
+  if (self.hasCheckin) {
+    if (!self.checkin.isInitialized) {
+      return NO;
+    }
   }
   if (self.hasDeviceReport) {
     if (!self.deviceReport.isInitialized) {
@@ -4293,8 +4772,20 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
   if (self.hasTimestamp) {
     [output writeInt64:6 value:self.timestamp];
   }
+  if (self.hasSndId) {
+    [output writeString:7 value:self.sndId];
+  }
+  if (self.hasRcvId) {
+    [output writeString:8 value:self.rcvId];
+  }
+  if (self.hasSignature) {
+    [output writeData:9 value:self.signature];
+  }
   if (self.hasRetCode) {
     [output writeEnum:17 value:self.retCode];
+  }
+  if (self.hasCheckin) {
+    [output writeMessage:18 value:self.checkin];
   }
   if (self.hasDeviceReport) {
     [output writeMessage:19 value:self.deviceReport];
@@ -4338,8 +4829,20 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
   if (self.hasTimestamp) {
     size += computeInt64Size(6, self.timestamp);
   }
+  if (self.hasSndId) {
+    size += computeStringSize(7, self.sndId);
+  }
+  if (self.hasRcvId) {
+    size += computeStringSize(8, self.rcvId);
+  }
+  if (self.hasSignature) {
+    size += computeDataSize(9, self.signature);
+  }
   if (self.hasRetCode) {
     size += computeEnumSize(17, self.retCode);
+  }
+  if (self.hasCheckin) {
+    size += computeMessageSize(18, self.checkin);
   }
   if (self.hasDeviceReport) {
     size += computeMessageSize(19, self.deviceReport);
@@ -4447,8 +4950,20 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
   if (other.hasMsgType) {
     [self setMsgType:other.msgType];
   }
+  if (other.hasSndId) {
+    [self setSndId:other.sndId];
+  }
+  if (other.hasRcvId) {
+    [self setRcvId:other.rcvId];
+  }
+  if (other.hasSignature) {
+    [self setSignature:other.signature];
+  }
   if (other.hasRetCode) {
     [self setRetCode:other.retCode];
+  }
+  if (other.hasCheckin) {
+    [self mergeCheckin:other.checkin];
   }
   if (other.hasDeviceReport) {
     [self mergeDeviceReport:other.deviceReport];
@@ -4523,6 +5038,18 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
         [self setTimestamp:[input readInt64]];
         break;
       }
+      case 58: {
+        [self setSndId:[input readString]];
+        break;
+      }
+      case 66: {
+        [self setRcvId:[input readString]];
+        break;
+      }
+      case 74: {
+        [self setSignature:[input readData]];
+        break;
+      }
       case 136: {
         int32_t value = [input readEnum];
         if (LYRetCodeIsValidValue(value)) {
@@ -4530,6 +5057,15 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
         } else {
           [unknownFields mergeVarintField:17 value:value];
         }
+        break;
+      }
+      case 146: {
+        LYCheckin_Builder* subBuilder = [LYCheckin builder];
+        if (self.hasCheckin) {
+          [subBuilder mergeFrom:self.checkin];
+        }
+        [input readMessage:subBuilder extensionRegistry:extensionRegistry];
+        [self setCheckin:[subBuilder buildPartial]];
         break;
       }
       case 154: {
@@ -4664,7 +5200,55 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
 }
 - (LYMsgOnAir_Builder*) clearMsgType {
   result.hasMsgType = NO;
-  result.msgType = LYMsgTypeLyVoid;
+  result.msgType = LYMsgTypeLyCheckin;
+  return self;
+}
+- (BOOL) hasSndId {
+  return result.hasSndId;
+}
+- (NSString*) sndId {
+  return result.sndId;
+}
+- (LYMsgOnAir_Builder*) setSndId:(NSString*) value {
+  result.hasSndId = YES;
+  result.sndId = value;
+  return self;
+}
+- (LYMsgOnAir_Builder*) clearSndId {
+  result.hasSndId = NO;
+  result.sndId = @"";
+  return self;
+}
+- (BOOL) hasRcvId {
+  return result.hasRcvId;
+}
+- (NSString*) rcvId {
+  return result.rcvId;
+}
+- (LYMsgOnAir_Builder*) setRcvId:(NSString*) value {
+  result.hasRcvId = YES;
+  result.rcvId = value;
+  return self;
+}
+- (LYMsgOnAir_Builder*) clearRcvId {
+  result.hasRcvId = NO;
+  result.rcvId = @"";
+  return self;
+}
+- (BOOL) hasSignature {
+  return result.hasSignature;
+}
+- (NSData*) signature {
+  return result.signature;
+}
+- (LYMsgOnAir_Builder*) setSignature:(NSData*) value {
+  result.hasSignature = YES;
+  result.signature = value;
+  return self;
+}
+- (LYMsgOnAir_Builder*) clearSignature {
+  result.hasSignature = NO;
+  result.signature = [NSData data];
   return self;
 }
 - (BOOL) hasRetCode {
@@ -4681,6 +5265,36 @@ static LYMsgOnAir* defaultLYMsgOnAirInstance = nil;
 - (LYMsgOnAir_Builder*) clearRetCode {
   result.hasRetCode = NO;
   result.retCode = LYRetCodeLySuccess;
+  return self;
+}
+- (BOOL) hasCheckin {
+  return result.hasCheckin;
+}
+- (LYCheckin*) checkin {
+  return result.checkin;
+}
+- (LYMsgOnAir_Builder*) setCheckin:(LYCheckin*) value {
+  result.hasCheckin = YES;
+  result.checkin = value;
+  return self;
+}
+- (LYMsgOnAir_Builder*) setCheckinBuilder:(LYCheckin_Builder*) builderForValue {
+  return [self setCheckin:[builderForValue build]];
+}
+- (LYMsgOnAir_Builder*) mergeCheckin:(LYCheckin*) value {
+  if (result.hasCheckin &&
+      result.checkin != [LYCheckin defaultInstance]) {
+    result.checkin =
+      [[[LYCheckin builderWithPrototype:result.checkin] mergeFrom:value] buildPartial];
+  } else {
+    result.checkin = value;
+  }
+  result.hasCheckin = YES;
+  return self;
+}
+- (LYMsgOnAir_Builder*) clearCheckin {
+  result.hasCheckin = NO;
+  result.checkin = [LYCheckin defaultInstance];
   return self;
 }
 - (BOOL) hasDeviceReport {

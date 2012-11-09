@@ -2,6 +2,8 @@
 
 #import "ProtocolBuffers.h"
 
+@class LYCheckin;
+@class LYCheckin_Builder;
 @class LYCityTraffic;
 @class LYCityTraffic_Builder;
 @class LYCoordinate;
@@ -31,6 +33,14 @@
 @class LYTrafficSub;
 @class LYTrafficSub_Builder;
 typedef enum {
+  LYOsTypeLyAndroid = 0,
+  LYOsTypeLyIos = 1,
+  LYOsTypeLyWp = 2,
+} LYOsType;
+
+BOOL LYOsTypeIsValidValue(LYOsType value);
+
+typedef enum {
   LYDirectionLyUnknown = 0,
   LYDirectionLyEast = 1,
   LYDirectionLyNortheast = 2,
@@ -59,12 +69,13 @@ BOOL LYRetCodeIsValidValue(LYRetCode value);
 typedef enum {
   LYPartyLyClient = 1,
   LYPartyLyTss = 2,
+  LYPartyLyTc = 3,
 } LYParty;
 
 BOOL LYPartyIsValidValue(LYParty value);
 
 typedef enum {
-  LYMsgTypeLyVoid = 1,
+  LYMsgTypeLyCheckin = 1,
   LYMsgTypeLyRetCode = 2,
   LYMsgTypeLyTrafficSub = 4,
   LYMsgTypeLyTrafficReport = 5,
@@ -938,15 +949,117 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 - (LYDeviceReport_Builder*) clearDeviceOsVersion;
 @end
 
+@interface LYCheckin : PBGeneratedMessage {
+@private
+  BOOL hasLyMajorRelease_:1;
+  BOOL hasLyMinorRelease_:1;
+  BOOL hasDeviceModel_:1;
+  BOOL hasOsVersion_:1;
+  BOOL hasDownloadUrl_:1;
+  BOOL hasDesc_:1;
+  BOOL hasOsType_:1;
+  int32_t lyMajorRelease;
+  int32_t lyMinorRelease;
+  NSString* deviceModel;
+  NSString* osVersion;
+  NSString* downloadUrl;
+  NSString* desc;
+  LYOsType osType;
+}
+- (BOOL) hasDeviceModel;
+- (BOOL) hasOsType;
+- (BOOL) hasOsVersion;
+- (BOOL) hasLyMajorRelease;
+- (BOOL) hasLyMinorRelease;
+- (BOOL) hasDownloadUrl;
+- (BOOL) hasDesc;
+@property (readonly, retain) NSString* deviceModel;
+@property (readonly) LYOsType osType;
+@property (readonly, retain) NSString* osVersion;
+@property (readonly) int32_t lyMajorRelease;
+@property (readonly) int32_t lyMinorRelease;
+@property (readonly, retain) NSString* downloadUrl;
+@property (readonly, retain) NSString* desc;
+
++ (LYCheckin*) defaultInstance;
+- (LYCheckin*) defaultInstance;
+
+- (BOOL) isInitialized;
+- (void) writeToCodedOutputStream:(PBCodedOutputStream*) output;
+- (LYCheckin_Builder*) builder;
++ (LYCheckin_Builder*) builder;
++ (LYCheckin_Builder*) builderWithPrototype:(LYCheckin*) prototype;
+
++ (LYCheckin*) parseFromData:(NSData*) data;
++ (LYCheckin*) parseFromData:(NSData*) data extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCheckin*) parseFromInputStream:(NSInputStream*) input;
++ (LYCheckin*) parseFromInputStream:(NSInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
++ (LYCheckin*) parseFromCodedInputStream:(PBCodedInputStream*) input;
++ (LYCheckin*) parseFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+@end
+
+@interface LYCheckin_Builder : PBGeneratedMessage_Builder {
+@private
+  LYCheckin* result;
+}
+
+- (LYCheckin*) defaultInstance;
+
+- (LYCheckin_Builder*) clear;
+- (LYCheckin_Builder*) clone;
+
+- (LYCheckin*) build;
+- (LYCheckin*) buildPartial;
+
+- (LYCheckin_Builder*) mergeFrom:(LYCheckin*) other;
+- (LYCheckin_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input;
+- (LYCheckin_Builder*) mergeFromCodedInputStream:(PBCodedInputStream*) input extensionRegistry:(PBExtensionRegistry*) extensionRegistry;
+
+- (BOOL) hasDeviceModel;
+- (NSString*) deviceModel;
+- (LYCheckin_Builder*) setDeviceModel:(NSString*) value;
+- (LYCheckin_Builder*) clearDeviceModel;
+
+- (BOOL) hasOsType;
+- (LYOsType) osType;
+- (LYCheckin_Builder*) setOsType:(LYOsType) value;
+- (LYCheckin_Builder*) clearOsType;
+
+- (BOOL) hasOsVersion;
+- (NSString*) osVersion;
+- (LYCheckin_Builder*) setOsVersion:(NSString*) value;
+- (LYCheckin_Builder*) clearOsVersion;
+
+- (BOOL) hasLyMajorRelease;
+- (int32_t) lyMajorRelease;
+- (LYCheckin_Builder*) setLyMajorRelease:(int32_t) value;
+- (LYCheckin_Builder*) clearLyMajorRelease;
+
+- (BOOL) hasLyMinorRelease;
+- (int32_t) lyMinorRelease;
+- (LYCheckin_Builder*) setLyMinorRelease:(int32_t) value;
+- (LYCheckin_Builder*) clearLyMinorRelease;
+
+- (BOOL) hasDownloadUrl;
+- (NSString*) downloadUrl;
+- (LYCheckin_Builder*) setDownloadUrl:(NSString*) value;
+- (LYCheckin_Builder*) clearDownloadUrl;
+
+- (BOOL) hasDesc;
+- (NSString*) desc;
+- (LYCheckin_Builder*) setDesc:(NSString*) value;
+- (LYCheckin_Builder*) clearDesc;
+@end
+
 @interface LYSamplePoint : PBGeneratedMessage {
 @private
   BOOL hasAltitude_:1;
-  BOOL hasTimestamp_:1;
   BOOL hasCourse_:1;
+  BOOL hasTimestamp_:1;
   BOOL hasSpCoordinate_:1;
   Float64 altitude;
+  Float64 course;
   int64_t timestamp;
-  int32_t course;
   LYCoordinate* spCoordinate;
 }
 - (BOOL) hasSpCoordinate;
@@ -956,7 +1069,7 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 @property (readonly, retain) LYCoordinate* spCoordinate;
 @property (readonly) int64_t timestamp;
 @property (readonly) Float64 altitude;
-@property (readonly) int32_t course;
+@property (readonly) Float64 course;
 
 + (LYSamplePoint*) defaultInstance;
 - (LYSamplePoint*) defaultInstance;
@@ -1010,8 +1123,8 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 - (LYSamplePoint_Builder*) clearAltitude;
 
 - (BOOL) hasCourse;
-- (int32_t) course;
-- (LYSamplePoint_Builder*) setCourse:(int32_t) value;
+- (Float64) course;
+- (LYSamplePoint_Builder*) setCourse:(Float64) value;
 - (LYSamplePoint_Builder*) clearCourse;
 @end
 
@@ -1069,10 +1182,14 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
   BOOL hasTimestamp_:1;
   BOOL hasVersion_:1;
   BOOL hasMsgId_:1;
+  BOOL hasSndId_:1;
+  BOOL hasRcvId_:1;
+  BOOL hasCheckin_:1;
   BOOL hasDeviceReport_:1;
   BOOL hasTrafficSub_:1;
   BOOL hasTrafficPub_:1;
   BOOL hasTrafficReport_:1;
+  BOOL hasSignature_:1;
   BOOL hasFromParty_:1;
   BOOL hasToParty_:1;
   BOOL hasMsgType_:1;
@@ -1080,10 +1197,14 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
   int64_t timestamp;
   int32_t version;
   int32_t msgId;
+  NSString* sndId;
+  NSString* rcvId;
+  LYCheckin* checkin;
   LYDeviceReport* deviceReport;
   LYTrafficSub* trafficSub;
   LYTrafficPub* trafficPub;
   LYTrafficReport* trafficReport;
+  NSData* signature;
   LYParty fromParty;
   LYParty toParty;
   LYMsgType msgType;
@@ -1095,7 +1216,11 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 - (BOOL) hasFromParty;
 - (BOOL) hasToParty;
 - (BOOL) hasMsgType;
+- (BOOL) hasSndId;
+- (BOOL) hasRcvId;
+- (BOOL) hasSignature;
 - (BOOL) hasRetCode;
+- (BOOL) hasCheckin;
 - (BOOL) hasDeviceReport;
 - (BOOL) hasTrafficSub;
 - (BOOL) hasTrafficPub;
@@ -1106,7 +1231,11 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 @property (readonly) LYParty fromParty;
 @property (readonly) LYParty toParty;
 @property (readonly) LYMsgType msgType;
+@property (readonly, retain) NSString* sndId;
+@property (readonly, retain) NSString* rcvId;
+@property (readonly, retain) NSData* signature;
 @property (readonly) LYRetCode retCode;
+@property (readonly, retain) LYCheckin* checkin;
 @property (readonly, retain) LYDeviceReport* deviceReport;
 @property (readonly, retain) LYTrafficSub* trafficSub;
 @property (readonly, retain) LYTrafficPub* trafficPub;
@@ -1176,10 +1305,32 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 - (LYMsgOnAir_Builder*) setMsgType:(LYMsgType) value;
 - (LYMsgOnAir_Builder*) clearMsgType;
 
+- (BOOL) hasSndId;
+- (NSString*) sndId;
+- (LYMsgOnAir_Builder*) setSndId:(NSString*) value;
+- (LYMsgOnAir_Builder*) clearSndId;
+
+- (BOOL) hasRcvId;
+- (NSString*) rcvId;
+- (LYMsgOnAir_Builder*) setRcvId:(NSString*) value;
+- (LYMsgOnAir_Builder*) clearRcvId;
+
+- (BOOL) hasSignature;
+- (NSData*) signature;
+- (LYMsgOnAir_Builder*) setSignature:(NSData*) value;
+- (LYMsgOnAir_Builder*) clearSignature;
+
 - (BOOL) hasRetCode;
 - (LYRetCode) retCode;
 - (LYMsgOnAir_Builder*) setRetCode:(LYRetCode) value;
 - (LYMsgOnAir_Builder*) clearRetCode;
+
+- (BOOL) hasCheckin;
+- (LYCheckin*) checkin;
+- (LYMsgOnAir_Builder*) setCheckin:(LYCheckin*) value;
+- (LYMsgOnAir_Builder*) setCheckinBuilder:(LYCheckin_Builder*) builderForValue;
+- (LYMsgOnAir_Builder*) mergeCheckin:(LYCheckin*) value;
+- (LYMsgOnAir_Builder*) clearCheckin;
 
 - (BOOL) hasDeviceReport;
 - (LYDeviceReport*) deviceReport;

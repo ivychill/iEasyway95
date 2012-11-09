@@ -44,7 +44,7 @@
             if (reply != nil)
             {
                 [self.delegate performSelectorOnMainThread:@selector(OnRceivePacket:) withObject:(NSData*)reply waitUntilDone:0];
-                NSLog(@"Received reply");
+                //NSLog(@"Received reply");
             }
         }
     }

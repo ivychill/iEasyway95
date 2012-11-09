@@ -33,7 +33,7 @@
     // Do any additional setup after loading the view from its nib.
     //webpageStr = @"https://www.roadclouding.com/users/sign_up";
     webpageStr = @"http://www.roadclouding.com/users/profile";
-    NSLog(@"%@", webpageStr);
+    //NSLog(@"%@", webpageStr);
     NSURL *url =[NSURL URLWithString:webpageStr];
     NSURLRequest *request =[NSURLRequest requestWithURL:url];
     [accountPageVIEW loadRequest:request];
@@ -77,7 +77,7 @@
     
     NSString* token = [self getTokenFromCookie];
     if (token != nil) {
-        NSLog(@"Cookie Session Value=%@", token);
+        //NSLog(@"Cookie Session Value=%@", token);
         [self.delegate gotUserLoginToken:token];
         //[self.navigationController popViewControllerAnimated:YES];
     }
@@ -90,7 +90,7 @@
     NSHTTPCookieStorage *cookieJar = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 
     for (cookie in [cookieJar cookies]) {
-        NSLog(@"Cookie Domain=%@, name=%@", cookie.domain, cookie.name);
+        //NSLog(@"Cookie Domain=%@, name=%@", cookie.domain, cookie.name);
         if ([[cookie domain] isEqualToString:@"www.roadclouding.com"])
         {
             if ([[cookie name] isEqualToString:@"_roadclouding_session"]) {

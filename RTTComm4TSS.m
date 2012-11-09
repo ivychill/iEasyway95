@@ -20,7 +20,7 @@
     //初始化和启动通信模块
     zmqTSSContext = [[ZMQContext alloc] initWithIOThreads:1U];
     //static NSString *const kEndpoint = endpoint;//@"tcp://42.121.18.140:6001";
-    NSLog(@"*** Start to connect to endpoint [%@].", endpoint);    
+    //NSLog(@"*** Start to connect to endpoint [%@].", endpoint);
     zmqTSSSocket = [zmqTSSContext socketWithType:ZMQ_DEALER];
     
     NSData* uuIDData=[uuID dataUsingEncoding: [NSString defaultCStringEncoding] ];
@@ -68,7 +68,7 @@
     //初始化和启动通信模块
     zmqTSSContext = [[ZMQContext alloc] initWithIOThreads:1U];
     //static NSString *const kEndpoint = endpoint;//@"tcp://42.121.18.140:6001";
-    NSLog(@"*** Start to connect to endpoint [%@].", endpoint);
+    //NSLog(@"*** Start to connect to endpoint [%@].", endpoint);
     zmqTSSSocket = [zmqTSSContext socketWithType:ZMQ_DEALER];
     
     NSData* uuIDData=[uuID dataUsingEncoding: [NSString defaultCStringEncoding] ];
@@ -78,12 +78,12 @@
     BOOL didBind = [zmqTSSSocket connectToEndpoint:endpoint];
     if (!didBind)
     {
-        NSLog(@"*** Failed to connect to endpoint [%@].", endpoint);
+        //NSLog(@"*** Failed to connect to endpoint [%@].", endpoint);
         return nil;
     }
     else
     {
-        NSLog(@"*** Successed to connected to endpoint [%@].", endpoint);
+        //NSLog(@"*** Successed to connected to endpoint [%@].", endpoint);
     }
     
     RttGOprRcvTSS *pRcvThread = [[RttGOprRcvTSS alloc] initWithZMQ:zmqTSSContext andSocket:zmqTSSSocket];

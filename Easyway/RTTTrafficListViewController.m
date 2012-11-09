@@ -54,7 +54,7 @@
         [setmentCTRL setSelectedSegmentIndex:1];
     }
     [self getDatasourceFromRunningDataSet];
-    //[self.navigationItem setTitle:@"拥堵路段列表"];
+    [self.navigationItem setTitle:@"拥堵路段列表"];
 }
 
 - (void)viewDidUnload
@@ -171,7 +171,7 @@
         }
         else
         {
-            NSLog(@"####Out of trafficArray.count; TrafficList####");
+            //NSLog(@"####Out of trafficArray.count; TrafficList####");
         }
         
     }

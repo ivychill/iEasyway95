@@ -3,12 +3,9 @@
 //
 //  Description: 语言合成控件
 //
-//  Created by 陈阳 on 11-2-23.
+//  Created by iflytek on 11-2-23.
 //  Copyright 2011 iFLYTEK. All rights reserved.
 //
-//	Important History:
-//	index	version		date		author		notes
-//	0		1.0.0		2011/2/23	yangchen	创建文件
 
 #import <UIKit/UIKit.h>
 
@@ -30,9 +27,20 @@
 */
 - (void)onSynthesizerEnd:(IFlySynthesizerControl *)iFlySynthesizerControl theError:(SpeechError) error;
 
-//xlhou add 20120305
+/*
+	 @function	onSynthesizerBufferProgress
+	 @abstract	缓冲进度
+	 @discussion	
+	 @param	
+*/
 - (void)onSynthesizerBufferProgress:(float)bufferProgress;
 
+/*
+	 @function	onSynthesizerPlayProgress
+	 @abstract	播放进度
+	 @discussion	
+	 @param	
+*/
 - (void)onSynthesizerPlayProgress:(float)playProgress;
 
 @end
@@ -54,7 +62,7 @@
 	@discussion	
 	@param		initParam:appID－使用令牌，需要到科大讯飞云网站上申请
 */
-- (id)initWithOrigin:(CGPoint)origin theInitParam:(NSString *)initParam;
+- (id)initWithOrigin:(CGPoint)origin initParam:(NSString *)initParam;
 
 /*
 	@function	setText
@@ -63,7 +71,7 @@
 	@param		text -	待合成的文本 
                 theParams － 设置引擎参数，“ent=引擎参数”，无特殊需要可设为nil
 */
-- (void)setText:(NSString *)text theParams:(NSString *)params;
+- (void)setText:(NSString *)text params:(NSString *)params;
 
 /*
 	 @function	setSampleRate
@@ -155,15 +163,6 @@
 
 
 /*
- @function	replay
- @abstract	重新播放
- @discussion	
- @param		
- */
-- (void) replay;
-
-
-/*
 	 @function	getUpflow
 	 @abstract	查询流量
 	 @discussion	
@@ -186,4 +185,12 @@
  @param:         
  */
 - (void) setShowLog:(BOOL)param;
+/*
+    @function: getVersion
+    @abstract: 获取版本号
+    @discussion:
+    @param:
+    @return :  返回SDK的版本号
+ */
+- (NSString *) getVersion;
 @end

@@ -54,7 +54,8 @@
                                @"server_url=%@,appid=%@",ENGINE_URL,APPID];
         
         // 合成控件
-        iFlySynthesizerControl = [[IFlySynthesizerControl alloc] initWithOrigin:H_CONTROL_ORIGIN theInitParam:initParam];
+        //[IFlySynthesizerControl alloc] initWithOrigin:<#(CGPoint)#> initParam:<#(NSString *)#>
+        iFlySynthesizerControl = [[IFlySynthesizerControl alloc] initWithOrigin:H_CONTROL_ORIGIN initParam:initParam];
         iFlySynthesizerControl.delegate = self;
         //[self.view addSubview:iFlySynthesizerControl];
         
@@ -81,7 +82,7 @@
 #if defined(DEBUG)
             if (hiTTSArray.count >0 || miTTSArray.count >0 || loTTSArray.count >0)
             {
-                NSLog(@"into TTS synthinize loop, hi=%d, mi=%d, lo=%d", hiTTSArray.count, miTTSArray.count, loTTSArray.count);
+                //NSLog(@"into TTS synthinize loop, hi=%d, mi=%d, lo=%d", hiTTSArray.count, miTTSArray.count, loTTSArray.count);
             }
 #endif
             if (isInProgress)
@@ -90,7 +91,7 @@
                 {
                     [iFlySynthesizerControl cancel];
                     isInProgress = NO;
-                    NSLog(@"高优先级抢占");
+                    //NSLog(@"高优先级抢占");
                     //这里不紧接着播，是因为讯飞API需要先等待一段时间才能继续处理，否则失败
                 }
                 else
@@ -99,7 +100,7 @@
                     progressTimer--;   //防止异常的超时保护，初始设置建议为30S
                     if (progressTimer ==0)
                     {
-                        NSLog(@"语音合成响应超时");
+                        //NSLog(@"语音合成响应超时");
                         [iFlySynthesizerControl cancel];
                         isInProgress = NO;
                     }
@@ -121,7 +122,7 @@
             {
                 //发送合成请求；
                 NSString *strTTS =  [[NSString alloc] initWithString:[miTTSArray objectAtIndex:0]];
-                NSLog(@"Traffic Array Count=%d", miTTSArray.count);
+                //NSLog(@"Traffic Array Count=%d", miTTSArray.count);
                 [self startSynTTS:strTTS];
                 [miTTSArray removeObjectAtIndex:0];
                 continue;
@@ -131,7 +132,7 @@
             {
                 //发送合成请求；
                 NSString *strTTS =  [[NSString alloc] initWithString:[loTTSArray objectAtIndex:0]];
-                NSLog(@"Traffic Array Count=%d", loTTSArray.count);
+                //NSLog(@"Traffic Array Count=%d", loTTSArray.count);
                 [self startSynTTS:strTTS];
                 [loTTSArray removeObjectAtIndex:0];
             }
@@ -143,24 +144,24 @@
 
 - (BOOL) startSynTTS:(NSString*) strInfo
 {
-    NSLog(@"Will Send TTS Request: %@", strInfo);
+    //NSLog(@"Will Send TTS Request: %@", strInfo);
     if ((strInfo == nil) && [strInfo isEqualToString:@""])
     {
         return NO;
     }
     
-    [iFlySynthesizerControl setText:strInfo theParams:nil];
+    [iFlySynthesizerControl setText:strInfo params:nil];
     BOOL ret = [iFlySynthesizerControl start];
     if(ret)
     {
         //[self disableButton];
-        NSLog(@"Begin TTS.....");
+        //NSLog(@"Begin TTS.....");
         isInProgress = YES;
         progressTimer = 60;
     }
     else
     {
-        NSLog(@"Synthesize Fault......");
+        //NSLog(@"Synthesize Fault......");
     }
     
     return ret;
@@ -168,19 +169,19 @@
 
 - (BOOL) startHighPerioritySynTTS:(NSString*) strInfo
 {
-    NSLog(@"Will Send TSS Request");
-    [iFlySynthesizerControl setText:strInfo theParams:nil];
+    //NSLog(@"Will Send TSS Request");
+    [iFlySynthesizerControl setText:strInfo params:nil];
     BOOL ret = [iFlySynthesizerControl start];
     if(ret)
     {
         //[self disableButton];
-        NSLog(@"Begin Hi TTS.....");
+        //NSLog(@"Begin Hi TTS.....");
         isInProgress = YES;
         progressTimer = 60;
     }
     else
     {
-        NSLog(@"Synthesize Fault......");
+        //NSLog(@"Synthesize Fault......");
     }
     
     return ret;
@@ -190,11 +191,11 @@
 //	合成结束回调, mainThread
 - (void)onSynthesizerEnd:(IFlySynthesizerControl *)iFlySynthesizerControl theError:(SpeechError) error
 {
-	NSLog(@"finish.....");
+	//NSLog(@"finish.....");
 	//[self enableButton];
     self.isInProgress = NO;
 	
-	NSLog(@"upFlow:%d,downFlow:%d",[self.iFlySynthesizerControl getUpflow], [self.iFlySynthesizerControl getDownflow]);
+	//NSLog(@"upFlow:%d,downFlow:%d",[self.iFlySynthesizerControl getUpflow], [self.iFlySynthesizerControl getDownflow]);
 }
 //xlhou add 20120305
 - (void)onSynthesizerBufferProgress:(float)bufferProgress

@@ -27,7 +27,7 @@
 @synthesize isDriving;
 @synthesize startPointInfo;
 @synthesize endPointInfo;
-@synthesize historyPathInfoList;
+//@synthesize historyPathInfoList;
 @synthesize lastUserLocation;
 
 //@synthesize filteredRouteTrafficList;
@@ -63,7 +63,7 @@
     startPointInfo = nil;
     endPointInfo = nil;
     isDriving = NO;
-    historyPathInfoList = [[NSMutableArray alloc] init];
+    //historyPathInfoList = [[NSMutableArray alloc] init];
     
     homeAddrInfo = nil;//[[BMKPoiInfo alloc] init];
     
@@ -124,7 +124,7 @@
         BOOL isSaved = NO;
         for (NSString *strSaved in self.searchHistoryArray)
         {
-            NSLog(@"******Saved Search Txt=%@", strSaved);
+            //NSLog(@"******Saved Search Txt=%@", strSaved);
             if([strSaved isEqualToString:searchTxt])
             {
                 isSaved = YES;
@@ -137,7 +137,7 @@
         }
         else
         {
-            NSInteger savedItemCnt = historyPathInfoList.count;
+            NSInteger savedItemCnt = self.searchHistoryArray.count;
             if (savedItemCnt >= 20)
             {
                 [self.searchHistoryArray removeObjectAtIndex:(savedItemCnt-1)];
