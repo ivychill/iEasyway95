@@ -1521,6 +1521,7 @@ static LYSegmentTraffic* defaultLYSegmentTrafficInstance = nil;
 @property (retain) NSString* road;
 @property int64_t timestamp;
 @property (retain) NSMutableArray* mutableSegmentTrafficsList;
+@property (retain) NSString* alias;
 @property (retain) NSString* href;
 @property (retain) NSString* desc;
 @end
@@ -1542,6 +1543,13 @@ static LYSegmentTraffic* defaultLYSegmentTrafficInstance = nil;
 }
 @synthesize timestamp;
 @synthesize mutableSegmentTrafficsList;
+- (BOOL) hasAlias {
+  return !!hasAlias_;
+}
+- (void) setHasAlias:(BOOL) value {
+  hasAlias_ = !!value;
+}
+@synthesize alias;
 - (BOOL) hasHref {
   return !!hasHref_;
 }
@@ -1559,6 +1567,7 @@ static LYSegmentTraffic* defaultLYSegmentTrafficInstance = nil;
 - (void) dealloc {
   self.road = nil;
   self.mutableSegmentTrafficsList = nil;
+  self.alias = nil;
   self.href = nil;
   self.desc = nil;
   [super dealloc];
@@ -1567,6 +1576,7 @@ static LYSegmentTraffic* defaultLYSegmentTrafficInstance = nil;
   if ((self = [super init])) {
     self.road = @"";
     self.timestamp = 0L;
+    self.alias = @"";
     self.href = @"";
     self.desc = @"";
   }
@@ -1612,6 +1622,9 @@ static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
   for (LYSegmentTraffic* element in self.segmentTrafficsList) {
     [output writeMessage:3 value:element];
   }
+  if (self.hasAlias) {
+    [output writeString:4 value:self.alias];
+  }
   if (self.hasDesc) {
     [output writeString:11 value:self.desc];
   }
@@ -1635,6 +1648,9 @@ static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
   }
   for (LYSegmentTraffic* element in self.segmentTrafficsList) {
     size += computeMessageSize(3, element);
+  }
+  if (self.hasAlias) {
+    size += computeStringSize(4, self.alias);
   }
   if (self.hasDesc) {
     size += computeStringSize(11, self.desc);
@@ -1729,6 +1745,9 @@ static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
     }
     [result.mutableSegmentTrafficsList addObjectsFromArray:other.mutableSegmentTrafficsList];
   }
+  if (other.hasAlias) {
+    [self setAlias:other.alias];
+  }
   if (other.hasHref) {
     [self setHref:other.href];
   }
@@ -1768,6 +1787,10 @@ static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
         LYSegmentTraffic_Builder* subBuilder = [LYSegmentTraffic builder];
         [input readMessage:subBuilder extensionRegistry:extensionRegistry];
         [self addSegmentTraffics:[subBuilder buildPartial]];
+        break;
+      }
+      case 34: {
+        [self setAlias:[input readString]];
         break;
       }
       case 90: {
@@ -1840,6 +1863,22 @@ static LYRoadTraffic* defaultLYRoadTrafficInstance = nil;
     result.mutableSegmentTrafficsList = [NSMutableArray array];
   }
   [result.mutableSegmentTrafficsList addObject:value];
+  return self;
+}
+- (BOOL) hasAlias {
+  return result.hasAlias;
+}
+- (NSString*) alias {
+  return result.alias;
+}
+- (LYRoadTraffic_Builder*) setAlias:(NSString*) value {
+  result.hasAlias = YES;
+  result.alias = value;
+  return self;
+}
+- (LYRoadTraffic_Builder*) clearAlias {
+  result.hasAlias = NO;
+  result.alias = @"";
   return self;
 }
 - (BOOL) hasHref {

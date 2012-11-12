@@ -79,12 +79,12 @@
         {
             sleep(1);
             
-#if defined(DEBUG)
-            if (hiTTSArray.count >0 || miTTSArray.count >0 || loTTSArray.count >0)
-            {
-                //NSLog(@"into TTS synthinize loop, hi=%d, mi=%d, lo=%d", hiTTSArray.count, miTTSArray.count, loTTSArray.count);
-            }
-#endif
+//#if defined(DEBUG)
+//            if (hiTTSArray.count >0 || miTTSArray.count >0 || loTTSArray.count >0)
+//            {
+//                NSLog(@"into TTS synthinize loop, hi=%d, mi=%d, lo=%d", hiTTSArray.count, miTTSArray.count, loTTSArray.count);
+//            }
+//#endif
             if (isInProgress)
             {
                 if (hiTTSArray.count > 0) //如果最高优先级有数据，则抢占

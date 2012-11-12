@@ -80,6 +80,8 @@ enum RTTEN_ACTIVITYTYPE {
     NSTimer *mCheckBKJobTimer;
     NSTimer *mFirstTimeInitDelayToDoTimer;
     NSTimer *mSendSampePoints2TSSTimer;
+    NSTimer *mClearOutDateTimer;
+
     
     enum RTTEN_ACTIVITYTYPE mRunningActivity;
 

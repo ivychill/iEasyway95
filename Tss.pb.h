@@ -468,20 +468,24 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 @private
   BOOL hasTimestamp_:1;
   BOOL hasRoad_:1;
+  BOOL hasAlias_:1;
   BOOL hasHref_:1;
   BOOL hasDesc_:1;
   int64_t timestamp;
   NSString* road;
+  NSString* alias;
   NSString* href;
   NSString* desc;
   NSMutableArray* mutableSegmentTrafficsList;
 }
 - (BOOL) hasRoad;
 - (BOOL) hasTimestamp;
+- (BOOL) hasAlias;
 - (BOOL) hasHref;
 - (BOOL) hasDesc;
 @property (readonly, retain) NSString* road;
 @property (readonly) int64_t timestamp;
+@property (readonly, retain) NSString* alias;
 @property (readonly, retain) NSString* href;
 @property (readonly, retain) NSString* desc;
 - (NSArray*) segmentTrafficsList;
@@ -537,6 +541,11 @@ BOOL LYTrafficSub_LYPubTypeIsValidValue(LYTrafficSub_LYPubType value);
 - (LYRoadTraffic_Builder*) addSegmentTraffics:(LYSegmentTraffic*) value;
 - (LYRoadTraffic_Builder*) addAllSegmentTraffics:(NSArray*) values;
 - (LYRoadTraffic_Builder*) clearSegmentTrafficsList;
+
+- (BOOL) hasAlias;
+- (NSString*) alias;
+- (LYRoadTraffic_Builder*) setAlias:(NSString*) value;
+- (LYRoadTraffic_Builder*) clearAlias;
 
 - (BOOL) hasHref;
 - (NSString*) href;

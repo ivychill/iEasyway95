@@ -217,6 +217,7 @@
     mCheckBKJobTimer = nil;
     mFirstTimeInitDelayToDoTimer = nil;
     mSendSampePoints2TSSTimer = nil;
+    mClearOutDateTimer = nil;
 }
 
 - (void) initBaiduMap
@@ -652,6 +653,7 @@
         [self sendChechinInfo2TSS];
         [self detectPath];
         [self setSendSampePoints2TSSTimer];
+        [self setClearOutDateTimer];
     }
 }
 
@@ -688,6 +690,34 @@
         [mSpeedSamplePoints removeAllObjects];
     }
 }
+
+//定时清理路况
+- (void) setClearOutDateTimer
+{
+    [self stopClearOutDateTimer];
+    
+    mClearOutDateTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(didClearOutDateTraffic) userInfo:nil repeats:YES];
+}
+
+- (void) stopClearOutDateTimer
+{
+    if (mClearOutDateTimer)
+    {
+        [mClearOutDateTimer invalidate];
+        mClearOutDateTimer = nil;
+    }
+}
+
+- (void) didClearOutDateTraffic
+{
+    [runningDataset.trafficContainer clearOutofDateTrafficData4Route];//清理超时的路况信息
+    [runningDataset.trafficContainer clearOutofDateTrafficData4Hot];  //清理超时的路况信息
+
+    [self CheckAndUpdateTrafficListView];
+    [self setDestinationTrafficSegCnt:runningDataset.trafficContainer.filteredRouteTrafficList.count];
+    [mMapView DrawTrafficPolyline:runningDataset.trafficContainer.filteredRouteTrafficList];
+}
+
 
 
 #pragma mark -
@@ -988,7 +1018,11 @@
             
             
             //获取路名
-            NSString *pKeyPtString =  [[NSString alloc] initWithString:mMapView.currentlySelectedAnnotation.addrString];
+            NSString *pKeyPtString =  @"未知道路";
+            if (mMapView.currentlySelectedAnnotation.addrString != nil)
+            {
+                 pKeyPtString =  [[NSString alloc] initWithString:mMapView.currentlySelectedAnnotation.addrString];
+            }
             NSArray *strArray = [pKeyPtString componentsSeparatedByString:@"\n"];
             NSInteger strCnt = strArray.count;
             NSString *strRdName = @"未知道路";
@@ -1500,6 +1534,7 @@
     
     //清理地图和路况数据
     [mMapView removeAllTrafficPolylines];
+    [self hideTrafficBoard];
 
     [runningDataset.trafficContainer removeAllRouteTraffic];
     [runningDataset.trafficContainer clearOutofDateTrafficData4Hot];
@@ -1738,9 +1773,27 @@
             
             if (nextTrafficDistance < 2000.0) //和下一个拥堵点距离小于2000米就提示关键信息
             {
-                NSString *trafficInfoText = [[NSString alloc] initWithFormat:@"%@", nearestTrffSeg.roadname];
                 
-                [self setTrafficBoardContent:nearestTrffSeg.roadname distance:nextTrafficDistance detail:nearestTrffSeg.detail];
+                NSString *strSpeed;
+                if (nearestTrffSeg.speedKMPH < 5)
+                {
+                    strSpeed = @"严重拥堵";
+                }
+                else
+                {
+                    if (nearestTrffSeg.speedKMPH < 15)
+                    {
+                        strSpeed = @"中度拥堵";
+                    }
+                    else
+                    {
+                        strSpeed = @"轻度拥堵";
+                    }
+                }
+
+                NSString *trafficInfoText = [[NSString alloc] initWithFormat:@"%@，%@", nearestTrffSeg.detail, strSpeed];
+                
+                [self setTrafficBoardContent:nearestTrffSeg.roadname distance:nextTrafficDistance detail:trafficInfoText];
                 [self showTrafficBoard];
                 
                 //NSLog(@"%@", trafficInfoText);
@@ -2334,12 +2387,12 @@
     }
     else if (segCount == 0)
     {
-        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 全线无拥堵",  self.currentlyRouteEndAddr];
+        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 无拥堵信息",  self.currentlyRouteEndAddr];
         [self.uiDestinationLBL setText:strLable];
     }
     else
     {
-        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 无路况信息",  self.currentlyRouteEndAddr];
+        NSString *strLable = [[NSString alloc] initWithFormat:@"%@ 无拥堵信息",  self.currentlyRouteEndAddr];
         [self.uiDestinationLBL setText:strLable];
     }
 }
@@ -3517,7 +3570,7 @@
             
             if (recvPackage.hasTrafficPub)
             {
-                NSLog(@"***************Route ID=%d", recvPackage.trafficPub.routeId);
+                //NSLog(@"***************Route ID=%d", recvPackage.trafficPub.routeId);
                 [self didReceiveTrafficPackage:recvPackage.trafficPub];
             }
             else 
@@ -3532,7 +3585,7 @@
             
             if (recvPackage.hasRetCode)
             {
-                NSLog(@"***************Receive a return code=%d**********", recvPackage.retCode);
+                //NSLog(@"***************Receive a return code=%d**********", recvPackage.retCode);
                 [self didReceiveReturnCode:recvPackage.retCode];
             }
             else
@@ -3570,7 +3623,7 @@
     {
         NSLog(@"Version: %d", checkinInfo.lyMajorRelease);
 
-        if (checkinInfo.lyMajorRelease > 3)
+        if (checkinInfo.lyMajorRelease > 2)
         {
             UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:nil message:@"该版本过低，已经停止服务\n建议立即到APPStore升级新版本"
                                                               delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil,nil];
@@ -3648,39 +3701,39 @@
     [self setDestinationTrafficSegCnt:runningDataset.trafficContainer.filteredRouteTrafficList.count];
 
     
-#warning LOG-TRAFFIC
-#if defined (DEBUG)
-    NSLog(@"---------------Received TrafficInfo--------------");
-    NSLog(@"City Name: %@", pTrafficInfo.city);
-    NSLog(@"RoadCount: %d", pTrafficInfo.roadTrafficsList.count);
-    //localtime((time_t*)(pTrafficInfo.recorded));
-    //NSLog(@"Recorded=%lld", pTrafficInfo.timestamp);
-
-
-    
-    int iSegRdCnt = pTrafficInfo.roadTrafficsList.count;
-    LYRoadTraffic *pRdTrc;
-    for (int i=0; i<iSegRdCnt; i++)
-    {
-        pRdTrc = [pTrafficInfo.roadTrafficsList objectAtIndex:i];
-        NSLog(@"RoadName: %@", pRdTrc.road);
-        NSLog(@"Description:%@", pRdTrc.desc);
-        int iSegCnt = pRdTrc.segmentTrafficsList.count;
-        
-        for (int j=0; j<iSegCnt; j++)
-        {
-            LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
-            NSLog(@"Direction: %d", pSegTrf.direction);
-            NSLog(@"Speed: %d", pSegTrf.speed);
-            NSLog(@"Details: %@", pSegTrf.details);
-            NSLog(@"StartPoint: %f, %f",  pSegTrf.segment.start.lng, pSegTrf.segment.start.lat);
-            NSLog(@"EndPoint: %f, %f", pSegTrf.segment.end.lng, pSegTrf.segment.end.lat);
-            int iSeconds = pSegTrf.timestamp;
-            NSString *recodedTime = [[NSString alloc]initWithUTF8String:(asctime(localtime((time_t*)&iSeconds )))];
-            NSLog(@"TimeStamp formated: %@", recodedTime);
-        }
-    }
-#endif
+//#warning LOG-TRAFFIC
+//#if defined (DEBUG)
+//    NSLog(@"---------------Received TrafficInfo--------------");
+//    NSLog(@"City Name: %@", pTrafficInfo.city);
+//    NSLog(@"RoadCount: %d", pTrafficInfo.roadTrafficsList.count);
+//    //localtime((time_t*)(pTrafficInfo.recorded));
+//    //NSLog(@"Recorded=%lld", pTrafficInfo.timestamp);
+//
+//
+//    
+//    int iSegRdCnt = pTrafficInfo.roadTrafficsList.count;
+//    LYRoadTraffic *pRdTrc;
+//    for (int i=0; i<iSegRdCnt; i++)
+//    {
+//        pRdTrc = [pTrafficInfo.roadTrafficsList objectAtIndex:i];
+//        NSLog(@"RoadName: %@", pRdTrc.road);
+//        NSLog(@"Description:%@", pRdTrc.desc);
+//        int iSegCnt = pRdTrc.segmentTrafficsList.count;
+//        
+//        for (int j=0; j<iSegCnt; j++)
+//        {
+//            LYSegmentTraffic *pSegTrf = [pRdTrc.segmentTrafficsList objectAtIndex:j];
+//            NSLog(@"Direction: %d", pSegTrf.direction);
+//            NSLog(@"Speed: %d", pSegTrf.speed);
+//            NSLog(@"Details: %@", pSegTrf.details);
+//            NSLog(@"StartPoint: %f, %f",  pSegTrf.segment.start.lng, pSegTrf.segment.start.lat);
+//            NSLog(@"EndPoint: %f, %f", pSegTrf.segment.end.lng, pSegTrf.segment.end.lat);
+//            int iSeconds = pSegTrf.timestamp;
+//            NSString *recodedTime = [[NSString alloc]initWithUTF8String:(asctime(localtime((time_t*)&iSeconds )))];
+//            NSLog(@"TimeStamp formated: %@", recodedTime);
+//        }
+//    }
+//#endif
     
 }
 
