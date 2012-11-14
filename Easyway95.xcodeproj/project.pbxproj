@@ -903,7 +903,7 @@
 		843772B015C9159400F807FD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Songhai Ye (8LYV6E3ELF)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Shenzhen Luyun Information Technologies Co., Ltd.";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -911,11 +911,8 @@
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Easyway/Easyway95-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "HUAWEIVER=1";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.2/inc",
 					"$(SRCROOT)/ProtocolBuffLib/Classes000",
@@ -936,9 +933,9 @@
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.2/libs/Release$(EFFECTIVE_PLATFORM_NAME)/libbaidumapapi.a",
 				);
 				PRODUCT_NAME = Easyway95;
-				PROVISIONING_PROFILE = "189D19E7-DFE7-4D38-A6A0-E6AE5F0B6FB9";
+				PROVISIONING_PROFILE = "F348C0BF-645D-44E7-9D69-AC5604D5F174";
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.1/inc $(SRCROOT)/ProtocolBuffLib/Classes $(SRCROOT)/ZMQ";
-				VALID_ARCHS = "armv6 armv7";
+				VALID_ARCHS = armv7;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -946,7 +943,7 @@
 		843772B115C9159400F807FD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Songhai Ye (8LYV6E3ELF)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Shenzhen Luyun Information Technologies Co., Ltd.";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -954,7 +951,7 @@
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Easyway/Easyway95-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "HUAWEIVER=1";
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.2/inc",
 					"$(SRCROOT)/ProtocolBuffLib/Classes000",
@@ -975,9 +972,9 @@
 					"$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.2/libs/Release$(EFFECTIVE_PLATFORM_NAME)/libbaidumapapi.a",
 				);
 				PRODUCT_NAME = Easyway95;
-				PROVISIONING_PROFILE = "189D19E7-DFE7-4D38-A6A0-E6AE5F0B6FB9";
+				PROVISIONING_PROFILE = "F348C0BF-645D-44E7-9D69-AC5604D5F174";
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/BaiduMapApi_Lib_iOS_1.2.1/inc $(SRCROOT)/ProtocolBuffLib/Classes $(SRCROOT)/ZMQ";
-				VALID_ARCHS = "armv6 armv7";
+				VALID_ARCHS = armv7;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

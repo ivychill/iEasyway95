@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "961"
-         endingLineNumber = "961"
+         startingLineNumber = "972"
+         endingLineNumber = "972"
          landmarkName = "-didHideAddrSearchBar:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3954"
-         endingLineNumber = "3954"
+         startingLineNumber = "3969"
+         endingLineNumber = "3969"
          landmarkName = "-ConstructTSSData"
          landmarkType = "5">
       </FileBreakpoint>
@@ -99,11 +99,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1663"
-         endingLineNumber = "1663"
+         startingLineNumber = "1674"
+         endingLineNumber = "1674"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -112,11 +112,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "4021"
-         endingLineNumber = "4021"
+         startingLineNumber = "4036"
+         endingLineNumber = "4036"
          landmarkName = "-ConstructTSSData"
          landmarkType = "5">
       </FileBreakpoint>
@@ -151,11 +151,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3681"
-         endingLineNumber = "3681"
+         startingLineNumber = "3696"
+         endingLineNumber = "3696"
          landmarkName = "-didReceiveTrafficPackage:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -164,11 +164,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3617"
-         endingLineNumber = "3617"
+         startingLineNumber = "3632"
+         endingLineNumber = "3632"
          landmarkName = "-OnRceivePacket:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -177,11 +177,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3615"
-         endingLineNumber = "3615"
+         startingLineNumber = "3630"
+         endingLineNumber = "3630"
          landmarkName = "-OnRceivePacket:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -190,11 +190,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3579"
-         endingLineNumber = "3579"
+         startingLineNumber = "3594"
+         endingLineNumber = "3594"
          landmarkName = "-OnRceivePacket:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -216,11 +216,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1161"
-         endingLineNumber = "1161"
+         startingLineNumber = "1172"
+         endingLineNumber = "1172"
          landmarkName = "-didAddrSearchInputWasChanged:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -229,11 +229,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1130"
-         endingLineNumber = "1130"
+         startingLineNumber = "1141"
+         endingLineNumber = "1141"
          landmarkName = "-didAddrSearchWasPressed:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -333,11 +333,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "3686"
-         endingLineNumber = "3686"
+         startingLineNumber = "3701"
+         endingLineNumber = "3701"
          landmarkName = "-didReceiveTrafficPackage:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -346,11 +346,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1026"
-         endingLineNumber = "1026"
+         startingLineNumber = "1037"
+         endingLineNumber = "1037"
          landmarkName = "-SetRoutePointType:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -359,11 +359,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374150756.891939"
+         timestampString = "374549832.978289"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "439"
-         endingLineNumber = "439"
+         startingLineNumber = "449"
+         endingLineNumber = "449"
          landmarkName = "-initLoadData"
          landmarkType = "5">
       </FileBreakpoint>
@@ -372,11 +372,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "814"
-         endingLineNumber = "814"
+         startingLineNumber = "825"
+         endingLineNumber = "825"
          landmarkName = "-didShowPrefSettingView:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -385,11 +385,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374150756.891939"
+         timestampString = "374549832.978289"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "600"
-         endingLineNumber = "600"
+         startingLineNumber = "610"
+         endingLineNumber = "610"
          landmarkName = "-didCheckBKJob"
          landmarkType = "5">
       </FileBreakpoint>
@@ -398,11 +398,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1555"
-         endingLineNumber = "1555"
+         startingLineNumber = "1566"
+         endingLineNumber = "1566"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -411,11 +411,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1644"
-         endingLineNumber = "1644"
+         startingLineNumber = "1655"
+         endingLineNumber = "1655"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -424,11 +424,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1603"
-         endingLineNumber = "1603"
+         startingLineNumber = "1614"
+         endingLineNumber = "1614"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -437,11 +437,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1617"
-         endingLineNumber = "1617"
+         startingLineNumber = "1628"
+         endingLineNumber = "1628"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -450,11 +450,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1608"
-         endingLineNumber = "1608"
+         startingLineNumber = "1619"
+         endingLineNumber = "1619"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -463,11 +463,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1605"
-         endingLineNumber = "1605"
+         startingLineNumber = "1616"
+         endingLineNumber = "1616"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -476,11 +476,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1638"
-         endingLineNumber = "1638"
+         startingLineNumber = "1649"
+         endingLineNumber = "1649"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -489,11 +489,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1630"
-         endingLineNumber = "1630"
+         startingLineNumber = "1641"
+         endingLineNumber = "1641"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -502,11 +502,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Easyway/RTTViewController.mm"
-         timestampString = "374401426.335508"
+         timestampString = "374552050.784531"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1646"
-         endingLineNumber = "1646"
+         startingLineNumber = "1657"
+         endingLineNumber = "1657"
          landmarkName = "-mapView:didUpdateUserLocation:"
          landmarkType = "5">
       </FileBreakpoint>

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>zh_CN</string>
 	<key>CFBundleDisplayName</key>
 	<string>路易95</string>
 	<key>CFBundleExecutable</key>
@@ -43,7 +43,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>1.1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIPrerenderedIcon</key>
@@ -52,6 +52,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIStatusBarHidden</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

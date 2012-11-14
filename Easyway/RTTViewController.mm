@@ -223,7 +223,17 @@
 - (void) initBaiduMap
 {
     //初始化百度地图相关
-    RTTMapView *baiduMapView = [[RTTMapView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+    
+    CGRect mainScreenRect = [[UIScreen mainScreen] bounds];
+    //CGSize mainScreenSize = rect_screen.size;
+    //CGFloat scale_screen = [UIScreen mainScreen].scale;
+    
+    //NSLog(@"size=%f, %f", size_screen.width, size_screen.height);
+    //NSLog(@"scale=%f", scale_screen);
+
+    //RTTMapView *baiduMapView = [[RTTMapView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
+    RTTMapView *baiduMapView = [[RTTMapView alloc] initWithFrame:mainScreenRect];
+
     if (!baiduMapView)
     {
         //NSLog(@"Error when init baidu map");
@@ -655,6 +665,7 @@
         [self setSendSampePoints2TSSTimer];
         [self setClearOutDateTimer];
     }
+    [mSwipeBar toggle:YES];
 }
 
 
@@ -2079,6 +2090,10 @@
     RTTToolbarView *toolbarView = [[[NSBundle mainBundle] loadNibNamed:@"RTTToolbarView" owner:self options:nil] lastObject];
     [toolbarView setDelegate:self];
     [swipeBar setBarView:toolbarView];
+    
+    //[mSwipeBar toggle:YES];
+    //[mSwipeBar toggle:NO];
+
  
 #if defined (HUAWEIVER)
     //[toolbarView.routeBookmarkBTN setHidden:YES];
